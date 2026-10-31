@@ -44,6 +44,7 @@ export interface MatchEvent {
   readonly zone: PitchZone;
   readonly diceCheck?: DiceCheckResult;
   readonly contestedCheck?: ContestedCheckResult;
+  readonly tacticalAdvantage?: 'SPACE_EXPLOITED' | 'OVERLOAD' | 'OFFSIDE_TRAP_BROKEN' | 'TIGHT_MARKING';
   readonly commentary: string;
   readonly score: { home: number; away: number };
 }
@@ -61,12 +62,16 @@ export interface MatchState {
 
 /**
  * Encuentra el jugador titular más adecuado para una acción según posición.
+ * Si excludeGK es true, jamás devuelve al portero (vital para jugadas fuera del área).
  */
-function getActivePlayer(team: Team, positions: SoccerPosition[]): Player {
+function getActivePlayer(team: Team, positions: SoccerPosition[], excludeGK: boolean = true): Player {
   const starters = team.roster.filter(p => team.lineup.includes(p.id));
   const candidate = starters.find(p => positions.includes(p.position));
-  if (candidate) return candidate;
-  return starters[Math.floor(Math.random() * starters.length)] || team.roster[0];
+  if (candidate && (!excludeGK || candidate.position !== 'GK')) {
+    return candidate;
+  }
+  const pool = excludeGK ? starters.filter(p => p.position !== 'GK') : starters;
+  return pool[Math.floor(Math.random() * pool.length)] || team.roster[0];
 }
 
 export class MatchEngine {
@@ -169,17 +174,23 @@ export class MatchEngine {
     return this.state;
   }
 
-  // --- Resoluciones Tácticas con Tiradas D20 ---
+  // --- Resoluciones Tácticas con Tiradas D20 y Movimientos de Apoyo ---
 
   private resolveBuildUp(atk: Team, def: Team, min: number): MatchEvent {
-    const passer = getActivePlayer(atk, ['CB', 'LB', 'RB', 'GK']);
-    const presser = getActivePlayer(def, ['ST', 'LW', 'RW']);
-    const receiver = getActivePlayer(atk, ['CM', 'CDM', 'CAM', 'LM', 'RM']);
+    // Los porteros NUNCA suben a iniciar pases arriesgados en mediocampo
+    const passer = getActivePlayer(atk, ['CB', 'LB', 'RB'], true);
+    const presser = getActivePlayer(def, ['ST', 'LW', 'RW'], true);
+    const receiver = getActivePlayer(atk, ['CM', 'CDM', 'CAM', 'LM', 'RM'], true);
 
-    const modPass = getAttributeModifier(passer.attributes.dexterity);
+    // Movimiento táctico: ¿El receptor se desmarca ofreciendo línea de pase limpia?
+    const receiverOffersOption = receiver.attributes.intelligence >= 12;
+    const modPass = getAttributeModifier(passer.attributes.dexterity) + (receiverOffersOption ? 1 : 0);
     const modPress = getAttributeModifier(presser.attributes.strength);
 
-    const rollAtk = rollD20(modPass, { rng: this.rng });
+    const rollAtk = rollD20(modPass, {
+      advantage: receiverOffersOption && Math.random() > 0.4,
+      rng: this.rng,
+    });
     const rollDef = rollD20(modPress, { rng: this.rng });
     const check = resolveContestedCheck(rollAtk, rollDef);
 
@@ -195,7 +206,10 @@ export class MatchEngine {
         targetPlayer: receiver,
         zone: 'MIDFIELD',
         contestedCheck: check,
-        commentary: `${passer.name} supera la presión inicial de ${presser.name} y conecta con ${receiver.name} (D20: ${rollAtk.total} vs ${rollDef.total}).`,
+        tacticalAdvantage: receiverOffersOption ? 'SPACE_EXPLOITED' : undefined,
+        commentary: receiverOffersOption
+          ? `${receiver.name} se desmarca ofreciendo apoyo y ${passer.name} conecta un pase limpio superando la presión de ${presser.name} (D20: ${rollAtk.total} vs ${rollDef.total}).`
+          : `${passer.name} aguanta la presión de ${presser.name} y conecta en corto con ${receiver.name}.`,
         score: { ...this.state.score },
       });
     } else {
@@ -211,23 +225,27 @@ export class MatchEngine {
         targetPlayer: receiver,
         zone: 'ATTACKING_THIRD',
         contestedCheck: check,
-        commentary: `¡Robo peligroso! ${presser.name} intercepta la salida de balón de ${passer.name}.`,
+        commentary: `¡Robo en salida! ${presser.name} anticipa la línea de pase de ${passer.name} hacia ${receiver.name}.`,
         score: { ...this.state.score },
       });
     }
   }
 
   private resolveMidfieldPlay(atk: Team, def: Team, min: number): MatchEvent {
-    const playmaker = getActivePlayer(atk, ['CM', 'CAM', 'CDM', 'LM', 'RM']);
-    const defender = getActivePlayer(def, ['CDM', 'CM', 'CB']);
-    const forward = getActivePlayer(atk, ['ST', 'LW', 'RW']);
+    const playmaker = getActivePlayer(atk, ['CM', 'CAM', 'CDM', 'LM', 'RM'], true);
+    const defender = getActivePlayer(def, ['CDM', 'CM', 'CB'], true);
+    const forward = getActivePlayer(atk, ['ST', 'LW', 'RW', 'CAM'], true);
 
+    // Movimiento táctico: ¿El delantero tira un desmarque al hueco a la espalda de los centrales?
+    const runsInBehind = forward.attributes.dexterity >= 13;
     const hasIntTrait = playmaker.traits.includes('SET_PIECE_SPECIALIST') || playmaker.traits.includes('COLD_BLOODED');
+
     const rollPlay = rollD20(getAttributeModifier(playmaker.attributes.intelligence), {
-      advantage: hasIntTrait && Math.random() > 0.5,
+      advantage: (hasIntTrait || runsInBehind) && Math.random() > 0.45,
       rng: this.rng,
     });
-    const rollDef = rollD20(getAttributeModifier(defender.attributes.wisdom), { rng: this.rng });
+    // La defensa balancea y bascula con sabiduría táctica
+    const rollDef = rollD20(getAttributeModifier(defender.attributes.wisdom) + 1, { rng: this.rng });
     const check = resolveContestedCheck(rollPlay, rollDef);
 
     if (check.attackerWon) {
@@ -242,7 +260,10 @@ export class MatchEngine {
         targetPlayer: forward,
         zone: 'ATTACKING_THIRD',
         contestedCheck: check,
-        commentary: `${playmaker.name} filtra un pase medido a ${forward.name} superando a ${defender.name} (D20: ${rollPlay.total} vs ${rollDef.total}).`,
+        tacticalAdvantage: runsInBehind ? 'SPACE_EXPLOITED' : undefined,
+        commentary: runsInBehind
+          ? `¡Desmarque al hueco de ${forward.name}! ${playmaker.name} lee el movimiento y filtra un pase con ventaja táctica (D20: ${rollPlay.total} vs ${rollDef.total}).`
+          : `${playmaker.name} hace circular el balón encontrando a ${forward.name} en tres cuartos de campo.`,
         score: { ...this.state.score },
       });
     } else {
@@ -258,26 +279,28 @@ export class MatchEngine {
         targetPlayer: forward,
         zone: 'MIDFIELD',
         contestedCheck: check,
-        commentary: `${defender.name} lee la intención del pase de ${playmaker.name} y corta la jugada.`,
+        tacticalAdvantage: 'TIGHT_MARKING',
+        commentary: `La defensa rival balancea bien las líneas y ${defender.name} intercepta el pase de ${playmaker.name}.`,
         score: { ...this.state.score },
       });
     }
   }
 
   private resolveAttackingThird(atk: Team, def: Team, min: number): MatchEvent {
-    const winger = getActivePlayer(atk, ['LW', 'RW', 'CAM', 'ST']);
-    const fullBack = getActivePlayer(def, ['LB', 'RB', 'CB']);
+    const winger = getActivePlayer(atk, ['LW', 'RW', 'CAM', 'ST'], true);
+    const fullBack = getActivePlayer(def, ['LB', 'RB', 'CB'], true);
+    const targetStriker = getActivePlayer(atk, ['ST', 'CAM'], true);
 
     const isExplosive = winger.traits.includes('EXPLOSIVE_WINGER') || winger.traits.includes('DRIBBLE_WIZARD');
     const rollWinger = rollD20(getAttributeModifier(winger.attributes.dexterity), {
       advantage: isExplosive && Math.random() > 0.4,
       rng: this.rng,
     });
-    // La defensa en campo grande cuenta con cobertura del central (+2 bono táctico de repliegue)
+    // Cobertura del central (+2 bono táctico de repliegue)
     const rollBack = rollD20(getAttributeModifier(fullBack.attributes.dexterity) + 2, { rng: this.rng });
     const check = resolveContestedCheck(rollWinger, rollBack);
 
-    // Solo un desborde claro (victoria por > 2) penetra al área pequeña; victoria ajustada mantiene balón en 3/4
+    // Solo un desborde claro penetra al área pequeña
     if (check.attackerWon && check.diff >= 3) {
       this.state.ballZone = 'OPPONENT_BOX';
       return this.recordEvent({
@@ -287,22 +310,24 @@ export class MatchEngine {
         defendingTeamId: def.id,
         primaryPlayer: winger,
         secondaryPlayer: fullBack,
+        targetPlayer: targetStriker,
         zone: 'OPPONENT_BOX',
         contestedCheck: check,
         commentary: `¡Gran jugada! ${winger.name} desborda a ${fullBack.name} y pisa el área rival con peligro (D20: ${rollWinger.total} vs ${rollBack.total}).`,
         score: { ...this.state.score },
       });
     } else if (check.attackerWon) {
-      // Retiene el balón en tres cuartos
       return this.recordEvent({
         minute: min,
         type: 'PASS_COMPLETED',
         attackingTeamId: atk.id,
         defendingTeamId: def.id,
         primaryPlayer: winger,
+        secondaryPlayer: fullBack,
+        targetPlayer: targetStriker,
         zone: 'ATTACKING_THIRD',
         contestedCheck: check,
-        commentary: `${winger.name} aguanta la entrada pero la defensa cierra el paso al área. Balón circulando.`,
+        commentary: `${winger.name} aguanta la entrada de ${fullBack.name} y apoya en corto hacia ${targetStriker.name}.`,
         score: { ...this.state.score },
       });
     } else {
@@ -317,16 +342,16 @@ export class MatchEngine {
         secondaryPlayer: winger,
         zone: 'DEFENSIVE_HALF',
         contestedCheck: check,
-        commentary: `Excelente corte de ${fullBack.name} frenando la internada de ${winger.name}.`,
+        commentary: `Excelente corte de ${fullBack.name} cerrando la internada de ${winger.name}.`,
         score: { ...this.state.score },
       });
     }
   }
 
   private resolveBoxShot(atk: Team, def: Team, min: number): MatchEvent {
-    const striker = getActivePlayer(atk, ['ST', 'LW', 'RW', 'CAM']);
-    const keeper = getActivePlayer(def, ['GK']);
-    const defender = getActivePlayer(def, ['CB']);
+    const striker = getActivePlayer(atk, ['ST', 'LW', 'RW', 'CAM'], true);
+    const keeper = getActivePlayer(def, ['GK'], false); // ¡Aquí y solo aquí actúa el portero!
+    const defender = getActivePlayer(def, ['CB'], true);
 
     const isPoacher = striker.traits.includes('POACHER');
     const rollShot = rollD20(getAttributeModifier(striker.attributes.strength), {
@@ -334,12 +359,11 @@ export class MatchEngine {
       rng: this.rng,
     });
 
-    // En F11, el portero tiene cobertura del central (+2 a la defensa del arco)
+    // En F11, el portero tiene cobertura del central
     const defBonus = 2 + getAttributeModifier(defender.attributes.wisdom);
     const rollSave = rollD20(getAttributeModifier(keeper.attributes.dexterity) + defBonus, { rng: this.rng });
     const check = resolveContestedCheck(rollShot, rollSave);
 
-    // Se requiere ganar la tirada enfrentada para marcar
     if (check.attackerWon) {
       if (atk.id === this.state.homeTeam.id) {
         this.state.score.home++;
@@ -375,7 +399,7 @@ export class MatchEngine {
         secondaryPlayer: striker,
         zone: 'DEFENSIVE_HALF',
         contestedCheck: check,
-        commentary: `¡PARADÓN! El guardameta ${keeper.name} salva el gol con una estirada providencial.`,
+        commentary: `¡PARADÓN! El guardameta ${keeper.name} salva el gol bajo palos ante el remate de ${striker.name}.`,
         score: { ...this.state.score },
       });
     }
