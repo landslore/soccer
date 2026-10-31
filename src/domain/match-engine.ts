@@ -40,6 +40,7 @@ export interface MatchEvent {
   readonly defendingTeamId: string | number;
   readonly primaryPlayer?: Player;
   readonly secondaryPlayer?: Player;
+  readonly targetPlayer?: Player;
   readonly zone: PitchZone;
   readonly diceCheck?: DiceCheckResult;
   readonly contestedCheck?: ContestedCheckResult;
@@ -173,6 +174,7 @@ export class MatchEngine {
   private resolveBuildUp(atk: Team, def: Team, min: number): MatchEvent {
     const passer = getActivePlayer(atk, ['CB', 'LB', 'RB', 'GK']);
     const presser = getActivePlayer(def, ['ST', 'LW', 'RW']);
+    const receiver = getActivePlayer(atk, ['CM', 'CDM', 'CAM', 'LM', 'RM']);
 
     const modPass = getAttributeModifier(passer.attributes.dexterity);
     const modPress = getAttributeModifier(presser.attributes.strength);
@@ -189,9 +191,11 @@ export class MatchEngine {
         attackingTeamId: atk.id,
         defendingTeamId: def.id,
         primaryPlayer: passer,
+        secondaryPlayer: presser,
+        targetPlayer: receiver,
         zone: 'MIDFIELD',
         contestedCheck: check,
-        commentary: `${passer.name} supera la presión inicial y conecta con el mediocampo (D20: ${rollAtk.total} vs ${rollDef.total}).`,
+        commentary: `${passer.name} supera la presión inicial de ${presser.name} y conecta con ${receiver.name} (D20: ${rollAtk.total} vs ${rollDef.total}).`,
         score: { ...this.state.score },
       });
     } else {
@@ -204,6 +208,7 @@ export class MatchEngine {
         defendingTeamId: atk.id,
         primaryPlayer: presser,
         secondaryPlayer: passer,
+        targetPlayer: receiver,
         zone: 'ATTACKING_THIRD',
         contestedCheck: check,
         commentary: `¡Robo peligroso! ${presser.name} intercepta la salida de balón de ${passer.name}.`,
@@ -215,6 +220,7 @@ export class MatchEngine {
   private resolveMidfieldPlay(atk: Team, def: Team, min: number): MatchEvent {
     const playmaker = getActivePlayer(atk, ['CM', 'CAM', 'CDM', 'LM', 'RM']);
     const defender = getActivePlayer(def, ['CDM', 'CM', 'CB']);
+    const forward = getActivePlayer(atk, ['ST', 'LW', 'RW']);
 
     const hasIntTrait = playmaker.traits.includes('SET_PIECE_SPECIALIST') || playmaker.traits.includes('COLD_BLOODED');
     const rollPlay = rollD20(getAttributeModifier(playmaker.attributes.intelligence), {
@@ -233,9 +239,10 @@ export class MatchEngine {
         defendingTeamId: def.id,
         primaryPlayer: playmaker,
         secondaryPlayer: defender,
+        targetPlayer: forward,
         zone: 'ATTACKING_THIRD',
         contestedCheck: check,
-        commentary: `${playmaker.name} encuentra el hueco y filtra un balón a tres cuartos de campo (D20: ${rollPlay.total} vs ${rollDef.total}).`,
+        commentary: `${playmaker.name} filtra un pase medido a ${forward.name} superando a ${defender.name} (D20: ${rollPlay.total} vs ${rollDef.total}).`,
         score: { ...this.state.score },
       });
     } else {
@@ -247,9 +254,11 @@ export class MatchEngine {
         attackingTeamId: def.id,
         defendingTeamId: atk.id,
         primaryPlayer: defender,
+        secondaryPlayer: playmaker,
+        targetPlayer: forward,
         zone: 'MIDFIELD',
         contestedCheck: check,
-        commentary: `${defender.name} lee la intención del pase y recupera el control del balón.`,
+        commentary: `${defender.name} lee la intención del pase de ${playmaker.name} y corta la jugada.`,
         score: { ...this.state.score },
       });
     }
