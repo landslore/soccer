@@ -103,3 +103,4 @@ export interface LeagueDatabase {
   readonly groups: CompetitionGroup[];
   readonly teams: Record<string, Team>;
 }
+

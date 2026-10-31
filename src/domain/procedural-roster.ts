@@ -138,3 +138,4 @@ export function getDefaultLineup(roster: Player[], formation: string = '4-3-3'):
 
   return chosenIds.slice(0, 11);
 }
+

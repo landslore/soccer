@@ -140,3 +140,4 @@ export const FixturesList: React.FC = () => {
     </div>
   );
 };
+

@@ -84,3 +84,4 @@ runMonteCarlo().catch(err => {
   console.error('❌ Error en test de balanceo:', err);
   process.exit(1);
 });
+

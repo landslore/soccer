@@ -67,3 +67,4 @@ describe('D20 Rule Engine', () => {
     expect(contested.outcome).toBe('CRITICAL_WIN');
   });
 });
+

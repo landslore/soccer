@@ -132,9 +132,14 @@ async function main() {
 
   const scClasif = santacruzRaw.clasificacion || [];
   for (const row of scClasif) {
-    const teamId = row.id || `sc_${globalTeamIndex}`;
-    const name = row.nombre || `Equipo ${teamId}`;
+    const teamId = row.equipoId || row.id || globalTeamIndex;
+    const name = row.equipo || row.nombre || `Equipo ${teamId}`;
     const badgeUrl = row.escudo || '';
+
+    // Buscar detalles adicionales en el mapa de equipos si existen
+    const teamDetail = santacruzRaw.teams?.[String(teamId)] || {};
+    const defaultField = teamDetail.campo || teamDetail.partidos?.[0]?.campo || 'Torre Nº 5';
+
     const stats: TeamStats = {
       position: row.posicion || 1,
       points: row.puntos || 0,
@@ -159,7 +164,7 @@ async function main() {
       sourceOrigin: 'SANTACRUZ_FUTGAL',
       groupNumber: santacruzGroupNum,
       groupName: santacruzGroupName,
-      defaultField: row.campo || 'Torre Nº 5',
+      defaultField,
       stats,
       roster,
       lineup,

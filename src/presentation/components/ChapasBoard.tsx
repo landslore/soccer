@@ -449,3 +449,4 @@ export const ChapasBoard: React.FC = () => {
     </div>
   );
 };
+

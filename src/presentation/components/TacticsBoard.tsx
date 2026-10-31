@@ -299,3 +299,4 @@ export const TacticsBoard: React.FC = () => {
     </div>
   );
 };
+

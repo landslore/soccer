@@ -165,3 +165,4 @@ export const StandingsTable: React.FC = () => {
     </div>
   );
 };
+
