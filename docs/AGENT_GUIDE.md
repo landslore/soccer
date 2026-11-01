@@ -132,3 +132,13 @@ Durante el partido, la interfaz cuenta con un panel de depuración en tiempo rea
 - Lista todas las opciones tácticas evaluadas con sus puntuaciones de utilidad ($0 - 100$).
 - Detalla la tirada D20 enfrentada ($1d20 + \text{mod}$) y si hubo críticos o ventajas.
 - Si necesitas diagnosticar decisiones anómalas de la IA, abre este panel en la esquina superior derecha del campo.
+
+---
+
+## 5. Registro y Resolución de Gaps Tácticos (`docs/feedbacks/`)
+
+Cada vez que el usuario o un agente identifique una decisión tácticamente absurda, un pase comprometido o una anomalía en el flujo del partido:
+1. **Documentar el gap en `docs/feedbacks/`** creando un archivo `GAP-XXX_nombre_descriptivo.md` con la plantilla oficial de `docs/feedbacks/README.md`.
+2. **Actualizar el índice de `docs/feedbacks/README.md`** marcando el estado (`🟡 PENDIENTE`).
+3. **Antes de modificar `src/domain/match-engine.ts`**: leer la solución técnica propuesta en el gap, implementar las fórmulas (sombra de pase, penalizaciones de utilidad, opciones de despeje) y verificar que `npm run audit:ui` y `npm run test:balance` se mantengan verdes.
+4. **Al resolver el gap**: cambiar su estado a `🟢 RESUELTO` e indicar el commit correspondiente.
