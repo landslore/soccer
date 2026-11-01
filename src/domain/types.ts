@@ -27,6 +27,14 @@ export type PersonalityTrait =
   | 'ANCHOR_TACKLER'        // Pivote destructor (+2 en entradas, riesgo de tarjeta)
   | 'DRIBBLE_WIZARD';       // Mago del regate (ventaja en 1vs1)
 
+export type PlayerPersonalityType = 
+  | 'SOLO_DRIBBLER'       // Regateador nato: busca el 1vs1 y avanzar en conducción independientemente de su posición
+  | 'PASS_MAESTRO'        // Organizador altruista: prioriza pases filtrados, aperturas y distribución asociativa
+  | 'SNIPER_SHOOTER'      // Gatillo fácil: busca disparar a puerta a la mínima opción desde media o larga distancia
+  | 'BOX_TO_BOX_RUNNER'   // Pulmón incansable: desmarques profundos de ruptura y apoyo en ambas áreas
+  | 'SAFETY_FIRST'        // Conservador táctico: asegura la posesión con pases horizontales o retrasados para evitar pérdidas
+  | 'AGGRESSIVE_PRESSER';  // Presionador asfixiante: busca anticipar, encimar y cortar balones con dureza física
+
 export interface Player {
   readonly id: string;
   readonly name: string;
@@ -34,6 +42,7 @@ export interface Player {
   readonly position: SoccerPosition;
   readonly attributes: PlayerAttributes;
   readonly traits: PersonalityTrait[];
+  personality: PlayerPersonalityType;
   stamina: number; // 0 a 100
   morale: number;  // -2 a +2
   cards: { yellow: number; red: boolean };

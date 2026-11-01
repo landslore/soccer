@@ -16,6 +16,18 @@ const __dirname = path.dirname(__filename);
 const SOURCES_ECM_PATH = '/Users/israelvinualeslopez/sources/docs/data.json';
 const SOURCES_SANTACRUZ_PATH = '/Users/israelvinualeslopez/sources/santacruz-2026/docs/data.json';
 const OUTPUT_FILE = path.resolve(__dirname, '../src/data/league-data.json');
+const PUBLIC_BADGES_DIR = path.resolve(__dirname, '../public/badges');
+
+function resolveBadgeUrl(teamKey: string, remoteUrl: string): string {
+  const safeKey = teamKey.replace(/[^a-z0-9_-]/gi, '_').toLowerCase();
+  for (const ext of ['png', 'jpg', 'jpeg', 'webp', 'svg']) {
+    const localFile = path.join(PUBLIC_BADGES_DIR, `${safeKey}.${ext}`);
+    if (fs.existsSync(localFile)) {
+      return `/badges/${safeKey}.${ext}`;
+    }
+  }
+  return remoteUrl;
+}
 
 async function main() {
   console.log('🔄 Iniciando ingestión no invasiva desde sources...');
@@ -49,7 +61,7 @@ async function main() {
         const teamKey = row.equipoKey || row.equipo || `ecm_${row.idEquipo}`;
         const teamId = row.idEquipo || globalTeamIndex;
         const name = row.equipo || row.nombre || teamKey;
-        const badgeUrl = row.escudo || '';
+        const badgeUrl = resolveBadgeUrl(teamKey, row.escudo || '');
 
         const stats: TeamStats = {
           position: row.posicion || 1,
@@ -134,7 +146,7 @@ async function main() {
   for (const row of scClasif) {
     const teamId = row.equipoId || row.id || globalTeamIndex;
     const name = row.equipo || row.nombre || `Equipo ${teamId}`;
-    const badgeUrl = row.escudo || '';
+    const badgeUrl = resolveBadgeUrl(`sc_${teamId}`, row.escudo || '');
 
     // Buscar detalles adicionales en el mapa de equipos si existen
     const teamDetail = santacruzRaw.teams?.[String(teamId)] || {};

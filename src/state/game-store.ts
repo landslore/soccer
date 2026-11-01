@@ -26,6 +26,7 @@ export interface BoardSnapshot {
 export interface MatchAuditStep {
   stepIndex: number;
   minute: number;
+  second?: number;
   event: MatchEvent;
   score: { home: number; away: number };
   ballZone: PitchZone | string;
@@ -205,15 +206,20 @@ export const useGameStore = create<GameState>((set, get) => ({
     let isKey = false;
     let category: MatchAuditStep['keyCategory'] = 'NORMAL';
     let keyLabel = '';
+    const timeLabel = `${event.minute}'${event.second ? ' 30"' : ''}`;
 
     if (event.type === 'GOAL') {
       isKey = true;
       category = 'GOAL';
-      keyLabel = `⚽ Min ${event.minute}' Gol de ${event.primaryPlayer?.name || 'Delantero'} (${event.score.home}-${event.score.away})`;
+      keyLabel = `⚽ Min ${timeLabel} Gol de ${event.primaryPlayer?.name || 'Delantero'} (${event.score.home}-${event.score.away})`;
     } else if (event.type === 'SHOT_SAVED') {
       isKey = true;
       category = 'SAVE';
-      keyLabel = `🧤 Min ${event.minute}' Parada de ${event.primaryPlayer?.name || 'Portero'}`;
+      keyLabel = `🧤 Min ${timeLabel} Parada de ${event.primaryPlayer?.name || 'Portero'}`;
+    } else if (event.type === 'CHANNEL_SPRINT') {
+      isKey = true;
+      category = 'COUNTER';
+      keyLabel = `🚀 Min ${timeLabel} Carrera al córner (${event.targetPlayer?.name || 'Extremo'})`;
     } else if (event.type === 'HALF_TIME') {
       isKey = true;
       category = 'HALFTIME';
@@ -225,17 +231,18 @@ export const useGameStore = create<GameState>((set, get) => ({
     } else if (event.tacticalAdvantage === 'SPACE_EXPLOITED') {
       isKey = true;
       category = 'COUNTER';
-      keyLabel = `⚡ Min ${event.minute}' Contragolpe Rompelíneas`;
+      keyLabel = `⚡ Min ${timeLabel} Contragolpe Rompelíneas`;
     } else if (event.diceCheck?.isCritical || event.contestedCheck?.attacker.isCritical) {
       isKey = true;
       category = 'COUNTER';
-      keyLabel = `🎲 Min ${event.minute}' ¡Nat 20 Crítico!`;
+      keyLabel = `🎲 Min ${timeLabel} ¡Nat 20 Crítico!`;
     }
 
     const nextState = { ...currentMatch.engine.getState() };
     const auditStep: MatchAuditStep = {
       stepIndex: currentMatch.auditTrail.length,
       minute: event.minute,
+      second: event.second || 0,
       event,
       score: { ...nextState.score },
       ballZone: nextState.ballZone,

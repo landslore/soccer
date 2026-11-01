@@ -1,11 +1,21 @@
 import React, { useState } from 'react';
 import { PlayerDecision, TacticalOption } from '../../domain/match-engine';
-import { Brain, ChevronDown, ChevronUp, Eye, EyeOff, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { PlayerPersonalityType } from '../../domain/types';
+import { Brain, ChevronDown, ChevronUp, Eye, EyeOff, ShieldAlert, CheckCircle2, BatteryCharging } from 'lucide-react';
 
 interface DecisionDebuggerProps {
   decision?: PlayerDecision;
   minute: number;
 }
+
+const PERSONALITY_LABELS: Record<PlayerPersonalityType, { label: string; icon: string; color: string }> = {
+  SOLO_DRIBBLER: { label: 'Regateador Nato', icon: '⚡', color: 'bg-amber-500/20 text-amber-300 border-amber-500/50' },
+  PASS_MAESTRO: { label: 'Maestro del Pase', icon: '🎯', color: 'bg-sky-500/20 text-sky-300 border-sky-500/50' },
+  SNIPER_SHOOTER: { label: 'Francotirador', icon: '🚀', color: 'bg-rose-500/20 text-rose-300 border-rose-500/50' },
+  BOX_TO_BOX_RUNNER: { label: 'Box-to-Box', icon: '🏃', color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50' },
+  SAFETY_FIRST: { label: 'Juego Seguro', icon: '🛡️', color: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/50' },
+  AGGRESSIVE_PRESSER: { label: 'Presión Feroz', icon: '⚔️', color: 'bg-orange-500/20 text-orange-300 border-orange-500/50' },
+};
 
 export const DecisionDebugger: React.FC<DecisionDebuggerProps> = ({ decision, minute }) => {
   const [isVisible, setIsVisible] = useState(true);
@@ -14,6 +24,15 @@ export const DecisionDebugger: React.FC<DecisionDebuggerProps> = ({ decision, mi
   if (!decision) return null;
 
   const { decisionMaker, chosenOption, evaluatedOptions, tacticalContext } = decision;
+  const personalityMeta = PERSONALITY_LABELS[decisionMaker.personality] || {
+    label: decisionMaker.personality,
+    icon: '👤',
+    color: 'bg-slate-700 text-slate-200 border-slate-600',
+  };
+
+  const stamina = decisionMaker.stamina ?? 100;
+  const isFatigued = stamina < 35;
+  const fatiguePenalty = stamina < 15 ? -2 : stamina < 30 ? -1 : 0;
 
   return (
     <div className="bg-slate-900 border-2 border-indigo-500/80 rounded-xl shadow-2xl overflow-hidden transition-all text-white my-4">
@@ -59,22 +78,63 @@ export const DecisionDebugger: React.FC<DecisionDebuggerProps> = ({ decision, mi
 
       {isVisible && isExpanded && (
         <div className="p-4 space-y-4 text-xs">
-          {/* Ficha rápida del Decisor */}
+          {/* Ficha rápida del Decisor: Personalidad, Atributos y Fatiga */}
           <div className="bg-slate-800/80 rounded-lg p-3 border border-slate-700 flex flex-wrap items-center justify-between gap-3">
-            <div>
+            <div className="space-y-1">
               <div className="text-[10px] text-slate-400 uppercase font-bold">Contexto Táctico:</div>
               <div className="text-sm font-bold text-slate-100">{tacticalContext}</div>
+              <div className="flex items-center gap-2 mt-1">
+                <span className={`text-[10px] px-2 py-0.5 rounded border font-semibold flex items-center gap-1 ${personalityMeta.color}`}>
+                  <span>{personalityMeta.icon}</span>
+                  <span>Personalidad: {personalityMeta.label}</span>
+                </span>
+              </div>
             </div>
-            <div className="flex items-center gap-3 text-[11px]">
-              <span className="bg-slate-700 px-2 py-1 rounded text-slate-200">
-                INT: <strong className="text-white">{decisionMaker.attributes.intelligence}</strong>
-              </span>
-              <span className="bg-slate-700 px-2 py-1 rounded text-slate-200">
-                DES: <strong className="text-white">{decisionMaker.attributes.dexterity}</strong>
-              </span>
-              <span className="bg-slate-700 px-2 py-1 rounded text-slate-200">
-                FUE: <strong className="text-white">{decisionMaker.attributes.strength}</strong>
-              </span>
+
+            {/* Atributos y Barra de Stamina */}
+            <div className="flex flex-col items-end gap-2">
+              <div className="flex items-center gap-2 text-[11px]">
+                <span className="bg-slate-700 px-2 py-1 rounded text-slate-200" title="Inteligencia / Visión">
+                  INT: <strong className="text-white">{decisionMaker.attributes.intelligence}</strong>
+                </span>
+                <span className="bg-slate-700 px-2 py-1 rounded text-slate-200" title="Destreza / Velocidad">
+                  DES: <strong className="text-white">{decisionMaker.attributes.dexterity}</strong>
+                </span>
+                <span className="bg-slate-700 px-2 py-1 rounded text-slate-200" title="Fuerza Física">
+                  FUE: <strong className="text-white">{decisionMaker.attributes.strength}</strong>
+                </span>
+                <span className="bg-slate-700 px-2 py-1 rounded text-slate-200" title="Constitución / Resistencia">
+                  CON: <strong className="text-white">{decisionMaker.attributes.constitution}</strong>
+                </span>
+              </div>
+
+              {/* Medidor de Energía */}
+              <div className="flex items-center gap-2 text-[11px]">
+                <span className="text-[10px] text-slate-400 flex items-center gap-1">
+                  <BatteryCharging className="w-3.5 h-3.5 text-emerald-400" />
+                  Energía:
+                </span>
+                <div className="w-24 bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-700">
+                  <div
+                    className={`h-full ${
+                      stamina > 65
+                        ? 'bg-emerald-400'
+                        : stamina > 35
+                        ? 'bg-amber-400'
+                        : 'bg-rose-500 animate-pulse'
+                    }`}
+                    style={{ width: `${stamina}%` }}
+                  />
+                </div>
+                <span className={`font-mono font-bold ${isFatigued ? 'text-rose-400' : 'text-slate-200'}`}>
+                  {stamina}%
+                </span>
+                {fatiguePenalty < 0 && (
+                  <span className="text-[9px] bg-rose-950 text-rose-300 border border-rose-700 px-1.5 py-0.2 rounded font-mono font-bold">
+                    Penaliz. {fatiguePenalty} D20
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 

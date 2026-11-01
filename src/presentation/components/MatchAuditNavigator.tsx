@@ -25,6 +25,14 @@ export const MatchAuditNavigator: React.FC = () => {
   const currentStepIdx = isInspecting ? inspectingStepIndex : auditTrail.length - 1;
   const currentStep: MatchAuditStep | undefined = auditTrail[currentStepIdx];
   const liveMinute = state.currentMinute;
+  const liveSecond = state.currentSecond;
+
+  const formatMatchTime = (min: number, sec?: number) => {
+    if (sec !== undefined && sec > 0) {
+      return `${min}' ${sec}"`;
+    }
+    return `${min}' 00"`;
+  };
 
   // Filtrar momentos clave para el carrusel de accesos rápidos
   const keyMoments = auditTrail.filter((s) => s.isKeyMoment);
@@ -49,7 +57,7 @@ export const MatchAuditNavigator: React.FC = () => {
                     : 'bg-rose-600 text-white animate-pulse'
                 }`}
               >
-                {isInspecting ? `Minuto ${currentStep?.minute}' (Paso ${currentStepIdx + 1}/${auditTrail.length})` : `🔴 DIRECTO • ${liveMinute}'`}
+                {isInspecting ? `Minuto ${formatMatchTime(currentStep?.minute ?? 0, currentStep?.second)} (Paso ${currentStepIdx + 1}/${auditTrail.length})` : `🔴 DIRECTO • ${formatMatchTime(liveMinute, liveSecond)}`}
               </span>
             </div>
             <div className="text-[11px] text-slate-400">
@@ -58,7 +66,7 @@ export const MatchAuditNavigator: React.FC = () => {
                   Revisando fotograma exacto: <strong className="text-slate-200">{currentStep?.event.type}</strong> ({currentStep?.score.home} - {currentStep?.score.away})
                 </span>
               ) : (
-                <span>Historial completo auditado ({auditTrail.length} minutos registrados). Navega libremente a cualquier jugada.</span>
+                <span>Historial completo auditado ({auditTrail.length} micro-ticks registrados). Navega libremente a cualquier jugada.</span>
               )}
             </div>
           </div>
@@ -74,7 +82,7 @@ export const MatchAuditNavigator: React.FC = () => {
                 title="Borra los minutos posteriores y continúa simulando el partido desde este instante"
               >
                 <Play className="w-4 h-4 fill-slate-950" />
-                Reanudar Partido desde aquí (Min {currentStep?.minute}')
+                Reanudar Partido desde aquí (Min {formatMatchTime(currentStep?.minute ?? 0, currentStep?.second)})
               </button>
 
               <button
@@ -92,11 +100,11 @@ export const MatchAuditNavigator: React.FC = () => {
       {/* 2. Barra de Navegación Temporal (Scrubber Slider) */}
       <div className="py-3">
         <div className="flex items-center justify-between text-xs text-slate-400 font-mono mb-1.5">
-          <span>0' Saque</span>
+          <span>0' 00" Saque</span>
           <span className="font-bold text-slate-200">
-            Paso inspeccionado: Minuto {currentStep?.minute}'
+            Paso inspeccionado: Minuto {formatMatchTime(currentStep?.minute ?? 0, currentStep?.second)}
           </span>
-          <span>{liveMinute}' Último minuto</span>
+          <span>{formatMatchTime(liveMinute, liveSecond)} Último instante</span>
         </div>
 
         <input

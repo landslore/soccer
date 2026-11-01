@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useGameStore } from '../../state/game-store';
 import { Calendar, Play, MapPin, Clock } from 'lucide-react';
+import { TeamBadge } from './TeamBadge';
 
 export const FixturesList: React.FC = () => {
   const { database, selectedGroupId, startMatch, setActiveTab } = useGameStore();
@@ -84,13 +85,7 @@ export const FixturesList: React.FC = () => {
                   <div className="flex items-center justify-between gap-3 my-2">
                     {/* Local */}
                     <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                      {homeTeam.badgeUrl ? (
-                        <img src={homeTeam.badgeUrl} alt={homeTeam.name} className="w-8 h-8 object-contain flex-shrink-0" />
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-blue-100 text-valle-blue flex items-center justify-center font-bold text-xs flex-shrink-0">
-                          {homeTeam.name.slice(0, 2)}
-                        </div>
-                      )}
+                      <TeamBadge name={homeTeam.name} badgeUrl={homeTeam.badgeUrl} size="md" />
                       <span className="font-bold text-slate-900 text-sm truncate">{homeTeam.name}</span>
                     </div>
 
@@ -108,13 +103,7 @@ export const FixturesList: React.FC = () => {
                     {/* Visitante */}
                     <div className="flex items-center justify-end gap-2.5 flex-1 min-w-0 text-right">
                       <span className="font-bold text-slate-900 text-sm truncate">{awayTeam.name}</span>
-                      {awayTeam.badgeUrl ? (
-                        <img src={awayTeam.badgeUrl} alt={awayTeam.name} className="w-8 h-8 object-contain flex-shrink-0" />
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-red-100 text-red-700 flex items-center justify-center font-bold text-xs flex-shrink-0">
-                          {awayTeam.name.slice(0, 2)}
-                        </div>
-                      )}
+                      <TeamBadge name={awayTeam.name} badgeUrl={awayTeam.badgeUrl} size="md" />
                     </div>
                   </div>
 

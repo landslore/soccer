@@ -93,19 +93,21 @@ describe('D20 Rule Engine', () => {
     const teamB = createMockTeam('2', 'Team B');
     const engine = new MatchEngine(teamA, teamB, 12345);
 
-    // Simular 20 pasos
+    // Simular 20 micro-ticks (10 minutos)
     for (let i = 0; i < 20; i++) {
       engine.step();
     }
-    expect(engine.getState().currentMinute).toBe(20);
-    const minute10Score = engine.getState().events.find(e => e.minute === 10)?.score || { home: 0, away: 0 };
+    expect(engine.getState().currentMinute).toBe(10);
+    expect(engine.getState().currentTick).toBe(20);
+    const step10Score = engine.getState().events[10]?.score || { home: 0, away: 0 };
 
     // Rebobinar al paso 10
     const ok = engine.rewindToStep(10);
     expect(ok).toBe(true);
-    expect(engine.getState().currentMinute).toBe(10);
-    expect(engine.getState().score).toEqual(minute10Score);
-    expect(engine.getState().events.length).toBe(11); // Minuto 0 + 10 minutos
+    expect(engine.getState().currentMinute).toBe(5);
+    expect(engine.getState().currentTick).toBe(10);
+    expect(engine.getState().score).toEqual(step10Score);
+    expect(engine.getState().events.length).toBe(11); // Tick 0 + 10 ticks
   });
 });
 

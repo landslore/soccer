@@ -1,9 +1,10 @@
 import React from 'react';
 import { useGameStore } from '../../state/game-store';
-import { Trophy, Shield } from 'lucide-react';
+import { Trophy } from 'lucide-react';
+import { TeamBadge } from './TeamBadge';
 
 export const StandingsTable: React.FC = () => {
-  const { database, selectedGroupId, userTeamId, setSelectedGroup, setUserTeam, startMatch, setActiveTab } = useGameStore();
+  const { database, selectedGroupId, userTeamId, setUserTeam, startMatch, setActiveTab } = useGameStore();
 
   const currentGroup = database.groups.find((g) => g.number === selectedGroupId) || database.groups[0];
 
@@ -12,31 +13,15 @@ export const StandingsTable: React.FC = () => {
       <div className="bg-white rounded-xl shadow-md p-5 border border-slate-200 mb-6">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-valle-yellow rounded-lg text-slate-900">
+            <div className="p-2 bg-valle-yellow rounded-lg text-slate-900 shadow-sm">
               <Trophy className="w-6 h-6" />
             </div>
             <div>
               <h2 className="text-xl font-black text-slate-900">{currentGroup.name}</h2>
               <p className="text-xs text-slate-500">
-                Clasificación de Fútbol 11 • {currentGroup.teams.length} Clubes
+                Clasificación Oficial de Fútbol 11 • {currentGroup.teams.length} Clubes en competición
               </p>
             </div>
-          </div>
-
-          {/* Selector de Grupo */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-600">Cambiar Grupo:</span>
-            <select
-              value={selectedGroupId}
-              onChange={(e) => setSelectedGroup(Number(e.target.value))}
-              className="bg-slate-50 border border-slate-300 rounded px-3 py-1.5 text-xs font-bold text-slate-800"
-            >
-              {database.groups.map((g) => (
-                <option key={g.number} value={g.number}>
-                  {g.name}
-                </option>
-              ))}
-            </select>
           </div>
         </div>
 
@@ -88,11 +73,7 @@ export const StandingsTable: React.FC = () => {
                     </td>
                     <td className="py-2.5 px-3">
                       <div className="flex items-center gap-2.5">
-                        {team.badgeUrl ? (
-                          <img src={team.badgeUrl} alt={team.name} className="w-6 h-6 object-contain flex-shrink-0" />
-                        ) : (
-                          <Shield className="w-5 h-5 text-slate-400 flex-shrink-0" />
-                        )}
+                        <TeamBadge name={team.name} badgeUrl={team.badgeUrl} size="sm" />
                         <span className="font-bold text-slate-900 truncate max-w-[220px]">
                           {team.name} {isUserTeam && <span className="text-[10px] text-valle-blue ml-1">(Tu Club)</span>}
                         </span>

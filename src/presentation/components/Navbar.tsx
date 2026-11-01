@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useGameStore, ActiveTab } from '../../state/game-store';
 import { Trophy, Users, Shield, Play, ChevronDown, Check } from 'lucide-react';
+import { TeamBadge } from './TeamBadge';
 
 export const Navbar: React.FC = () => {
   const {
@@ -49,11 +50,7 @@ export const Navbar: React.FC = () => {
               onClick={() => setIsTeamModalOpen(true)}
               className="flex items-center gap-2 bg-valle-blue-dark hover:bg-blue-900 px-3 py-1.5 rounded-lg border border-blue-400/40 text-sm font-semibold transition-all shadow-inner"
             >
-              {currentTeam?.badgeUrl ? (
-                <img src={currentTeam.badgeUrl} alt={currentTeam.name} className="w-6 h-6 object-contain" />
-              ) : (
-                <Shield className="w-5 h-5 text-valle-yellow" />
-              )}
+              <TeamBadge name={currentTeam?.name || 'Club'} badgeUrl={currentTeam?.badgeUrl} size="sm" />
               <div className="text-left">
                 <div className="text-xs text-blue-200">Tu Club:</div>
                 <div className="font-bold text-white max-w-[180px] truncate">{currentTeam?.name || 'Selecciona Equipo'}</div>
@@ -156,13 +153,7 @@ export const Navbar: React.FC = () => {
                         : 'border-slate-200 hover:border-blue-300 hover:bg-slate-50'
                     }`}
                   >
-                    {t.badgeUrl ? (
-                      <img src={t.badgeUrl} alt={t.name} className="w-10 h-10 object-contain flex-shrink-0" />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-blue-100 text-valle-blue flex items-center justify-center font-bold text-sm">
-                        {t.name.slice(0, 2)}
-                      </div>
-                    )}
+                    <TeamBadge name={t.name} badgeUrl={t.badgeUrl} size="lg" />
                     <div className="min-w-0 flex-1">
                       <div className="font-bold text-slate-900 text-sm truncate">{t.name}</div>
                       <div className="text-xs text-slate-500">

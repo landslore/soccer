@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useGameStore } from '../../state/game-store';
 import { Player, F11Formation } from '../../domain/types';
 import { getAttributeModifier } from '../../domain/d20';
-import { Shield, Sparkles, Award } from 'lucide-react';
+import { Sparkles, Award } from 'lucide-react';
+import { TeamBadge } from './TeamBadge';
 
 export const TacticsBoard: React.FC = () => {
   const { database, userTeamId, updateUserTactics, swapPlayers, setActiveTab, startMatch } = useGameStore();
@@ -78,11 +79,7 @@ export const TacticsBoard: React.FC = () => {
       {/* Cabecera del club y botones rápidos */}
       <div className="bg-white rounded-xl shadow-md p-4 mb-6 flex flex-wrap items-center justify-between gap-4 border-l-8 border-valle-blue">
         <div className="flex items-center gap-4">
-          {currentTeam.badgeUrl ? (
-            <img src={currentTeam.badgeUrl} alt={currentTeam.name} className="w-14 h-14 object-contain" />
-          ) : (
-            <Shield className="w-14 h-14 text-valle-blue" />
-          )}
+          <TeamBadge name={currentTeam.name} badgeUrl={currentTeam.badgeUrl} size="xl" />
           <div>
             <h2 className="text-xl font-black text-slate-900">{currentTeam.name}</h2>
             <p className="text-xs text-slate-500 font-medium">

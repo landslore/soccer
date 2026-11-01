@@ -1,4 +1,4 @@
-import { Player, PlayerAttributes, PersonalityTrait, SoccerPosition } from './types';
+import { Player, PlayerAttributes, PersonalityTrait, PlayerPersonalityType, SoccerPosition } from './types';
 import { createPRNG } from './d20';
 
 const FIRST_NAMES = [
@@ -103,6 +103,31 @@ export function generateTeamRoster(teamId: string | number, teamSeed: number): P
         }
       }
 
+      // Asignar arquetipo de personalidad conductual
+      let personality: PlayerPersonalityType = 'SAFETY_FIRST';
+      const randP = rng();
+      if (traits.includes('DRIBBLE_WIZARD') || traits.includes('EXPLOSIVE_WINGER') || (baseStats.dexterity >= 14 && randP > 0.4)) {
+        personality = 'SOLO_DRIBBLER';
+      } else if (traits.includes('POACHER') || (baseStats.strength >= 14 && randP > 0.45)) {
+        personality = 'SNIPER_SHOOTER';
+      } else if (baseStats.intelligence >= 13 && randP > 0.35) {
+        personality = 'PASS_MAESTRO';
+      } else if (baseStats.constitution >= 13 && randP > 0.35) {
+        personality = 'BOX_TO_BOX_RUNNER';
+      } else if (traits.includes('ANCHOR_TACKLER') || ((profile.pos === 'CB' || profile.pos === 'CDM') && baseStats.strength >= 13)) {
+        personality = 'AGGRESSIVE_PRESSER';
+      } else {
+        const fallbackPersonalities: PlayerPersonalityType[] = [
+          'SOLO_DRIBBLER',
+          'PASS_MAESTRO',
+          'SNIPER_SHOOTER',
+          'BOX_TO_BOX_RUNNER',
+          'SAFETY_FIRST',
+          'AGGRESSIVE_PRESSER',
+        ];
+        personality = fallbackPersonalities[Math.floor(randP * fallbackPersonalities.length)];
+      }
+
       roster.push({
         id: `ply_${teamId}_${squadNumber}`,
         name,
@@ -110,6 +135,7 @@ export function generateTeamRoster(teamId: string | number, teamSeed: number): P
         position: profile.pos,
         attributes: baseStats,
         traits,
+        personality,
         stamina: 100,
         morale: 0,
         cards: { yellow: 0, red: false }

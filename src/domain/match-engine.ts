@@ -1,4 +1,4 @@
-import { Player, Team, SoccerPosition } from './types';
+import { Player, Team, SoccerPosition, PlayerPersonalityType } from './types';
 import { 
   rollD20, 
   getAttributeModifier, 
@@ -23,6 +23,10 @@ export type MatchEventType =
   | 'DRIBBLE_TACKLED'
   | 'CROSS_COMPLETED'
   | 'THROUGH_BALL'
+  | 'CONTROL_AND_DRIVE'
+  | 'CHANNEL_SPRINT'
+  | 'SWITCH_PLAY'
+  | 'HOLD_UP_PLAY'
   | 'AERIAL_DUEL_WON'
   | 'SHOT_SAVED'
   | 'GOAL'
@@ -43,6 +47,10 @@ export interface TacticalOption {
     | 'LONG_SHOT' 
     | 'BOX_FINISH' 
     | 'SAFETY_BACKPASS'
+    | 'CONTROL_AND_DRIVE'
+    | 'CHANNEL_SPRINT'
+    | 'SWITCH_PLAY'
+    | 'HOLD_UP_PLAY'
     | 'COUNTER_ATTACK';
   readonly label: string;
   readonly targetPlayer?: Player;
@@ -62,6 +70,7 @@ export interface PlayerDecision {
 
 export interface MatchEvent {
   readonly minute: number;
+  readonly second?: number; // 0 o 30 segundos
   readonly type: MatchEventType;
   readonly attackingTeamId: string | number;
   readonly defendingTeamId: string | number;
@@ -81,6 +90,8 @@ export interface MatchState {
   readonly homeTeam: Team;
   readonly awayTeam: Team;
   currentMinute: number;
+  currentSecond: number; // 0 o 30
+  currentTick: number;   // 0 a 180 (cada tick representa ~30s de juego)
   score: { home: number; away: number };
   possessionTeamId: string | number;
   ballZone: PitchZone;
@@ -90,11 +101,83 @@ export interface MatchState {
 
 export interface EngineSnapshot {
   readonly currentMinute: number;
+  readonly currentSecond: number;
+  readonly currentTick: number;
   readonly score: { home: number; away: number };
   readonly possessionTeamId: string | number;
   readonly ballZone: PitchZone;
   readonly isFinished: boolean;
   readonly eventsCount: number;
+}
+
+/**
+ * Modula la utilidad de una opción táctica en función del arquetipo de personalidad del jugador.
+ * Permite que jugadores con perfil regateador tiendan a encarar incluso jugando en el centro,
+ * o que pasadores natos busquen siempre el pase asociativo.
+ */
+export function applyPersonalityBias(player: Player, opt: TacticalOption): TacticalOption {
+  const personality: PlayerPersonalityType = player.personality || 'SAFETY_FIRST';
+  let scoreDelta = 0;
+  let personalityReason = '';
+
+  switch (personality) {
+    case 'SOLO_DRIBBLER':
+      if (opt.actionType === 'DRIBBLE' || opt.actionType === 'CONTROL_AND_DRIVE') {
+        scoreDelta = +26;
+        personalityReason = ' [Rasgo Regateador: tendencia natural a encarar y avanzar en solitario]';
+      } else if (opt.actionType === 'SHORT_PASS' || opt.actionType === 'SAFETY_BACKPASS') {
+        scoreDelta = -14;
+      }
+      break;
+
+    case 'PASS_MAESTRO':
+      if (opt.actionType === 'THROUGH_BALL' || opt.actionType === 'CROSS' || opt.actionType === 'SWITCH_PLAY' || opt.actionType === 'CHANNEL_SPRINT') {
+        scoreDelta = +24;
+        personalityReason = ' [Rasgo Organizador: prioriza visión asociativa y envíos al hueco]';
+      } else if (opt.actionType === 'DRIBBLE') {
+        scoreDelta = -18;
+      }
+      break;
+
+    case 'SNIPER_SHOOTER':
+      if (opt.actionType === 'LONG_SHOT' || opt.actionType === 'BOX_FINISH') {
+        scoreDelta = +28;
+        personalityReason = ' [Rasgo Gatillo Fácil: busca el disparo franco ante cualquier resquicio]';
+      } else if (opt.actionType === 'SAFETY_BACKPASS') {
+        scoreDelta = -15;
+      }
+      break;
+
+    case 'BOX_TO_BOX_RUNNER':
+      if (opt.actionType === 'CHANNEL_SPRINT' || opt.actionType === 'COUNTER_ATTACK' || opt.actionType === 'THROUGH_BALL') {
+        scoreDelta = +22;
+        personalityReason = ' [Rasgo Pulmón Incansable: explota el despliegue físico y las rupturas al espacio]';
+      }
+      break;
+
+    case 'SAFETY_FIRST':
+      if (opt.actionType === 'SHORT_PASS' || opt.actionType === 'SAFETY_BACKPASS' || opt.actionType === 'HOLD_UP_PLAY') {
+        scoreDelta = +25;
+        personalityReason = ' [Rasgo Conservador: minimiza pérdidas asegurando la posesión]';
+      } else if (opt.actionType === 'DRIBBLE' || opt.actionType === 'LONG_SHOT') {
+        scoreDelta = -22;
+      }
+      break;
+
+    case 'AGGRESSIVE_PRESSER':
+      if (opt.actionType === 'COUNTER_ATTACK' || opt.actionType === 'DRIBBLE') {
+        scoreDelta = +14;
+        personalityReason = ' [Rasgo Presionador: busca verticalidad inmediata tras recuperación]';
+      }
+      break;
+  }
+
+  const newScore = Math.max(5, Math.min(98, opt.utilityScore + scoreDelta));
+  return {
+    ...opt,
+    utilityScore: newScore,
+    reason: personalityReason ? `${opt.reason}${personalityReason}` : opt.reason,
+  };
 }
 
 /**
@@ -131,6 +214,8 @@ export class MatchEngine {
       homeTeam,
       awayTeam,
       currentMinute: 0,
+      currentSecond: 0,
+      currentTick: 0,
       score: { home: 0, away: 0 },
       possessionTeamId: homeTeam.id,
       ballZone: 'MIDFIELD',
@@ -140,6 +225,7 @@ export class MatchEngine {
 
     this.recordEvent({
       minute: 0,
+      second: 0,
       type: 'KICK_OFF',
       attackingTeamId: homeTeam.id,
       defendingTeamId: awayTeam.id,
@@ -153,36 +239,68 @@ export class MatchEngine {
     return this.state;
   }
 
+  private applyEffort(player: Player, intensity: 'LOW' | 'MEDIUM' | 'HIGH'): void {
+    const conMod = getAttributeModifier(player.attributes.constitution);
+    let drain = 0.4;
+    if (intensity === 'MEDIUM') drain = 0.9;
+    if (intensity === 'HIGH') drain = 2.4;
+
+    const effectiveDrain = Math.max(0.1, drain - conMod * 0.12);
+    player.stamina = Math.max(5, Math.min(100, Math.round((player.stamina - effectiveDrain) * 10) / 10));
+  }
+
+  private getFatigueModifier(player: Player): number {
+    if (player.stamina < 30) return -1;
+    if (player.stamina < 15) return -2;
+    return 0;
+  }
+
   /**
-   * Ejecuta 1 minuto de simulación táctica basada en tiradas D20.
+   * Ejecuta 1 micro-tick de simulación táctica (cada tick equivale a ~30 segundos de juego).
+   * Un partido completo de 90 minutos se resuelve en 180 ticks.
    */
   public step(): MatchEvent | null {
     if (this.state.isFinished) return null;
 
-    this.state.currentMinute++;
-    const minute = this.state.currentMinute;
+    this.state.currentTick++;
+    this.state.currentMinute = Math.floor(this.state.currentTick / 2);
+    this.state.currentSecond = (this.state.currentTick % 2) * 30;
 
-    if (minute === 45) {
+    const minute = this.state.currentMinute;
+    const second = this.state.currentSecond;
+
+    // Descanso en el tick 90 (45' 00")
+    if (this.state.currentTick === 90) {
+      [this.state.homeTeam, this.state.awayTeam].forEach(team => {
+        team.roster.forEach(p => {
+          const conMod = getAttributeModifier(p.attributes.constitution);
+          p.stamina = Math.min(100, Math.round((p.stamina + 22 + conMod * 1.5) * 10) / 10);
+        });
+      });
+
       return this.recordEvent({
         minute: 45,
+        second: 0,
         type: 'HALF_TIME',
         attackingTeamId: this.state.possessionTeamId,
         defendingTeamId: this.getDefendingTeam().id,
         zone: 'MIDFIELD',
-        commentary: `Descanso. Marcador: ${this.state.homeTeam.name} ${this.state.score.home} - ${this.state.score.away} ${this.state.awayTeam.name}.`,
+        commentary: `⏱️ Descanso (45' 00"). Marcador: ${this.state.homeTeam.name} ${this.state.score.home} - ${this.state.score.away} ${this.state.awayTeam.name}.`,
         score: { ...this.state.score },
       });
     }
 
-    if (minute >= 90) {
+    // Final del partido en el tick 180 (90' 00")
+    if (this.state.currentTick >= 180) {
       this.state.isFinished = true;
       return this.recordEvent({
         minute: 90,
+        second: 0,
         type: 'FULL_TIME',
         attackingTeamId: this.state.possessionTeamId,
         defendingTeamId: this.getDefendingTeam().id,
         zone: 'MIDFIELD',
-        commentary: `¡Final del partido! Resultado: ${this.state.homeTeam.name} ${this.state.score.home} - ${this.state.score.away} ${this.state.awayTeam.name}.`,
+        commentary: `🏁 ¡Final del partido! (90' 00"). Resultado: ${this.state.homeTeam.name} ${this.state.score.home} - ${this.state.score.away} ${this.state.awayTeam.name}.`,
         score: { ...this.state.score },
       });
     }
@@ -190,20 +308,20 @@ export class MatchEngine {
     const attackingTeam = this.getAttackingTeam();
     const defendingTeam = this.getDefendingTeam();
 
-    // 1. Resolver según la zona del balón mediante el motor de evaluación táctica
+    // Resolver según la zona del balón mediante el motor de evaluación táctica
     switch (this.state.ballZone) {
       case 'OWN_BOX':
       case 'DEFENSIVE_HALF':
-        return this.resolveBuildUpOrCounter(attackingTeam, defendingTeam, minute);
+        return this.resolveBuildUpOrCounter(attackingTeam, defendingTeam, minute, second);
 
       case 'MIDFIELD':
-        return this.resolveMidfieldDecisions(attackingTeam, defendingTeam, minute);
+        return this.resolveMidfieldDecisions(attackingTeam, defendingTeam, minute, second);
 
       case 'ATTACKING_THIRD':
-        return this.resolveAttackingThirdDecisions(attackingTeam, defendingTeam, minute);
+        return this.resolveAttackingThirdDecisions(attackingTeam, defendingTeam, minute, second);
 
       case 'OPPONENT_BOX':
-        return this.resolveBoxShot(attackingTeam, defendingTeam, minute);
+        return this.resolveBoxShot(attackingTeam, defendingTeam, minute, second);
 
       default:
         this.state.ballZone = 'MIDFIELD';
@@ -223,7 +341,7 @@ export class MatchEngine {
 
   // --- Sistema Inteligente de Toma de Decisiones y Opciones Tácticas ---
 
-  private resolveBuildUpOrCounter(atk: Team, def: Team, min: number): MatchEvent {
+  private resolveBuildUpOrCounter(atk: Team, def: Team, min: number, sec: number = 0): MatchEvent {
     const passer = getActivePlayer(atk, ['CB', 'LB', 'RB'], true);
     const presser = getActivePlayer(def, ['ST', 'LW', 'RW'], true);
     const midfielder = getActivePlayer(atk, ['CM', 'CDM', 'CAM', 'LM', 'RM'], true, [passer.id]);
@@ -231,7 +349,7 @@ export class MatchEngine {
 
     const passerInt = passer.attributes.intelligence;
     const passerDes = passer.attributes.dexterity;
-    const modPass = getAttributeModifier(passerDes);
+    const modPass = getAttributeModifier(passerDes) + this.getFatigueModifier(passer);
 
     // Evaluar opciones de salida
     const isCounterAdvantage = atk.tactics.tempo === 'FAST_TRANSITION' && forward.attributes.dexterity >= 13;
@@ -257,20 +375,38 @@ export class MatchEngine {
       reason: isCounterAdvantage 
         ? `Lanza contragolpe directo aprovechando la velocidad punta de ${forward.name}` 
         : `Envío directo hacia campo rival buscando saltar líneas`,
-      d20Bonus: getAttributeModifier(passerInt),
+      d20Bonus: getAttributeModifier(passerInt) + this.getFatigueModifier(passer),
     };
 
-    const evaluatedOptions = [optShort, optCounter];
-    const chosen = isCounterAdvantage ? optCounter : optShort;
+    const optDribbleExit: TacticalOption = {
+      actionType: 'DRIBBLE',
+      label: `Conducción vertical para sortear la presión de ${presser.name}`,
+      targetZone: 'MIDFIELD',
+      utilityScore: passerDes >= 13 ? 65 : 35,
+      riskLevel: 'HIGH',
+      reason: `Eludir al delantero con quiebro y salir con balón dominado`,
+      d20Bonus: getAttributeModifier(passerDes) + this.getFatigueModifier(passer),
+    };
+
+    const rawOptions = [optShort, optCounter, optDribbleExit];
+    const evaluatedOptions = rawOptions
+      .map(opt => applyPersonalityBias(passer, opt))
+      .sort((a, b) => b.utilityScore - a.utilityScore);
+
+    const chosen = evaluatedOptions[0];
 
     const decision: PlayerDecision = {
       decisionMaker: passer,
       chosenOption: chosen,
       evaluatedOptions,
-      tacticalContext: `Salida de balón en campo propio (${this.state.ballZone})`,
+      tacticalContext: `Salida de balón en campo propio (${this.state.ballZone}) - Min ${min}' ${sec ? '30"' : '00"'}`,
     };
 
     if (chosen.actionType === 'COUNTER_ATTACK') {
+      this.applyEffort(passer, 'HIGH');
+      this.applyEffort(forward, 'HIGH');
+      this.applyEffort(presser, 'MEDIUM');
+
       const rollAtk = rollD20(chosen.d20Bonus, { advantage: true, rng: this.rng });
       const rollDef = rollD20(getAttributeModifier(presser.attributes.strength), { rng: this.rng });
       const check = resolveContestedCheck(rollAtk, rollDef);
@@ -279,6 +415,7 @@ export class MatchEngine {
         this.state.ballZone = 'ATTACKING_THIRD'; // Salta directo a tres cuartos (sin volver al centro)
         return this.recordEvent({
           minute: min,
+          second: sec,
           type: 'PASS_COMPLETED',
           attackingTeamId: atk.id,
           defendingTeamId: def.id,
@@ -289,7 +426,7 @@ export class MatchEngine {
           contestedCheck: check,
           tacticalAdvantage: 'SPACE_EXPLOITED',
           decision,
-          commentary: `⚡ ¡CONTRAGOLPE RÁPIDO! ${passer.name} mete un pase largo que rompe la presión rival y encuentra la carrera de ${forward.name}.`,
+          commentary: `⚡ ¡CONTRAGOLPE RÁPIDO! ${passer.name} mete un pase largo que rompe la presión rival y encuentra la carrera al sprint de ${forward.name}.`,
           score: { ...this.state.score },
         });
       } else {
@@ -297,6 +434,7 @@ export class MatchEngine {
         this.state.ballZone = 'MIDFIELD';
         return this.recordEvent({
           minute: min,
+          second: sec,
           type: 'PASS_INTERCEPTED',
           attackingTeamId: def.id,
           defendingTeamId: atk.id,
@@ -310,8 +448,53 @@ export class MatchEngine {
           score: { ...this.state.score },
         });
       }
+    } else if (chosen.actionType === 'DRIBBLE') {
+      this.applyEffort(passer, 'HIGH');
+      this.applyEffort(presser, 'MEDIUM');
+
+      const rollAtk = rollD20(chosen.d20Bonus, { rng: this.rng });
+      const rollDef = rollD20(getAttributeModifier(presser.attributes.dexterity), { rng: this.rng });
+      const check = resolveContestedCheck(rollAtk, rollDef);
+
+      if (check.attackerWon) {
+        this.state.ballZone = 'MIDFIELD';
+        return this.recordEvent({
+          minute: min,
+          second: sec,
+          type: 'DRIBBLE_SUCCESS',
+          attackingTeamId: atk.id,
+          defendingTeamId: def.id,
+          primaryPlayer: passer,
+          secondaryPlayer: presser,
+          zone: 'MIDFIELD',
+          contestedCheck: check,
+          decision,
+          commentary: `¡Qué personalidad! ${passer.name} quiebra a ${presser.name} en su propia mitad y avanza conduciendo con soltura.`,
+          score: { ...this.state.score },
+        });
+      } else {
+        this.switchPossession();
+        this.state.ballZone = 'DEFENSIVE_HALF';
+        return this.recordEvent({
+          minute: min,
+          second: sec,
+          type: 'DRIBBLE_TACKLED',
+          attackingTeamId: def.id,
+          defendingTeamId: atk.id,
+          primaryPlayer: presser,
+          secondaryPlayer: passer,
+          zone: 'DEFENSIVE_HALF',
+          contestedCheck: check,
+          decision,
+          commentary: `¡Error grave! ${passer.name} arriesgó en el regate y ${presser.name} le roba la cartera en salida de balón.`,
+          score: { ...this.state.score },
+        });
+      }
     } else {
       // Salida en corto
+      this.applyEffort(passer, 'LOW');
+      this.applyEffort(midfielder, 'LOW');
+
       const rollAtk = rollD20(chosen.d20Bonus, { rng: this.rng });
       const rollDef = rollD20(getAttributeModifier(presser.attributes.strength), { rng: this.rng });
       const check = resolveContestedCheck(rollAtk, rollDef);
@@ -322,6 +505,7 @@ export class MatchEngine {
         this.state.ballZone = nextZone;
         return this.recordEvent({
           minute: min,
+          second: sec,
           type: 'PASS_COMPLETED',
           attackingTeamId: atk.id,
           defendingTeamId: def.id,
@@ -340,6 +524,7 @@ export class MatchEngine {
         this.state.ballZone = turnoverZone;
         return this.recordEvent({
           minute: min,
+          second: sec,
           type: 'PASS_INTERCEPTED',
           attackingTeamId: def.id,
           defendingTeamId: atk.id,
@@ -356,7 +541,7 @@ export class MatchEngine {
     }
   }
 
-  private resolveMidfieldDecisions(atk: Team, def: Team, min: number): MatchEvent {
+  private resolveMidfieldDecisions(atk: Team, def: Team, min: number, sec: number = 0): MatchEvent {
     const playmaker = getActivePlayer(atk, ['CM', 'CAM', 'CDM', 'LM', 'RM'], true);
     const defender = getActivePlayer(def, ['CDM', 'CM', 'CB'], true);
     const forward = getActivePlayer(atk, ['ST', 'LW', 'RW', 'CAM'], true, [playmaker.id]);
@@ -365,98 +550,250 @@ export class MatchEngine {
     const intVal = playmaker.attributes.intelligence;
     const desVal = playmaker.attributes.dexterity;
     const fwdDes = forward.attributes.dexterity;
+    const wingDes = winger.attributes.dexterity;
 
+    // 1. Control orientado y avance en conducción (micro-tick de circulación)
+    const optControl: TacticalOption = {
+      actionType: 'CONTROL_AND_DRIVE',
+      label: `Control orientado y avance 5 metros con balón dominado`,
+      targetZone: 'MIDFIELD',
+      utilityScore: desVal >= 13 ? 88 : 78,
+      riskLevel: 'LOW',
+      reason: `${playmaker.name} orienta el cuerpo, templa el juego y gana metros en conducción arrastrando marcas`,
+      d20Bonus: getAttributeModifier(desVal) + this.getFatigueModifier(playmaker),
+    };
+
+    // 2. Balón al espacio al córner para la carrera al sprint del extremo
+    const optChannelSprint: TacticalOption = {
+      actionType: 'CHANNEL_SPRINT',
+      label: `Pase en profundidad al córner para la carrera de ${winger.name}`,
+      targetPlayer: winger,
+      targetZone: 'ATTACKING_THIRD',
+      utilityScore: wingDes >= 13 ? 84 : 64,
+      riskLevel: 'MEDIUM',
+      reason: `${playmaker.name} manda un envío largo al espacio hacia el banderín de córner para la zancada de ${winger.name}`,
+      d20Bonus: getAttributeModifier(intVal) + this.getFatigueModifier(playmaker),
+    };
+
+    // 3. Pase filtrado vertical entre centrales
     const optThrough: TacticalOption = {
       actionType: 'THROUGH_BALL',
       label: `Pase filtrado al hueco para ${forward.name}`,
       targetPlayer: forward,
       targetZone: 'ATTACKING_THIRD',
-      utilityScore: fwdDes >= 13 ? 85 : 60,
+      utilityScore: fwdDes >= 13 ? 83 : 62,
       riskLevel: 'MEDIUM',
-      reason: `${forward.name} tira un desmarque al hueco buscando la espalda del central rival`,
-      d20Bonus: getAttributeModifier(intVal) + (fwdDes >= 13 ? 1 : 0),
+      reason: `${forward.name} tira un desmarque de ruptura buscando la espalda del central rival`,
+      d20Bonus: getAttributeModifier(intVal) + (fwdDes >= 13 ? 1 : 0) + this.getFatigueModifier(playmaker),
     };
 
+    // 4. Apertura a banda
     const optWide: TacticalOption = {
       actionType: 'SHORT_PASS',
       label: `Abrir juego a la banda para ${winger.name}`,
       targetPlayer: winger,
       targetZone: 'ATTACKING_THIRD',
-      utilityScore: atk.tactics.width === 'WIDE' ? 82 : 70,
+      utilityScore: atk.tactics.width === 'WIDE' ? 80 : 68,
       riskLevel: 'LOW',
       reason: `Aprovechar la amplitud de banda para estirar el bloque defensivo rival`,
-      d20Bonus: getAttributeModifier(desVal) + 2,
+      d20Bonus: getAttributeModifier(desVal) + 2 + this.getFatigueModifier(playmaker),
     };
 
+    // 5. Regate 1vs1
     const optDribble: TacticalOption = {
       actionType: 'DRIBBLE',
       label: `Conducción individual superando línea de presión`,
       targetZone: 'ATTACKING_THIRD',
-      utilityScore: desVal >= 14 ? 75 : 40,
+      utilityScore: desVal >= 14 ? 74 : 40,
       riskLevel: 'HIGH',
-      reason: `Encarar en el 1vs1 para atraer defensores y generar superioridad`,
-      d20Bonus: getAttributeModifier(desVal),
+      reason: `Encarar a ${defender.name} en el 1vs1 para atraer defensores y generar superioridad`,
+      d20Bonus: getAttributeModifier(desVal) + this.getFatigueModifier(playmaker),
     };
 
-    const evaluatedOptions = [optThrough, optWide, optDribble].sort((a, b) => b.utilityScore - a.utilityScore);
+    // 6. Pase de seguridad atrás
+    const optReset: TacticalOption = {
+      actionType: 'SAFETY_BACKPASS',
+      label: `Pase de seguridad atrás para reorganizar la posesión`,
+      targetZone: 'MIDFIELD',
+      utilityScore: 72,
+      riskLevel: 'LOW',
+      reason: `Pausar la circulación y bascular con los centrales ante la falta de huecos claros`,
+      d20Bonus: getAttributeModifier(intVal) + 3 + this.getFatigueModifier(playmaker),
+    };
+
+    const rawOptions = [optControl, optChannelSprint, optThrough, optWide, optDribble, optReset];
+    const evaluatedOptions = rawOptions
+      .map(opt => applyPersonalityBias(playmaker, opt))
+      .sort((a, b) => b.utilityScore - a.utilityScore);
+
     const chosen = evaluatedOptions[0];
 
     const decision: PlayerDecision = {
       decisionMaker: playmaker,
       chosenOption: chosen,
       evaluatedOptions,
-      tacticalContext: `Construcción en el centro del campo (Minuto ${min}')`,
+      tacticalContext: `Construcción en el centro del campo (Minuto ${min}' ${sec ? '30"' : '00"'})`,
     };
 
-    const rollPlay = rollD20(chosen.d20Bonus, {
-      advantage: chosen.actionType === 'THROUGH_BALL' && fwdDes >= 13,
-      rng: this.rng,
-    });
-    const rollDef = rollD20(getAttributeModifier(defender.attributes.wisdom) + 1, { rng: this.rng });
-    const check = resolveContestedCheck(rollPlay, rollDef);
+    if (chosen.actionType === 'CONTROL_AND_DRIVE') {
+      this.applyEffort(playmaker, 'MEDIUM');
+      this.applyEffort(defender, 'LOW');
 
-    if (check.attackerWon) {
-      this.state.ballZone = 'ATTACKING_THIRD'; // AVANZA A TRES CUARTOS
+      const rollAtk = rollD20(chosen.d20Bonus, { rng: this.rng });
+      const rollDef = rollD20(getAttributeModifier(defender.attributes.wisdom), { rng: this.rng });
+      const check = resolveContestedCheck(rollAtk, rollDef);
+
+      if (check.attackerWon) {
+        return this.recordEvent({
+          minute: min,
+          second: sec,
+          type: 'CONTROL_AND_DRIVE',
+          attackingTeamId: atk.id,
+          defendingTeamId: def.id,
+          primaryPlayer: playmaker,
+          secondaryPlayer: defender,
+          zone: 'MIDFIELD',
+          contestedCheck: check,
+          decision,
+          commentary: `⚡ ${playmaker.name} orienta el control con categoría y avanza 5 metros con balón dominado mientras el equipo bascula.`,
+          score: { ...this.state.score },
+        });
+      } else {
+        this.switchPossession();
+        this.state.ballZone = 'DEFENSIVE_HALF';
+        return this.recordEvent({
+          minute: min,
+          second: sec,
+          type: 'DRIBBLE_TACKLED',
+          attackingTeamId: def.id,
+          defendingTeamId: atk.id,
+          primaryPlayer: defender,
+          secondaryPlayer: playmaker,
+          zone: 'DEFENSIVE_HALF',
+          contestedCheck: check,
+          decision,
+          commentary: `${defender.name} sale al paso con determinación y frena el avance de ${playmaker.name}.`,
+          score: { ...this.state.score },
+        });
+      }
+    } else if (chosen.actionType === 'CHANNEL_SPRINT') {
+      this.applyEffort(playmaker, 'MEDIUM');
+      this.applyEffort(winger, 'HIGH');
+      this.applyEffort(defender, 'HIGH');
+
+      const rollPlay = rollD20(chosen.d20Bonus + getAttributeModifier(wingDes), { rng: this.rng });
+      const rollDef = rollD20(getAttributeModifier(defender.attributes.dexterity) + 1, { rng: this.rng });
+      const check = resolveContestedCheck(rollPlay, rollDef);
+
+      if (check.attackerWon) {
+        this.state.ballZone = 'ATTACKING_THIRD';
+        return this.recordEvent({
+          minute: min,
+          second: sec,
+          type: 'CHANNEL_SPRINT',
+          attackingTeamId: atk.id,
+          defendingTeamId: def.id,
+          primaryPlayer: playmaker,
+          secondaryPlayer: defender,
+          targetPlayer: winger,
+          zone: 'ATTACKING_THIRD',
+          contestedCheck: check,
+          tacticalAdvantage: 'SPACE_EXPLOITED',
+          decision,
+          commentary: `🚀 ¡Balón en profundidad al córner! ${playmaker.name} lanza al espacio y ${winger.name} gana la carrera al sprint hasta la línea de fondo.`,
+          score: { ...this.state.score },
+        });
+      } else {
+        this.switchPossession();
+        this.state.ballZone = 'DEFENSIVE_HALF';
+        return this.recordEvent({
+          minute: min,
+          second: sec,
+          type: 'PASS_INTERCEPTED',
+          attackingTeamId: def.id,
+          defendingTeamId: atk.id,
+          primaryPlayer: defender,
+          secondaryPlayer: playmaker,
+          targetPlayer: winger,
+          zone: 'DEFENSIVE_HALF',
+          contestedCheck: check,
+          decision,
+          commentary: `${defender.name} corrige la posición con velocidad y corta el pase en profundidad hacia ${winger.name}.`,
+          score: { ...this.state.score },
+        });
+      }
+    } else if (chosen.actionType === 'SAFETY_BACKPASS') {
+      this.applyEffort(playmaker, 'LOW');
+
       return this.recordEvent({
         minute: min,
-        type: chosen.actionType === 'DRIBBLE' ? 'DRIBBLE_SUCCESS' : 'PASS_COMPLETED',
+        second: sec,
+        type: 'PASS_COMPLETED',
         attackingTeamId: atk.id,
         defendingTeamId: def.id,
         primaryPlayer: playmaker,
         secondaryPlayer: defender,
-        targetPlayer: chosen.targetPlayer,
-        zone: 'ATTACKING_THIRD',
-        contestedCheck: check,
-        tacticalAdvantage: chosen.actionType === 'THROUGH_BALL' ? 'SPACE_EXPLOITED' : undefined,
+        zone: 'MIDFIELD',
         decision,
-        commentary: chosen.actionType === 'THROUGH_BALL'
-          ? `¡Visión estelar! ${playmaker.name} filtra un balón perfecto al desmarque de ${forward.name} (D20: ${rollPlay.total} vs ${rollDef.total}).`
-          : `${playmaker.name} abre con precisión a banda para ${chosen.targetPlayer?.name}, plantando al equipo en campo contrario.`,
+        commentary: `${playmaker.name} pausa la jugada y apoya atrás en corto para conservar la posesión y reorganizar el ataque.`,
         score: { ...this.state.score },
       });
     } else {
-      this.switchPossession();
-      // ¡NO vuelve forzadamente al centro si fue corte en 3/4!
-      this.state.ballZone = 'DEFENSIVE_HALF';
-      return this.recordEvent({
-        minute: min,
-        type: 'PASS_INTERCEPTED',
-        attackingTeamId: def.id,
-        defendingTeamId: atk.id,
-        primaryPlayer: defender,
-        secondaryPlayer: playmaker,
-        targetPlayer: chosen.targetPlayer,
-        zone: 'DEFENSIVE_HALF',
-        contestedCheck: check,
-        tacticalAdvantage: 'TIGHT_MARKING',
-        decision,
-        commentary: `${defender.name} lee la intención de ${playmaker.name} y corta el avance defensivamente.`,
-        score: { ...this.state.score },
+      this.applyEffort(playmaker, chosen.actionType === 'DRIBBLE' ? 'HIGH' : 'MEDIUM');
+      if (chosen.targetPlayer) this.applyEffort(chosen.targetPlayer, chosen.actionType === 'THROUGH_BALL' ? 'HIGH' : 'LOW');
+      this.applyEffort(defender, 'MEDIUM');
+
+      const rollPlay = rollD20(chosen.d20Bonus, {
+        advantage: chosen.actionType === 'THROUGH_BALL' && fwdDes >= 13,
+        rng: this.rng,
       });
+      const rollDef = rollD20(getAttributeModifier(defender.attributes.wisdom) + 1, { rng: this.rng });
+      const check = resolveContestedCheck(rollPlay, rollDef);
+
+      if (check.attackerWon) {
+        this.state.ballZone = 'ATTACKING_THIRD';
+        return this.recordEvent({
+          minute: min,
+          second: sec,
+          type: chosen.actionType === 'DRIBBLE' ? 'DRIBBLE_SUCCESS' : 'PASS_COMPLETED',
+          attackingTeamId: atk.id,
+          defendingTeamId: def.id,
+          primaryPlayer: playmaker,
+          secondaryPlayer: defender,
+          targetPlayer: chosen.targetPlayer,
+          zone: 'ATTACKING_THIRD',
+          contestedCheck: check,
+          tacticalAdvantage: chosen.actionType === 'THROUGH_BALL' ? 'SPACE_EXPLOITED' : undefined,
+          decision,
+          commentary: chosen.actionType === 'THROUGH_BALL'
+            ? `¡Visión estelar! ${playmaker.name} filtra un balón perfecto al desmarque de ${forward.name} (D20: ${rollPlay.total} vs ${rollDef.total}).`
+            : `${playmaker.name} abre con precisión a banda para ${chosen.targetPlayer?.name}, plantando al equipo en campo contrario.`,
+          score: { ...this.state.score },
+        });
+      } else {
+        this.switchPossession();
+        this.state.ballZone = 'DEFENSIVE_HALF';
+        return this.recordEvent({
+          minute: min,
+          second: sec,
+          type: 'PASS_INTERCEPTED',
+          attackingTeamId: def.id,
+          defendingTeamId: atk.id,
+          primaryPlayer: defender,
+          secondaryPlayer: playmaker,
+          targetPlayer: chosen.targetPlayer,
+          zone: 'DEFENSIVE_HALF',
+          contestedCheck: check,
+          tacticalAdvantage: 'TIGHT_MARKING',
+          decision,
+          commentary: `${defender.name} lee la intención de ${playmaker.name} y corta el avance defensivamente.`,
+          score: { ...this.state.score },
+        });
+      }
     }
   }
 
-  private resolveAttackingThirdDecisions(atk: Team, def: Team, min: number): MatchEvent {
+  private resolveAttackingThirdDecisions(atk: Team, def: Team, min: number, sec: number = 0): MatchEvent {
     // Determinar si la jugada transcurre por banda (extremo/lateral) o por el carril central (mediapunta/interior)
     const flankPlayer = getActivePlayer(atk, ['LW', 'RW', 'LB', 'RB'], true);
     const centralPlaymaker = getActivePlayer(atk, ['CAM', 'CM', 'ST'], true);
@@ -464,7 +801,6 @@ export class MatchEngine {
 
     const carrier = isFlankPlay ? flankPlayer : centralPlaymaker;
     const fullBack = getActivePlayer(def, ['LB', 'RB', 'CB'], true);
-    // El rematador o receptor del pase NUNCA puede ser el portador del balón
     const striker = getActivePlayer(atk, ['ST', 'CAM', 'LW', 'RW'], true, [carrier.id]);
 
     const carrierDes = carrier.attributes.dexterity;
@@ -472,7 +808,7 @@ export class MatchEngine {
     const carrierInt = carrier.attributes.intelligence;
     const isPoacher = striker.traits.includes('POACHER') || striker.attributes.strength >= 13;
 
-    let evaluatedOptions: TacticalOption[] = [];
+    let rawOptions: TacticalOption[] = [];
 
     if (isFlankPlay) {
       // JUGADA POR BANDA: Centros, desborde por línea de fondo o diagonal interior
@@ -484,7 +820,7 @@ export class MatchEngine {
         utilityScore: isPoacher ? 88 : 72,
         riskLevel: 'MEDIUM',
         reason: `${carrier.name} gana línea de fondo y pone un centro medido al corazón del área para ${striker.name}`,
-        d20Bonus: getAttributeModifier(carrierDes) + (striker.traits.includes('AERIAL_TOWER') ? 2 : 0),
+        d20Bonus: getAttributeModifier(carrierDes) + (striker.traits.includes('AERIAL_TOWER') ? 2 : 0) + this.getFatigueModifier(carrier),
       };
 
       const optDribbleBox: TacticalOption = {
@@ -494,7 +830,7 @@ export class MatchEngine {
         utilityScore: carrierDes >= 14 ? 80 : 52,
         riskLevel: 'HIGH',
         reason: `Encarar a ${fullBack.name} con regate exterior para pisar área con balón dominado`,
-        d20Bonus: getAttributeModifier(carrierDes),
+        d20Bonus: getAttributeModifier(carrierDes) + this.getFatigueModifier(carrier),
       };
 
       const optLongShot: TacticalOption = {
@@ -504,10 +840,10 @@ export class MatchEngine {
         utilityScore: carrierFue >= 14 ? 70 : 46,
         riskLevel: 'MEDIUM',
         reason: `Trazar la diagonal hacia la frontal buscando el ángulo lejano`,
-        d20Bonus: getAttributeModifier(carrierFue),
+        d20Bonus: getAttributeModifier(carrierFue) + this.getFatigueModifier(carrier),
       };
 
-      evaluatedOptions = [optCross, optDribbleBox, optLongShot].sort((a, b) => b.utilityScore - a.utilityScore);
+      rawOptions = [optCross, optDribbleBox, optLongShot];
     } else {
       // JUGADA POR EL CENTRO (CAM / CM): Pase filtrado al desmarque, apertura o tiro lejano
       const optThrough: TacticalOption = {
@@ -518,7 +854,7 @@ export class MatchEngine {
         utilityScore: striker.attributes.dexterity >= 13 ? 90 : 75,
         riskLevel: 'MEDIUM',
         reason: `${carrier.name} filtra un balón milimétrico a la espalda de los centrales para la carrera de ${striker.name}`,
-        d20Bonus: getAttributeModifier(carrierInt) + 1,
+        d20Bonus: getAttributeModifier(carrierInt) + 1 + this.getFatigueModifier(carrier),
       };
 
       const optSpread: TacticalOption = {
@@ -529,7 +865,7 @@ export class MatchEngine {
         utilityScore: 78,
         riskLevel: 'LOW',
         reason: `Abrir el juego a la banda para estirar la zaga y buscar el 2vs1`,
-        d20Bonus: getAttributeModifier(carrierInt),
+        d20Bonus: getAttributeModifier(carrierInt) + this.getFatigueModifier(carrier),
       };
 
       const optEdgeShot: TacticalOption = {
@@ -539,11 +875,15 @@ export class MatchEngine {
         utilityScore: carrierFue >= 14 ? 74 : 50,
         riskLevel: 'MEDIUM',
         reason: `Probar el golpeo de media distancia ante el bloque bajo rival`,
-        d20Bonus: getAttributeModifier(carrierFue),
+        d20Bonus: getAttributeModifier(carrierFue) + this.getFatigueModifier(carrier),
       };
 
-      evaluatedOptions = [optThrough, optSpread, optEdgeShot].sort((a, b) => b.utilityScore - a.utilityScore);
+      rawOptions = [optThrough, optSpread, optEdgeShot];
     }
+
+    const evaluatedOptions = rawOptions
+      .map(opt => applyPersonalityBias(carrier, opt))
+      .sort((a, b) => b.utilityScore - a.utilityScore);
 
     const chosen = evaluatedOptions[0];
 
@@ -551,15 +891,19 @@ export class MatchEngine {
       decisionMaker: carrier,
       chosenOption: chosen,
       evaluatedOptions,
-      tacticalContext: `Ataque en tres cuartos de campo (${isFlankPlay ? 'Acción por Banda' : 'Creación Interior'})`,
+      tacticalContext: `Ataque en tres cuartos de campo (${isFlankPlay ? 'Acción por Banda' : 'Creación Interior'}) - Min ${min}' ${sec ? '30"' : '00"'}`,
     };
+
+    this.applyEffort(carrier, chosen.actionType === 'DRIBBLE' ? 'HIGH' : 'MEDIUM');
+    if (chosen.targetPlayer) this.applyEffort(chosen.targetPlayer, chosen.actionType === 'THROUGH_BALL' || chosen.actionType === 'CROSS' ? 'HIGH' : 'LOW');
+    this.applyEffort(fullBack, 'MEDIUM');
 
     const rollAtk = rollD20(chosen.d20Bonus, {
       advantage: carrier.traits.includes('EXPLOSIVE_WINGER') || carrier.traits.includes('DRIBBLE_WIZARD'),
       rng: this.rng,
     });
-    // Cobertura colectiva de la zaga y repliegue en el último tercio (+3 bono posicional)
-    const rollDef = rollD20(getAttributeModifier(fullBack.attributes.dexterity) + 3, { rng: this.rng });
+    // Cobertura colectiva de la zaga y repliegue en el último tercio (+4 bono posicional)
+    const rollDef = rollD20(getAttributeModifier(fullBack.attributes.dexterity) + 4, { rng: this.rng });
     const check = resolveContestedCheck(rollAtk, rollDef);
 
     if (check.attackerWon) {
@@ -581,6 +925,7 @@ export class MatchEngine {
 
       return this.recordEvent({
         minute: min,
+        second: sec,
         type: eventType,
         attackingTeamId: atk.id,
         defendingTeamId: def.id,
@@ -599,6 +944,7 @@ export class MatchEngine {
       this.state.ballZone = 'DEFENSIVE_HALF'; // El nuevo equipo atacante inicia desde atrás, ¡no en el centro!
       return this.recordEvent({
         minute: min,
+        second: sec,
         type: 'DRIBBLE_TACKLED',
         attackingTeamId: def.id,
         defendingTeamId: atk.id,
@@ -613,9 +959,9 @@ export class MatchEngine {
     }
   }
 
-  private resolveBoxShot(atk: Team, def: Team, min: number): MatchEvent {
+  private resolveBoxShot(atk: Team, def: Team, min: number, sec: number = 0): MatchEvent {
     const striker = getActivePlayer(atk, ['ST', 'LW', 'RW', 'CAM'], true);
-    const keeper = getActivePlayer(def, ['GK'], false); // ¡Aquí y solo aquí actúa el portero!
+    const keeper = getActivePlayer(def, ['GK'], false);
     const defender = getActivePlayer(def, ['CB', 'LB', 'RB'], true);
 
     const strikerDes = striker.attributes.dexterity;
@@ -630,7 +976,7 @@ export class MatchEngine {
       utilityScore: strikerDes >= 14 ? 85 : 72,
       riskLevel: 'LOW',
       reason: `Buscar el ángulo imposible ajustando el balón al poste con rosca sutil fuera del alcance de ${keeper.name}`,
-      d20Bonus: getAttributeModifier(strikerDes) + (isPoacher ? 1 : 0),
+      d20Bonus: getAttributeModifier(strikerDes) + (isPoacher ? 1 : 0) + this.getFatigueModifier(striker),
     };
 
     const optPower: TacticalOption = {
@@ -640,7 +986,7 @@ export class MatchEngine {
       utilityScore: strikerFue >= 14 ? 82 : 70,
       riskLevel: 'MEDIUM',
       reason: `Zambombazo seco de empeine total buscando doblarle las manos a ${keeper.name}`,
-      d20Bonus: getAttributeModifier(strikerFue),
+      d20Bonus: getAttributeModifier(strikerFue) + this.getFatigueModifier(striker),
     };
 
     const optDribbleKeeper: TacticalOption = {
@@ -650,18 +996,25 @@ export class MatchEngine {
       utilityScore: (strikerDes >= 15 && striker.traits.includes('DRIBBLE_WIZARD')) ? 86 : 52,
       riskLevel: 'HIGH',
       reason: `Amagar la salida de ${keeper.name} para empujarla a puerta vacía`,
-      d20Bonus: getAttributeModifier(strikerDes),
+      d20Bonus: getAttributeModifier(strikerDes) + this.getFatigueModifier(striker),
     };
 
-    const evaluatedOptions = [optPlacement, optPower, optDribbleKeeper].sort((a, b) => b.utilityScore - a.utilityScore);
+    const rawOptions = [optPlacement, optPower, optDribbleKeeper];
+    const evaluatedOptions = rawOptions
+      .map(opt => applyPersonalityBias(striker, opt))
+      .sort((a, b) => b.utilityScore - a.utilityScore);
+
     const chosen = evaluatedOptions[0];
 
     const decision: PlayerDecision = {
       decisionMaker: striker,
       chosenOption: chosen,
       evaluatedOptions,
-      tacticalContext: `Definición en el área rival ante ${keeper.name} (OPPONENT_BOX)`,
+      tacticalContext: `Definición en el área rival ante ${keeper.name} (OPPONENT_BOX) - Min ${min}' ${sec ? '30"' : '00"'}`,
     };
+
+    this.applyEffort(striker, 'HIGH');
+    this.applyEffort(keeper, 'HIGH');
 
     const rollShot = rollD20(chosen.d20Bonus, {
       criticalThreshold: isPoacher ? 18 : 20,
@@ -669,8 +1022,8 @@ export class MatchEngine {
       rng: this.rng,
     });
 
-    // En F11, el portero tiene achique posicional y cobertura del central (+4 bono defensivo del arco)
-    const defBonus = 4 + getAttributeModifier(defender.attributes.wisdom);
+    // En F11, el portero tiene achique posicional y cobertura del central (+5 bono defensivo del arco)
+    const defBonus = 5 + getAttributeModifier(defender.attributes.wisdom);
     const rollSave = rollD20(getAttributeModifier(keeper.attributes.dexterity) + defBonus, { rng: this.rng });
     const check = resolveContestedCheck(rollShot, rollSave);
 
@@ -687,6 +1040,7 @@ export class MatchEngine {
 
       return this.recordEvent({
         minute: min,
+        second: sec,
         type: 'GOAL',
         attackingTeamId: atk.id,
         defendingTeamId: def.id,
@@ -705,6 +1059,7 @@ export class MatchEngine {
       this.state.ballZone = 'OWN_BOX';
       return this.recordEvent({
         minute: min,
+        second: sec,
         type: 'SHOT_SAVED',
         attackingTeamId: atk.id,
         defendingTeamId: def.id,
@@ -747,6 +1102,8 @@ export class MatchEngine {
   private saveSnapshot(): void {
     this.snapshots.push({
       currentMinute: this.state.currentMinute,
+      currentSecond: this.state.currentSecond,
+      currentTick: this.state.currentTick,
       score: { ...this.state.score },
       possessionTeamId: this.state.possessionTeamId,
       ballZone: this.state.ballZone,
@@ -768,6 +1125,8 @@ export class MatchEngine {
     this.state = {
       ...this.state,
       currentMinute: snap.currentMinute,
+      currentSecond: snap.currentSecond,
+      currentTick: snap.currentTick,
       score: { ...snap.score },
       possessionTeamId: snap.possessionTeamId,
       ballZone: snap.ballZone,

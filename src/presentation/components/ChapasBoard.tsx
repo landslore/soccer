@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useGameStore, ChapaSnapshot } from '../../state/game-store';
+import { PlayerPersonalityType } from '../../domain/types';
 import { Play, Pause, FastForward, RotateCcw, Dices, Award, Sparkles, Brain, History } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { DecisionDebugger } from './DecisionDebugger';
 import { MatchAuditNavigator } from './MatchAuditNavigator';
+import { TeamBadge } from './TeamBadge';
 
 interface ChapaEntity {
   id: string;
@@ -24,6 +26,10 @@ interface ChapaEntity {
   hasBall: boolean;
   isHighlight: boolean;
   isMakingRun: boolean;
+  dexterity: number;
+  stamina: number;
+  personality: PlayerPersonalityType;
+  isSprinting: boolean;
 }
 
 interface BallEntity {
@@ -69,8 +75,10 @@ export const ChapasBoard: React.FC = () => {
 
   const displayedEvent = isAuditing ? activeStep?.event : currentMatch?.lastEvent;
   const displayedMinute = isAuditing ? activeStep?.minute ?? 0 : currentMatch?.state.currentMinute ?? 0;
+  const displayedSecond = isAuditing ? activeStep?.second ?? 0 : currentMatch?.state.currentSecond ?? 0;
   const displayedScore = isAuditing ? activeStep?.score ?? { home: 0, away: 0 } : currentMatch?.state.score ?? { home: 0, away: 0 };
   const displayedZone = isAuditing ? activeStep?.ballZone ?? 'MIDFIELD' : currentMatch?.state.ballZone ?? 'MIDFIELD';
+  const formatTime = (min: number, sec?: number) => (sec !== undefined && sec > 0 ? `${min}' ${sec}"` : `${min}' 00"`);
 
   // 1. Inicializar las 22 chapas según formación 4-3-3 reglamentaria
   useEffect(() => {
@@ -136,6 +144,10 @@ export const ChapasBoard: React.FC = () => {
         hasBall: false,
         isHighlight: false,
         isMakingRun: false,
+        dexterity: p?.attributes.dexterity ?? 10,
+        stamina: p?.stamina ?? 100,
+        personality: p?.personality ?? 'PASS_MAESTRO',
+        isSprinting: false,
       };
     });
 
@@ -164,6 +176,10 @@ export const ChapasBoard: React.FC = () => {
         hasBall: false,
         isHighlight: false,
         isMakingRun: false,
+        dexterity: p?.attributes.dexterity ?? 10,
+        stamina: p?.stamina ?? 100,
+        personality: p?.personality ?? 'PASS_MAESTRO',
+        isSprinting: false,
       };
     });
 
@@ -194,9 +210,17 @@ export const ChapasBoard: React.FC = () => {
 
     // Actualizar objetivos tácticos manteniendo formación
     Object.values(chapas).forEach((c) => {
+      // Sincronizar estado físico y fatiga acumulada
+      const team = c.isHome ? currentMatch?.homeTeam : currentMatch?.awayTeam;
+      const pl = team?.roster.find((r) => r.id === c.id);
+      if (pl) {
+        c.stamina = pl.stamina;
+      }
+
       c.hasBall = false;
       c.isHighlight = false;
       c.isMakingRun = false;
+      c.isSprinting = false;
 
       // REGLA ESTRICTA DE PORTERO: Guardar su arco
       if (c.position === 'GK') {
@@ -601,6 +625,70 @@ export const ChapasBoard: React.FC = () => {
         break;
       }
 
+      case 'CONTROL_AND_DRIVE': {
+        if (primaryChapa) {
+          primaryChapa.hasBall = true;
+          const advanceDist = primaryChapa.isHome ? -45 : 45;
+          primaryChapa.targetY = Math.max(85, Math.min(height - 85, primaryChapa.y + advanceDist));
+          primaryChapa.targetX = Math.max(50, Math.min(width - 50, primaryChapa.x + (Math.random() * 20 - 10)));
+          ball.targetX = primaryChapa.targetX;
+          ball.targetY = primaryChapa.targetY;
+        }
+        break;
+      }
+
+      case 'CHANNEL_SPRINT': {
+        if (primaryChapa) {
+          primaryChapa.isSprinting = true;
+          primaryChapa.isMakingRun = true;
+          primaryChapa.hasBall = true;
+          const isLeftFlank = primaryChapa.x < width / 2;
+          primaryChapa.targetX = isLeftFlank ? 55 : width - 55;
+          const deepRunY = primaryChapa.isHome ? 150 : height - 150;
+          primaryChapa.targetY = deepRunY;
+
+          if (secondaryChapa && secondaryChapa.position !== 'GK') {
+            secondaryChapa.isSprinting = true;
+            secondaryChapa.targetX = isLeftFlank ? 85 : width - 85;
+            secondaryChapa.targetY = primaryChapa.isHome ? 175 : height - 175;
+          }
+
+          ball.targetX = primaryChapa.targetX;
+          ball.targetY = primaryChapa.targetY;
+        }
+        break;
+      }
+
+      case 'SWITCH_PLAY': {
+        if (primaryChapa && targetChapa) {
+          primaryChapa.hasBall = true;
+          targetChapa.isMakingRun = true;
+          targetChapa.isSprinting = true;
+          ball.targetX = targetChapa.targetX;
+          ball.targetY = targetChapa.targetY;
+
+          setTimeout(() => {
+            targetChapa.hasBall = true;
+            if (primaryChapa) primaryChapa.hasBall = false;
+          }, 450);
+        }
+        break;
+      }
+
+      case 'HOLD_UP_PLAY': {
+        if (primaryChapa) {
+          primaryChapa.hasBall = true;
+          ball.targetX = primaryChapa.targetX;
+          ball.targetY = primaryChapa.targetY;
+          if (secondaryChapa && secondaryChapa.position !== 'GK') {
+            const markOffset = primaryChapa.isHome ? -28 : 28;
+            secondaryChapa.targetX = primaryChapa.targetX;
+            secondaryChapa.targetY = primaryChapa.targetY + markOffset;
+          }
+        }
+        break;
+      }
+
       default:
         break;
     }
@@ -690,13 +778,20 @@ export const ChapasBoard: React.FC = () => {
         const dist = Math.hypot(dx, dy);
 
         if (dist > 1.2) {
-          // Velocidad punta calibrada: jugador corriendo suavemente a zancadas
-          const maxSpeed = c.isMakingRun || c.isHighlight ? 3.6 : 2.2;
-          const desiredSpeed = Math.min(maxSpeed, dist * 0.15);
+          // Velocidad punta diferenciada por destreza (DES) y fatiga (stamina)
+          const fatigueFactor = 0.70 + 0.30 * (c.stamina / 100);
+          const baseSpeed = (2.2 + (c.dexterity - 8) * 0.28) * fatigueFactor;
+          const maxSpeed = c.isSprinting
+            ? baseSpeed * 1.35
+            : c.isMakingRun || c.isHighlight
+            ? baseSpeed * 1.15
+            : baseSpeed;
+
+          const desiredSpeed = Math.min(maxSpeed, dist * 0.16);
           const nx = dx / dist;
           const ny = dy / dist;
 
-          // Aceleración suave
+          // Aceleración y zancada con inercia física
           c.vx += (nx * desiredSpeed - c.vx) * 0.16;
           c.vy += (ny * desiredSpeed - c.vy) * 0.16;
 
@@ -839,10 +934,27 @@ export const ChapasBoard: React.FC = () => {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
         ctx.fill();
 
-        if (c.isMakingRun) {
+        // Anillo sutil de energía / stamina alrededor de la chapa
+        const staminaRatio = Math.max(0, Math.min(100, c.stamina)) / 100;
+        const startAngle = -Math.PI / 2;
+        const endAngle = startAngle + Math.PI * 2 * staminaRatio;
+
+        ctx.beginPath();
+        ctx.arc(drawX, drawY, c.radius + 3, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(15, 23, 42, 0.35)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(drawX, drawY, c.radius + 3, startAngle, endAngle);
+        ctx.strokeStyle = c.stamina > 65 ? '#22c55e' : c.stamina > 35 ? '#eab308' : '#ef4444';
+        ctx.lineWidth = 2.2;
+        ctx.stroke();
+
+        if (c.isMakingRun || c.isSprinting) {
           ctx.beginPath();
-          ctx.arc(drawX, drawY, c.radius + 6, 0, Math.PI * 2);
-          ctx.strokeStyle = '#22c55e';
+          ctx.arc(drawX, drawY, c.radius + 6.5, 0, Math.PI * 2);
+          ctx.strokeStyle = c.isSprinting ? '#f97316' : '#22c55e';
           ctx.lineWidth = 2;
           ctx.setLineDash([2, 3]);
           ctx.stroke();
@@ -851,7 +963,7 @@ export const ChapasBoard: React.FC = () => {
 
         if (c.isHighlight) {
           ctx.beginPath();
-          ctx.arc(drawX, drawY, c.radius + 7, 0, Math.PI * 2);
+          ctx.arc(drawX, drawY, c.radius + 7.5, 0, Math.PI * 2);
           ctx.strokeStyle = '#fdd835';
           ctx.lineWidth = 2.5;
           ctx.stroke();
@@ -859,7 +971,7 @@ export const ChapasBoard: React.FC = () => {
 
         if (c.hasBall) {
           ctx.beginPath();
-          ctx.arc(drawX, drawY, c.radius + 10, 0, Math.PI * 2);
+          ctx.arc(drawX, drawY, c.radius + 10.5, 0, Math.PI * 2);
           ctx.strokeStyle = '#38bdf8';
           ctx.lineWidth = 2;
           ctx.setLineDash([3, 3]);
@@ -887,10 +999,11 @@ export const ChapasBoard: React.FC = () => {
 
         // Badge de Nombre cápsula anti-solapamiento con distinción nítida de equipo
         const teamTag = c.isHome ? 'L' : 'V';
-        const labelText = `[${teamTag}] ${c.name} (${c.position})`;
+        const sprintTag = c.isSprinting ? '⚡' : '';
+        const labelText = `${sprintTag}[${teamTag}] ${c.name} (${c.position})`;
         ctx.font = 'bold 9px sans-serif';
         const textWidth = ctx.measureText(labelText).width;
-        const badgeY = drawY + c.radius + 3;
+        const badgeY = drawY + c.radius + 4.5;
 
         ctx.fillStyle = c.isHome ? 'rgba(0, 60, 150, 0.92)' : 'rgba(180, 25, 25, 0.92)';
         ctx.beginPath();
@@ -968,9 +1081,7 @@ export const ChapasBoard: React.FC = () => {
         <div className="p-4 flex flex-wrap items-center justify-between gap-4">
           {/* Local */}
           <div className="flex items-center gap-3 flex-1 min-w-[200px]">
-            {homeTeam.badgeUrl && (
-              <img src={homeTeam.badgeUrl} alt={homeTeam.name} className="w-11 h-11 object-contain" />
-            )}
+            <TeamBadge name={homeTeam.name} badgeUrl={homeTeam.badgeUrl} size="lg" />
             <div className="min-w-0">
               <div className="font-black text-sm md:text-base truncate">{homeTeam.name}</div>
               <div className="text-[11px] text-blue-300 font-bold uppercase">Local • Chapas Azules</div>
@@ -998,9 +1109,7 @@ export const ChapasBoard: React.FC = () => {
               <div className="font-black text-sm md:text-base truncate">{awayTeam.name}</div>
               <div className="text-[11px] text-red-300 font-bold uppercase">Visitante • Chapas Rojas</div>
             </div>
-            {awayTeam.badgeUrl && (
-              <img src={awayTeam.badgeUrl} alt={awayTeam.name} className="w-11 h-11 object-contain" />
-            )}
+            <TeamBadge name={awayTeam.name} badgeUrl={awayTeam.badgeUrl} size="lg" />
           </div>
         </div>
 
@@ -1093,7 +1202,7 @@ export const ChapasBoard: React.FC = () => {
               <div className="absolute top-2.5 left-2.5 right-2.5 bg-amber-500/95 text-slate-950 font-black text-xs px-3 py-1.5 rounded-lg shadow-xl flex items-center justify-between z-10 border border-amber-300 backdrop-blur-sm">
                 <span className="flex items-center gap-1.5 truncate">
                   <History className="w-4 h-4 flex-shrink-0 animate-pulse text-slate-950" />
-                  <span className="truncate">Fotograma Histórico: Min {displayedMinute}' • {displayedEvent?.type}</span>
+                  <span className="truncate">Fotograma Histórico: Min {formatTime(displayedMinute, displayedSecond)} • {displayedEvent?.type}</span>
                 </span>
                 <span className="font-mono text-xs bg-slate-950 text-amber-300 px-2 py-0.5 rounded ml-2 flex-shrink-0">
                   {displayedScore.home} - {displayedScore.away}
@@ -1120,7 +1229,7 @@ export const ChapasBoard: React.FC = () => {
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-bold text-xs uppercase tracking-wider text-blue-300 flex items-center gap-2">
                 <Dices className="w-4 h-4 text-valle-yellow" />
-                Tirada D20 Minuto {displayedMinute}'
+                Tirada D20 Minuto {formatTime(displayedMinute, displayedSecond)}
               </h3>
               {displayedEvent?.tacticalAdvantage === 'SPACE_EXPLOITED' && (
                 <span className="bg-emerald-950 text-emerald-400 border border-emerald-500 text-[10px] font-black px-2 py-0.5 rounded uppercase">
@@ -1210,7 +1319,7 @@ export const ChapasBoard: React.FC = () => {
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <span className="font-black text-slate-900">{ev.minute}'</span>
+                    <span className="font-black text-slate-900">{formatTime(ev.minute, ev.second)}</span>
                     <span className="text-[10px] text-slate-400 font-bold uppercase">{ev.type}</span>
                   </div>
                   <div className="text-[11px] leading-relaxed">{ev.commentary}</div>

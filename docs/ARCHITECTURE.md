@@ -78,16 +78,31 @@ flowchart TD
 │   │       ├── Navbar.tsx
 │   │       ├── ChapasBoard.tsx
 │   │       ├── DecisionDebugger.tsx
+│   │       ├── MatchAuditNavigator.tsx
+│   │       ├── TeamBadge.tsx
 │   │       ├── TacticsBoard.tsx
 │   │       ├── StandingsTable.tsx
 │   │       └── FixturesList.tsx
 │   ├── App.tsx
 │   ├── main.tsx
 │   └── index.css
+├── public/
+│   └── badges/                   # Escudos locales descargados para resiliencia offline y SSL
 ├── package.json
 ├── tsconfig.json
 └── vite.config.ts
 ```
+
+---
+
+## 3. Manejo de Escudos y Assets de Clubes (`TeamBadge.tsx`)
+
+Para prevenir problemas de certificados SSL externos (como los servidores escolares IIS de ECMadrid que provocaban imágenes rotas en el navegador) o caídas de red:
+1. **Descarga Local Resiliente**: Los escudos oficiales de los clubes se almacenan en `public/badges/` y son servidos localmente por Vite como recursos estáticos seguros.
+2. **Componente `<TeamBadge>`**:
+   - Gestiona `onError` de manera transparente.
+   - En caso de fallo o ausencia de imagen, genera automáticamente un escudo heráldico con los colores característicos del equipo y sus iniciales en SVG de alta resolución, evitando iconos de imagen rota.
+3. **Unificación de Selectores**: El selector de grupo está centralizado en la cabecera global (`Navbar.tsx`), eliminando selects duplicados y redundantes en el cuerpo de las vistas.
 
 ---
 
