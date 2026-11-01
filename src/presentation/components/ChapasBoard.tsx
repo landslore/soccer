@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useGameStore } from '../../state/game-store';
-import { Play, Pause, FastForward, RotateCcw, Dices, Award, Sparkles, Brain } from 'lucide-react';
+import { useGameStore, ChapaSnapshot } from '../../state/game-store';
+import { Play, Pause, FastForward, RotateCcw, Dices, Award, Sparkles, Brain, History } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { DecisionDebugger } from './DecisionDebugger';
+import { MatchAuditNavigator } from './MatchAuditNavigator';
 
 interface ChapaEntity {
   id: string;
@@ -37,7 +38,14 @@ interface BallEntity {
 }
 
 export const ChapasBoard: React.FC = () => {
-  const { currentMatch, stepMatch, simulateRestOfMatch, toggleAutoPlay, startMatch } = useGameStore();
+  const { 
+    currentMatch, 
+    stepMatch, 
+    simulateRestOfMatch, 
+    toggleAutoPlay, 
+    startMatch,
+    setBoardSnapshotForStep 
+  } = useGameStore();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const chapasRef = useRef<Record<string, ChapaEntity>>({});
@@ -54,6 +62,15 @@ export const ChapasBoard: React.FC = () => {
 
   const [activeActionText, setActiveActionText] = useState<string>('');
   const [showDebugger, setShowDebugger] = useState<boolean>(true);
+
+  const inspectingIndex = currentMatch?.inspectingStepIndex;
+  const isAuditing = inspectingIndex !== null && inspectingIndex !== undefined;
+  const activeStep = isAuditing && currentMatch ? currentMatch.auditTrail[inspectingIndex] : null;
+
+  const displayedEvent = isAuditing ? activeStep?.event : currentMatch?.lastEvent;
+  const displayedMinute = isAuditing ? activeStep?.minute ?? 0 : currentMatch?.state.currentMinute ?? 0;
+  const displayedScore = isAuditing ? activeStep?.score ?? { home: 0, away: 0 } : currentMatch?.state.score ?? { home: 0, away: 0 };
+  const displayedZone = isAuditing ? activeStep?.ballZone ?? 'MIDFIELD' : currentMatch?.state.ballZone ?? 'MIDFIELD';
 
   // 1. Inicializar las 22 chapas según formación 4-3-3 reglamentaria
   useEffect(() => {
@@ -490,7 +507,56 @@ export const ChapasBoard: React.FC = () => {
       default:
         break;
     }
+
+    // Capturar snapshot visual del paso actual para auditoría time-travel
+    if (!isAuditing && currentMatch) {
+      const snapChapas: Record<string, ChapaSnapshot> = {};
+      Object.values(chapas).forEach((c) => {
+        snapChapas[c.id] = {
+          id: c.id,
+          name: c.name,
+          number: c.number,
+          position: c.position,
+          isHome: c.isHome,
+          x: c.targetX,
+          y: c.targetY,
+          hasBall: c.hasBall,
+          isHighlight: c.isHighlight,
+          isMakingRun: c.isMakingRun,
+        };
+      });
+      const stepIdx = currentMatch.auditTrail.length - 1;
+      setBoardSnapshotForStep(stepIdx, {
+        ball: { x: ball.targetX, y: ball.targetY },
+        chapas: snapChapas,
+      });
+    }
   }, [currentMatch?.lastEvent]);
+
+  // Restaurar posiciones visuales exactas cuando el usuario audita un fotograma previo
+  useEffect(() => {
+    if (inspectingIndex === null || inspectingIndex === undefined || !currentMatch) return;
+    const step = currentMatch.auditTrail[inspectingIndex];
+    if (!step) return;
+
+    setActiveActionText(step.event.commentary);
+
+    if (step.boardSnapshot) {
+      const snap = step.boardSnapshot;
+      Object.entries(snap.chapas).forEach(([pId, s]) => {
+        const c = chapasRef.current[pId];
+        if (c) {
+          c.targetX = s.x;
+          c.targetY = s.y;
+          c.hasBall = s.hasBall;
+          c.isHighlight = s.isHighlight;
+          c.isMakingRun = s.isMakingRun;
+        }
+      });
+      ballRef.current.targetX = snap.ball.x;
+      ballRef.current.targetY = snap.ball.y;
+    }
+  }, [inspectingIndex]);
 
   // 3. Loop de Física a 60 FPS: Locomoción Suave + Fuerza de Repulsión Anti-Solapamiento
   useEffect(() => {
@@ -796,7 +862,7 @@ export const ChapasBoard: React.FC = () => {
     );
   }
 
-  const { homeTeam, awayTeam, state, lastEvent, isPlaying } = currentMatch;
+  const { homeTeam, awayTeam, state, isPlaying } = currentMatch;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
@@ -817,13 +883,15 @@ export const ChapasBoard: React.FC = () => {
           {/* Marcador & Minuto */}
           <div className="flex flex-col items-center justify-center px-6 py-2 bg-slate-800 rounded-lg border border-slate-700 shadow-inner">
             <div className="text-3xl md:text-4xl font-black tracking-widest text-valle-yellow flex items-center gap-3">
-              <span>{state.score.home}</span>
+              <span>{displayedScore.home}</span>
               <span className="text-slate-500 text-2xl">-</span>
-              <span>{state.score.away}</span>
+              <span>{displayedScore.away}</span>
             </div>
-            <div className="text-xs font-bold text-emerald-400 mt-0.5 flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              {state.isFinished ? 'FINALIZADO' : `${state.currentMinute}' Minuto`}
+            <div className={`text-xs font-bold mt-0.5 flex items-center gap-1.5 ${isAuditing ? 'text-amber-400' : 'text-emerald-400'}`}>
+              <span className={`w-2 h-2 rounded-full ${isAuditing ? 'bg-amber-400 animate-ping' : 'bg-emerald-400 animate-pulse'}`}></span>
+              {isAuditing 
+                ? `AUDITORÍA • ${displayedMinute}' Minuto` 
+                : (state.isFinished ? 'FINALIZADO' : `${state.currentMinute}' Minuto`)}
             </div>
           </div>
 
@@ -898,9 +966,12 @@ export const ChapasBoard: React.FC = () => {
         </div>
       </div>
 
+      {/* NAVEGADOR DE AUDITORÍA Y TIME-TRAVEL */}
+      <MatchAuditNavigator />
+
       {/* PANEL DE DEBUG DE DECISIONES DE LA IA */}
       {showDebugger && (
-        <DecisionDebugger decision={lastEvent?.decision} minute={state.currentMinute} />
+        <DecisionDebugger decision={displayedEvent?.decision} minute={displayedMinute} />
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -908,19 +979,31 @@ export const ChapasBoard: React.FC = () => {
         <div className="lg:col-span-8 bg-white rounded-xl shadow-md p-4 border border-slate-200 flex flex-col items-center">
           <div className="w-full bg-slate-900 text-valle-yellow font-bold text-xs px-3 py-2 rounded-lg mb-3 flex items-center justify-between border border-slate-700">
             <span className="flex items-center gap-2 truncate">
-              {lastEvent?.tacticalAdvantage === 'SPACE_EXPLOITED' ? (
+              {displayedEvent?.tacticalAdvantage === 'SPACE_EXPLOITED' ? (
                 <Sparkles className="w-4 h-4 text-emerald-400 flex-shrink-0 animate-spin" />
               ) : (
                 <span>⚡</span>
               )}
-              <span className="truncate">{activeActionText || 'Listo para el saque inicial. ¡Rueda el balón!'}</span>
+              <span className="truncate">{activeActionText || displayedEvent?.commentary || 'Listo para el saque inicial. ¡Rueda el balón!'}</span>
             </span>
             <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono flex-shrink-0">
-              Zona: {state.ballZone}
+              Zona: {displayedZone}
             </span>
           </div>
 
           <div className="relative w-full max-w-[560px] aspect-[9/13] shadow-2xl rounded-xl overflow-hidden border-4 border-slate-400">
+            {isAuditing && (
+              <div className="absolute top-2.5 left-2.5 right-2.5 bg-amber-500/95 text-slate-950 font-black text-xs px-3 py-1.5 rounded-lg shadow-xl flex items-center justify-between z-10 border border-amber-300 backdrop-blur-sm">
+                <span className="flex items-center gap-1.5 truncate">
+                  <History className="w-4 h-4 flex-shrink-0 animate-pulse text-slate-950" />
+                  <span className="truncate">Fotograma Histórico: Min {displayedMinute}' • {displayedEvent?.type}</span>
+                </span>
+                <span className="font-mono text-xs bg-slate-950 text-amber-300 px-2 py-0.5 rounded ml-2 flex-shrink-0">
+                  {displayedScore.home} - {displayedScore.away}
+                </span>
+              </div>
+            )}
+
             <canvas
               ref={canvasRef}
               width={560}
@@ -940,29 +1023,29 @@ export const ChapasBoard: React.FC = () => {
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-bold text-xs uppercase tracking-wider text-blue-300 flex items-center gap-2">
                 <Dices className="w-4 h-4 text-valle-yellow" />
-                Tirada D20 Minuto {state.currentMinute}'
+                Tirada D20 Minuto {displayedMinute}'
               </h3>
-              {lastEvent?.tacticalAdvantage === 'SPACE_EXPLOITED' && (
+              {displayedEvent?.tacticalAdvantage === 'SPACE_EXPLOITED' && (
                 <span className="bg-emerald-950 text-emerald-400 border border-emerald-500 text-[10px] font-black px-2 py-0.5 rounded uppercase">
                   ⭐ Ventaja Táctica
                 </span>
               )}
             </div>
 
-            {lastEvent?.contestedCheck ? (
+            {displayedEvent?.contestedCheck ? (
               <div className="space-y-3">
                 <div className="bg-slate-800/90 rounded-lg p-3 border border-slate-700">
                   <div className="text-[11px] text-slate-400 font-medium">Tirada Enfrentada de Rol:</div>
                   <div className="flex items-center justify-between mt-2">
                     <div className="text-center">
                       <div className="text-xs text-blue-300 font-bold truncate max-w-[100px]">
-                        {lastEvent.primaryPlayer?.name || 'Atacante'}
+                        {displayedEvent.primaryPlayer?.name || 'Atacante'}
                       </div>
                       <div className="text-3xl font-black text-valle-yellow">
-                        {lastEvent.contestedCheck.attacker.total}
+                        {displayedEvent.contestedCheck.attacker.total}
                       </div>
                       <div className="text-[10px] text-slate-400">
-                        d20 ({lastEvent.contestedCheck.attacker.naturalRoll}) + {lastEvent.contestedCheck.attacker.modifier}
+                        d20 ({displayedEvent.contestedCheck.attacker.naturalRoll}) + {displayedEvent.contestedCheck.attacker.modifier}
                       </div>
                     </div>
 
@@ -970,13 +1053,13 @@ export const ChapasBoard: React.FC = () => {
 
                     <div className="text-center">
                       <div className="text-xs text-red-300 font-bold truncate max-w-[100px]">
-                        {lastEvent.secondaryPlayer?.name || 'Defensor'}
+                        {displayedEvent.secondaryPlayer?.name || 'Defensor'}
                       </div>
                       <div className="text-3xl font-black text-white">
-                        {lastEvent.contestedCheck.defender.total}
+                        {displayedEvent.contestedCheck.defender.total}
                       </div>
                       <div className="text-[10px] text-slate-400">
-                        d20 ({lastEvent.contestedCheck.defender.naturalRoll}) + {lastEvent.contestedCheck.defender.modifier}
+                        d20 ({displayedEvent.contestedCheck.defender.naturalRoll}) + {displayedEvent.contestedCheck.defender.modifier}
                       </div>
                     </div>
                   </div>
@@ -984,17 +1067,17 @@ export const ChapasBoard: React.FC = () => {
                   <div className="mt-3 pt-2.5 border-t border-slate-700 text-center">
                     <span
                       className={`text-xs font-black px-3 py-1 rounded uppercase tracking-wider ${
-                        lastEvent.contestedCheck.attackerWon
+                        displayedEvent.contestedCheck.attackerWon
                           ? 'bg-emerald-900/80 text-emerald-300 border border-emerald-500'
                           : 'bg-red-900/80 text-red-300 border border-red-500'
                       }`}
                     >
-                      {lastEvent.contestedCheck.attackerWon ? '¡Éxito Atacante!' : '¡Robo / Corte Defensivo!'}
+                      {displayedEvent.contestedCheck.attackerWon ? '¡Éxito Atacante!' : '¡Robo / Corte Defensivo!'}
                     </span>
                   </div>
                 </div>
 
-                {lastEvent.diceCheck?.isCritical && (
+                {displayedEvent.diceCheck?.isCritical && (
                   <div className="bg-yellow-500/20 border border-yellow-400 text-yellow-300 p-2.5 rounded-lg text-xs font-bold flex items-center gap-2 animate-bounce">
                     <Award className="w-5 h-5 text-yellow-400 flex-shrink-0" />
                     <span>¡NAT 20 CRÍTICO! Jugada de antología.</span>
@@ -1003,7 +1086,7 @@ export const ChapasBoard: React.FC = () => {
               </div>
             ) : (
               <div className="text-slate-400 text-xs text-center py-4 italic">
-                Pulsa en "Tirada D20" para ejecutar y animar la siguiente jugada.
+                {isAuditing ? 'Sin tirada enfrentada en este fotograma.' : 'Pulsa en "Tirada D20" para ejecutar y animar la siguiente jugada.'}
               </div>
             )}
           </div>

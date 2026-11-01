@@ -1,5 +1,26 @@
 import { describe, it, expect } from 'vitest';
 import { getAttributeModifier, rollD20, resolveContestedCheck } from './d20';
+import { MatchEngine } from './match-engine';
+import { generateTeamRoster, getDefaultLineup } from './procedural-roster';
+import { Team } from './types';
+
+function createMockTeam(id: string, name: string): Team {
+  const roster = generateTeamRoster(id, 42);
+  const lineup = getDefaultLineup(roster, '4-3-3');
+  return {
+    id,
+    key: `team_${id}`,
+    name,
+    badgeUrl: '',
+    sourceOrigin: 'ECM_MADRID',
+    groupNumber: 1,
+    groupName: 'Grupo 1',
+    stats: { position: 1, points: 30, played: 10, won: 10, drawn: 0, lost: 0, goalsFor: 30, goalsAgainst: 5, goalDiff: 25, form: 'VVVV' },
+    roster,
+    lineup,
+    tactics: { formation: '4-3-3', tempo: 'BALANCED', mentality: 'BALANCED', pressingLevel: 'MID_FIELD', width: 'BALANCED' },
+  };
+}
 
 describe('D20 Rule Engine', () => {
   it('calcula correctamente los modificadores d20 basados en atributos clásicos', () => {
@@ -65,6 +86,26 @@ describe('D20 Rule Engine', () => {
     const contested = resolveContestedCheck(atk, def);
     expect(contested.attackerWon).toBe(true);
     expect(contested.outcome).toBe('CRITICAL_WIN');
+  });
+
+  it('permite rebobinar (time-travel rewind) a un minuto exacto y bifurcar', () => {
+    const teamA = createMockTeam('1', 'Team A');
+    const teamB = createMockTeam('2', 'Team B');
+    const engine = new MatchEngine(teamA, teamB, 12345);
+
+    // Simular 20 pasos
+    for (let i = 0; i < 20; i++) {
+      engine.step();
+    }
+    expect(engine.getState().currentMinute).toBe(20);
+    const minute10Score = engine.getState().events.find(e => e.minute === 10)?.score || { home: 0, away: 0 };
+
+    // Rebobinar al paso 10
+    const ok = engine.rewindToStep(10);
+    expect(ok).toBe(true);
+    expect(engine.getState().currentMinute).toBe(10);
+    expect(engine.getState().score).toEqual(minute10Score);
+    expect(engine.getState().events.length).toBe(11); // Minuto 0 + 10 minutos
   });
 });
 

@@ -56,14 +56,26 @@ const POSITION_PROFILES: PositionRequirement[] = [
 export function generateTeamRoster(teamId: string | number, teamSeed: number): Player[] {
   const rng = createPRNG(teamSeed);
   const roster: Player[] = [];
+  const usedNames = new Set<string>();
   let squadNumber = 1;
 
   for (const profile of POSITION_PROFILES) {
     const count = profile.min;
     for (let i = 0; i < count; i++) {
-      const firstName = FIRST_NAMES[Math.floor(rng() * FIRST_NAMES.length)];
-      const lastName = LAST_NAMES[Math.floor(rng() * LAST_NAMES.length)];
-      const name = `${firstName} ${lastName}`;
+      let firstName = '';
+      let lastName = '';
+      let name = '';
+      let attempts = 0;
+
+      // Garantizar que no existan dos jugadores con el mismo nombre y apellido en la misma plantilla
+      do {
+        firstName = FIRST_NAMES[Math.floor(rng() * FIRST_NAMES.length)];
+        lastName = LAST_NAMES[Math.floor(rng() * LAST_NAMES.length)];
+        name = `${firstName} ${lastName}`;
+        attempts++;
+      } while (usedNames.has(name) && attempts < 100);
+
+      usedNames.add(name);
 
       // Atributos base entre 8 y 16, con bonos a atributos principales
       const baseStats: PlayerAttributes = {

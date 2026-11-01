@@ -87,23 +87,42 @@ export interface MatchState {
   isFinished: boolean;
 }
 
+export interface EngineSnapshot {
+  readonly currentMinute: number;
+  readonly score: { home: number; away: number };
+  readonly possessionTeamId: string | number;
+  readonly ballZone: PitchZone;
+  readonly isFinished: boolean;
+  readonly eventsCount: number;
+}
+
 /**
  * Encuentra el jugador titular más adecuado para una acción según posición.
  * Si excludeGK es true, jamás devuelve al portero (vital para jugadas fuera del área).
+ * Si se pasa excludePlayerIds, evita que un jugador se pase o centre a sí mismo.
  */
-function getActivePlayer(team: Team, positions: SoccerPosition[], excludeGK: boolean = true): Player {
-  const starters = team.roster.filter(p => team.lineup.includes(p.id));
+function getActivePlayer(
+  team: Team, 
+  positions: SoccerPosition[], 
+  excludeGK: boolean = true,
+  excludePlayerIds: (string | number)[] = []
+): Player {
+  const starters = team.roster.filter(p => team.lineup.includes(p.id) && !excludePlayerIds.includes(p.id));
   const candidate = starters.find(p => positions.includes(p.position));
   if (candidate && (!excludeGK || candidate.position !== 'GK')) {
     return candidate;
   }
   const pool = excludeGK ? starters.filter(p => p.position !== 'GK') : starters;
-  return pool[Math.floor(Math.random() * pool.length)] || team.roster[0];
+  if (pool.length > 0) {
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  return team.roster.find(p => !excludePlayerIds.includes(p.id)) || team.roster[0];
 }
 
 export class MatchEngine {
   private state: MatchState;
   private rng: () => number;
+  private snapshots: EngineSnapshot[] = [];
 
   constructor(homeTeam: Team, awayTeam: Team, seed: number = Date.now()) {
     this.rng = createPRNG(seed);
@@ -206,8 +225,8 @@ export class MatchEngine {
   private resolveBuildUpOrCounter(atk: Team, def: Team, min: number): MatchEvent {
     const passer = getActivePlayer(atk, ['CB', 'LB', 'RB'], true);
     const presser = getActivePlayer(def, ['ST', 'LW', 'RW'], true);
-    const midfielder = getActivePlayer(atk, ['CM', 'CDM', 'CAM', 'LM', 'RM'], true);
-    const forward = getActivePlayer(atk, ['ST', 'LW', 'RW'], true);
+    const midfielder = getActivePlayer(atk, ['CM', 'CDM', 'CAM', 'LM', 'RM'], true, [passer.id]);
+    const forward = getActivePlayer(atk, ['ST', 'LW', 'RW'], true, [passer.id]);
 
     const passerInt = passer.attributes.intelligence;
     const passerDes = passer.attributes.dexterity;
@@ -339,8 +358,8 @@ export class MatchEngine {
   private resolveMidfieldDecisions(atk: Team, def: Team, min: number): MatchEvent {
     const playmaker = getActivePlayer(atk, ['CM', 'CAM', 'CDM', 'LM', 'RM'], true);
     const defender = getActivePlayer(def, ['CDM', 'CM', 'CB'], true);
-    const forward = getActivePlayer(atk, ['ST', 'LW', 'RW', 'CAM'], true);
-    const winger = getActivePlayer(atk, ['LW', 'RW'], true);
+    const forward = getActivePlayer(atk, ['ST', 'LW', 'RW', 'CAM'], true, [playmaker.id]);
+    const winger = getActivePlayer(atk, ['LW', 'RW'], true, [playmaker.id]);
 
     const intVal = playmaker.attributes.intelligence;
     const desVal = playmaker.attributes.dexterity;
@@ -439,7 +458,8 @@ export class MatchEngine {
   private resolveAttackingThirdDecisions(atk: Team, def: Team, min: number): MatchEvent {
     const winger = getActivePlayer(atk, ['LW', 'RW', 'CAM', 'ST'], true);
     const fullBack = getActivePlayer(def, ['LB', 'RB', 'CB'], true);
-    const striker = getActivePlayer(atk, ['ST', 'CAM'], true);
+    // ¡El rematador o receptor del centro NUNCA puede ser el mismo jugador que centra!
+    const striker = getActivePlayer(atk, ['ST', 'CAM', 'LW', 'RW'], true, [winger.id]);
 
     const wingerDes = winger.attributes.dexterity;
     const wingerFue = winger.attributes.strength;
@@ -614,6 +634,42 @@ export class MatchEngine {
 
   private recordEvent(event: MatchEvent): MatchEvent {
     this.state.events.push(event);
+    this.saveSnapshot();
     return event;
+  }
+
+  private saveSnapshot(): void {
+    this.snapshots.push({
+      currentMinute: this.state.currentMinute,
+      score: { ...this.state.score },
+      possessionTeamId: this.state.possessionTeamId,
+      ballZone: this.state.ballZone,
+      isFinished: this.state.isFinished,
+      eventsCount: this.state.events.length,
+    });
+  }
+
+  /**
+   * Rebobina el estado interno del motor al instante temporal de un paso previo.
+   * Permite reanudar y bifurcar la simulación desde cualquier punto auditado.
+   */
+  public rewindToStep(stepIndex: number): boolean {
+    if (stepIndex < 0 || stepIndex >= this.snapshots.length) {
+      return false;
+    }
+
+    const snap = this.snapshots[stepIndex];
+    this.state = {
+      ...this.state,
+      currentMinute: snap.currentMinute,
+      score: { ...snap.score },
+      possessionTeamId: snap.possessionTeamId,
+      ballZone: snap.ballZone,
+      isFinished: snap.isFinished,
+      events: this.state.events.slice(0, snap.eventsCount),
+    };
+
+    this.snapshots = this.snapshots.slice(0, stepIndex + 1);
+    return true;
   }
 }

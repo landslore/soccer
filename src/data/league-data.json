@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-31T23:42:44.283Z",
+  "updatedAt": "2026-11-01T00:57:39.051Z",
   "groups": [
     {
       "id": 1,
@@ -598,20 +598,18 @@
             },
             {
               "id": "ply_1186_6",
-              "name": "Hugo Molina",
+              "name": "Samuel Ramírez",
               "number": 6,
               "position": "LB",
               "attributes": {
-                "strength": 15,
-                "dexterity": 17,
+                "strength": 14,
+                "dexterity": 13,
                 "constitution": 16,
-                "intelligence": 10,
-                "wisdom": 14,
-                "charisma": 12
+                "intelligence": 12,
+                "wisdom": 15,
+                "charisma": 14
               },
-              "traits": [
-                "SET_PIECE_SPECIALIST"
-              ],
+              "traits": [],
               "stamina": 100,
               "morale": 0,
               "cards": {
@@ -621,18 +619,21 @@
             },
             {
               "id": "ply_1186_7",
-              "name": "Martín Martínez",
+              "name": "Alejandro Álvarez",
               "number": 7,
               "position": "RB",
               "attributes": {
-                "strength": 12,
+                "strength": 14,
                 "dexterity": 16,
-                "constitution": 15,
-                "intelligence": 12,
-                "wisdom": 15,
-                "charisma": 12
+                "constitution": 13,
+                "intelligence": 15,
+                "wisdom": 12,
+                "charisma": 9
               },
-              "traits": [],
+              "traits": [
+                "EXPLOSIVE_WINGER",
+                "AERIAL_TOWER"
+              ],
               "stamina": 100,
               "morale": 0,
               "cards": {
@@ -642,37 +643,16 @@
             },
             {
               "id": "ply_1186_8",
-              "name": "Diego Ramírez",
+              "name": "Pablo Molina",
               "number": 8,
               "position": "CDM",
               "attributes": {
-                "strength": 12,
-                "dexterity": 10,
+                "strength": 15,
+                "dexterity": 12,
                 "constitution": 15,
-                "intelligence": 14,
-                "wisdom": 15,
-                "charisma": 15
-              },
-              "traits": [],
-              "stamina": 100,
-              "morale": 0,
-              "cards": {
-                "yellow": 0,
-                "red": false
-              }
-            },
-            {
-              "id": "ply_1186_9",
-              "name": "Álvaro Molina",
-              "number": 9,
-              "position": "CDM",
-              "attributes": {
-                "strength": 14,
-                "dexterity": 10,
-                "constitution": 10,
                 "intelligence": 13,
-                "wisdom": 17,
-                "charisma": 14
+                "wisdom": 14,
+                "charisma": 9
               },
               "traits": [
                 "DEFENSIVE_GENERAL"
@@ -685,17 +665,38 @@
               }
             },
             {
+              "id": "ply_1186_9",
+              "name": "Alejandro Torres",
+              "number": 9,
+              "position": "CDM",
+              "attributes": {
+                "strength": 16,
+                "dexterity": 14,
+                "constitution": 13,
+                "intelligence": 11,
+                "wisdom": 15,
+                "charisma": 14
+              },
+              "traits": [],
+              "stamina": 100,
+              "morale": 0,
+              "cards": {
+                "yellow": 0,
+                "red": false
+              }
+            },
+            {
               "id": "ply_1186_10",
-              "name": "Mateo Jiménez",
+              "name": "Lucas Martínez",
               "number": 10,
               "position": "CM",
               "attributes": {
-                "strength": 9,
+                "strength": 11,
                 "dexterity": 10,
-                "constitution": 13,
-                "intelligence": 13,
+                "constitution": 16,
+                "intelligence": 16,
                 "wisdom": 14,
-                "charisma": 13
+                "charisma": 15
               },
               "traits": [
                 "COLD_BLOODED",
@@ -710,20 +711,18 @@
             },
             {
               "id": "ply_1186_11",
-              "name": "Gael Vázquez",
+              "name": "Hugo Martín",
               "number": 11,
               "position": "CM",
               "attributes": {
                 "strength": 9,
-                "dexterity": 11,
-                "constitution": 11,
-                "intelligence": 18,
+                "dexterity": 15,
+                "constitution": 15,
+                "intelligence": 13,
                 "wisdom": 13,
-                "charisma": 10
+                "charisma": 14
               },
-              "traits": [
-                "COLD_BLOODED"
-              ],
+              "traits": [],
               "stamina": 100,
               "morale": 0,
               "cards": {
@@ -733,20 +732,18 @@
             },
             {
               "id": "ply_1186_12",
-              "name": "Alejandro Vázquez",
+              "name": "Brais Ramos",
               "number": 12,
               "position": "CAM",
               "attributes": {
-                "strength": 14,
-                "dexterity": 15,
-                "constitution": 10,
-                "intelligence": 17,
-                "wisdom": 10,
-                "charisma": 13
+                "strength": 13,
+                "dexterity": 11,
+                "constitution": 15,
+                "intelligence": 13,
+                "wisdom": 13,
+                "charisma": 10
               },
-              "traits": [
-                "DRIBBLE_WIZARD"
-              ],
+              "traits": [],
               "stamina": 100,
               "morale": 0,
               "cards": {
@@ -2410,39 +2407,16 @@
             },
             {
               "id": "ply_996_6",
-              "name": "Álvaro Rodríguez",
+              "name": "Diego García",
               "number": 6,
               "position": "LB",
               "attributes": {
-                "strength": 12,
-                "dexterity": 11,
-                "constitution": 10,
-                "intelligence": 10,
+                "strength": 9,
+                "dexterity": 12,
+                "constitution": 12,
+                "intelligence": 11,
                 "wisdom": 10,
                 "charisma": 11
-              },
-              "traits": [
-                "DEFENSIVE_GENERAL"
-              ],
-              "stamina": 100,
-              "morale": 0,
-              "cards": {
-                "yellow": 0,
-                "red": false
-              }
-            },
-            {
-              "id": "ply_996_7",
-              "name": "Diego Martínez",
-              "number": 7,
-              "position": "RB",
-              "attributes": {
-                "strength": 13,
-                "dexterity": 17,
-                "constitution": 15,
-                "intelligence": 13,
-                "wisdom": 10,
-                "charisma": 15
               },
               "traits": [
                 "EXPLOSIVE_WINGER"
@@ -2455,17 +2429,38 @@
               }
             },
             {
+              "id": "ply_996_7",
+              "name": "Sergio Gil",
+              "number": 7,
+              "position": "RB",
+              "attributes": {
+                "strength": 14,
+                "dexterity": 16,
+                "constitution": 11,
+                "intelligence": 15,
+                "wisdom": 12,
+                "charisma": 10
+              },
+              "traits": [],
+              "stamina": 100,
+              "morale": 0,
+              "cards": {
+                "yellow": 0,
+                "red": false
+              }
+            },
+            {
               "id": "ply_996_8",
-              "name": "Carlos Martínez",
+              "name": "Samuel Gil",
               "number": 8,
               "position": "CDM",
               "attributes": {
-                "strength": 11,
-                "dexterity": 15,
-                "constitution": 14,
-                "intelligence": 13,
-                "wisdom": 12,
-                "charisma": 9
+                "strength": 14,
+                "dexterity": 9,
+                "constitution": 9,
+                "intelligence": 14,
+                "wisdom": 17,
+                "charisma": 15
               },
               "traits": [
                 "DEFENSIVE_GENERAL"
@@ -2479,20 +2474,19 @@
             },
             {
               "id": "ply_996_9",
-              "name": "Bruno Domínguez",
+              "name": "Martín Gil",
               "number": 9,
               "position": "CDM",
               "attributes": {
-                "strength": 11,
-                "dexterity": 9,
-                "constitution": 14,
-                "intelligence": 11,
-                "wisdom": 18,
-                "charisma": 13
+                "strength": 13,
+                "dexterity": 15,
+                "constitution": 13,
+                "intelligence": 12,
+                "wisdom": 15,
+                "charisma": 11
               },
               "traits": [
-                "DEFENSIVE_GENERAL",
-                "DRIBBLE_WIZARD"
+                "DEFENSIVE_GENERAL"
               ],
               "stamina": 100,
               "morale": 0,
@@ -2503,19 +2497,19 @@
             },
             {
               "id": "ply_996_10",
-              "name": "Xoel Álvarez",
+              "name": "Adrián Navarro",
               "number": 10,
               "position": "CM",
               "attributes": {
-                "strength": 11,
-                "dexterity": 13,
-                "constitution": 15,
-                "intelligence": 13,
+                "strength": 14,
+                "dexterity": 11,
+                "constitution": 14,
+                "intelligence": 17,
                 "wisdom": 12,
-                "charisma": 14
+                "charisma": 11
               },
               "traits": [
-                "COLD_BLOODED"
+                "SET_PIECE_SPECIALIST"
               ],
               "stamina": 100,
               "morale": 0,
@@ -2526,19 +2520,20 @@
             },
             {
               "id": "ply_996_11",
-              "name": "Iker Hernández",
+              "name": "Diego Alonso",
               "number": 11,
               "position": "CM",
               "attributes": {
-                "strength": 13,
-                "dexterity": 10,
-                "constitution": 16,
-                "intelligence": 15,
-                "wisdom": 10,
-                "charisma": 12
+                "strength": 10,
+                "dexterity": 15,
+                "constitution": 15,
+                "intelligence": 12,
+                "wisdom": 12,
+                "charisma": 10
               },
               "traits": [
-                "COLD_BLOODED"
+                "SET_PIECE_SPECIALIST",
+                "DEFENSIVE_GENERAL"
               ],
               "stamina": 100,
               "morale": 0,
@@ -2549,87 +2544,18 @@
             },
             {
               "id": "ply_996_12",
-              "name": "Gael Gutiérrez",
+              "name": "Carlos Navarro",
               "number": 12,
               "position": "CAM",
               "attributes": {
-                "strength": 12,
-                "dexterity": 14,
-                "constitution": 15,
-                "intelligence": 18,
-                "wisdom": 14,
-                "charisma": 13
-              },
-              "traits": [
-                "ANCHOR_TACKLER"
-              ],
-              "stamina": 100,
-              "morale": 0,
-              "cards": {
-                "yellow": 0,
-                "red": false
-              }
-            },
-            {
-              "id": "ply_996_13",
-              "name": "Pablo Hernández",
-              "number": 13,
-              "position": "LM",
-              "attributes": {
-                "strength": 9,
-                "dexterity": 13,
-                "constitution": 11,
-                "intelligence": 11,
-                "wisdom": 14,
-                "charisma": 10
-              },
-              "traits": [
-                "EXPLOSIVE_WINGER",
-                "ANCHOR_TACKLER"
-              ],
-              "stamina": 100,
-              "morale": 0,
-              "cards": {
-                "yellow": 0,
-                "red": false
-              }
-            },
-            {
-              "id": "ply_996_14",
-              "name": "Nicolás Serrano",
-              "number": 14,
-              "position": "RM",
-              "attributes": {
-                "strength": 10,
-                "dexterity": 13,
+                "strength": 15,
+                "dexterity": 17,
                 "constitution": 14,
-                "intelligence": 17,
+                "intelligence": 15,
                 "wisdom": 13,
-                "charisma": 15
-              },
-              "traits": [],
-              "stamina": 100,
-              "morale": 0,
-              "cards": {
-                "yellow": 0,
-                "red": false
-              }
-            },
-            {
-              "id": "ply_996_15",
-              "name": "Marcos Gutiérrez",
-              "number": 15,
-              "position": "ST",
-              "attributes": {
-                "strength": 17,
-                "dexterity": 11,
-                "constitution": 11,
-                "intelligence": 11,
-                "wisdom": 9,
-                "charisma": 13
+                "charisma": 11
               },
               "traits": [
-                "COLD_BLOODED",
                 "DRIBBLE_WIZARD"
               ],
               "stamina": 100,
@@ -2640,19 +2566,92 @@
               }
             },
             {
+              "id": "ply_996_13",
+              "name": "Hugo Ruiz",
+              "number": 13,
+              "position": "LM",
+              "attributes": {
+                "strength": 11,
+                "dexterity": 12,
+                "constitution": 14,
+                "intelligence": 11,
+                "wisdom": 12,
+                "charisma": 13
+              },
+              "traits": [
+                "DRIBBLE_WIZARD"
+              ],
+              "stamina": 100,
+              "morale": 0,
+              "cards": {
+                "yellow": 0,
+                "red": false
+              }
+            },
+            {
+              "id": "ply_996_14",
+              "name": "Manuel Ruiz",
+              "number": 14,
+              "position": "RM",
+              "attributes": {
+                "strength": 14,
+                "dexterity": 17,
+                "constitution": 13,
+                "intelligence": 16,
+                "wisdom": 11,
+                "charisma": 13
+              },
+              "traits": [
+                "DRIBBLE_WIZARD",
+                "COLD_BLOODED"
+              ],
+              "stamina": 100,
+              "morale": 0,
+              "cards": {
+                "yellow": 0,
+                "red": false
+              }
+            },
+            {
+              "id": "ply_996_15",
+              "name": "Adrián Martín",
+              "number": 15,
+              "position": "ST",
+              "attributes": {
+                "strength": 12,
+                "dexterity": 15,
+                "constitution": 9,
+                "intelligence": 14,
+                "wisdom": 12,
+                "charisma": 14
+              },
+              "traits": [
+                "COLD_BLOODED",
+                "DEFENSIVE_GENERAL"
+              ],
+              "stamina": 100,
+              "morale": 0,
+              "cards": {
+                "yellow": 0,
+                "red": false
+              }
+            },
+            {
               "id": "ply_996_16",
-              "name": "Adrián Molina",
+              "name": "Mateo Pérez",
               "number": 16,
               "position": "ST",
               "attributes": {
-                "strength": 15,
+                "strength": 12,
                 "dexterity": 13,
-                "constitution": 9,
-                "intelligence": 10,
-                "wisdom": 10,
-                "charisma": 11
+                "constitution": 10,
+                "intelligence": 11,
+                "wisdom": 9,
+                "charisma": 10
               },
-              "traits": [],
+              "traits": [
+                "POACHER"
+              ],
               "stamina": 100,
               "morale": 0,
               "cards": {
@@ -2662,16 +2661,16 @@
             },
             {
               "id": "ply_996_17",
-              "name": "Daniel Álvarez",
+              "name": "Rodrigo Alonso",
               "number": 17,
               "position": "LW",
               "attributes": {
-                "strength": 15,
-                "dexterity": 13,
+                "strength": 14,
+                "dexterity": 15,
                 "constitution": 12,
-                "intelligence": 13,
-                "wisdom": 13,
-                "charisma": 12
+                "intelligence": 10,
+                "wisdom": 10,
+                "charisma": 13
               },
               "traits": [],
               "stamina": 100,
@@ -2683,20 +2682,18 @@
             },
             {
               "id": "ply_996_18",
-              "name": "Alex Hernández",
+              "name": "Hugo Gómez",
               "number": 18,
               "position": "RW",
               "attributes": {
-                "strength": 17,
-                "dexterity": 11,
-                "constitution": 9,
-                "intelligence": 9,
-                "wisdom": 11,
-                "charisma": 13
+                "strength": 15,
+                "dexterity": 12,
+                "constitution": 15,
+                "intelligence": 12,
+                "wisdom": 14,
+                "charisma": 9
               },
-              "traits": [
-                "EXPLOSIVE_WINGER"
-              ],
+              "traits": [],
               "stamina": 100,
               "morale": 0,
               "cards": {
@@ -3328,20 +3325,19 @@
             },
             {
               "id": "ply_962_6",
-              "name": "Martín Ruiz",
+              "name": "Sergio García",
               "number": 6,
               "position": "LB",
               "attributes": {
-                "strength": 12,
-                "dexterity": 11,
-                "constitution": 12,
-                "intelligence": 13,
-                "wisdom": 14,
-                "charisma": 10
+                "strength": 11,
+                "dexterity": 16,
+                "constitution": 16,
+                "intelligence": 10,
+                "wisdom": 9,
+                "charisma": 11
               },
               "traits": [
-                "SET_PIECE_SPECIALIST",
-                "COLD_BLOODED"
+                "EXPLOSIVE_WINGER"
               ],
               "stamina": 100,
               "morale": 0,
@@ -3352,15 +3348,15 @@
             },
             {
               "id": "ply_962_7",
-              "name": "Alejandro Martínez",
+              "name": "Daniel Rodríguez",
               "number": 7,
               "position": "RB",
               "attributes": {
-                "strength": 9,
-                "dexterity": 18,
-                "constitution": 12,
-                "intelligence": 13,
-                "wisdom": 14,
+                "strength": 15,
+                "dexterity": 13,
+                "constitution": 15,
+                "intelligence": 14,
+                "wisdom": 13,
                 "charisma": 13
               },
               "traits": [
@@ -3375,18 +3371,19 @@
             },
             {
               "id": "ply_962_8",
-              "name": "Leo Torres",
+              "name": "Gonzalo Ruiz",
               "number": 8,
               "position": "CDM",
               "attributes": {
-                "strength": 12,
-                "dexterity": 9,
-                "constitution": 12,
-                "intelligence": 9,
-                "wisdom": 18,
-                "charisma": 11
+                "strength": 10,
+                "dexterity": 12,
+                "constitution": 9,
+                "intelligence": 15,
+                "wisdom": 13,
+                "charisma": 14
               },
               "traits": [
+                "ANCHOR_TACKLER",
                 "AERIAL_TOWER"
               ],
               "stamina": 100,
@@ -3398,111 +3395,18 @@
             },
             {
               "id": "ply_962_9",
-              "name": "Nicolás Pérez",
+              "name": "Gael García",
               "number": 9,
               "position": "CDM",
               "attributes": {
-                "strength": 15,
-                "dexterity": 9,
-                "constitution": 15,
-                "intelligence": 11,
-                "wisdom": 12,
-                "charisma": 14
-              },
-              "traits": [
-                "DEFENSIVE_GENERAL",
-                "ANCHOR_TACKLER"
-              ],
-              "stamina": 100,
-              "morale": 0,
-              "cards": {
-                "yellow": 0,
-                "red": false
-              }
-            },
-            {
-              "id": "ply_962_10",
-              "name": "Mateo González",
-              "number": 10,
-              "position": "CM",
-              "attributes": {
-                "strength": 11,
-                "dexterity": 15,
-                "constitution": 15,
-                "intelligence": 16,
+                "strength": 17,
+                "dexterity": 11,
+                "constitution": 10,
+                "intelligence": 14,
                 "wisdom": 14,
-                "charisma": 13
+                "charisma": 10
               },
               "traits": [
-                "COLD_BLOODED"
-              ],
-              "stamina": 100,
-              "morale": 0,
-              "cards": {
-                "yellow": 0,
-                "red": false
-              }
-            },
-            {
-              "id": "ply_962_11",
-              "name": "Nicolás Torres",
-              "number": 11,
-              "position": "CM",
-              "attributes": {
-                "strength": 14,
-                "dexterity": 15,
-                "constitution": 14,
-                "intelligence": 12,
-                "wisdom": 14,
-                "charisma": 14
-              },
-              "traits": [],
-              "stamina": 100,
-              "morale": 0,
-              "cards": {
-                "yellow": 0,
-                "red": false
-              }
-            },
-            {
-              "id": "ply_962_12",
-              "name": "Marcos Moreno",
-              "number": 12,
-              "position": "CAM",
-              "attributes": {
-                "strength": 13,
-                "dexterity": 13,
-                "constitution": 15,
-                "intelligence": 18,
-                "wisdom": 13,
-                "charisma": 12
-              },
-              "traits": [
-                "DRIBBLE_WIZARD",
-                "EXPLOSIVE_WINGER"
-              ],
-              "stamina": 100,
-              "morale": 0,
-              "cards": {
-                "yellow": 0,
-                "red": false
-              }
-            },
-            {
-              "id": "ply_962_13",
-              "name": "Daniel Alonso",
-              "number": 13,
-              "position": "LM",
-              "attributes": {
-                "strength": 14,
-                "dexterity": 17,
-                "constitution": 13,
-                "intelligence": 10,
-                "wisdom": 10,
-                "charisma": 13
-              },
-              "traits": [
-                "DRIBBLE_WIZARD",
                 "DEFENSIVE_GENERAL"
               ],
               "stamina": 100,
@@ -3513,17 +3417,64 @@
               }
             },
             {
-              "id": "ply_962_14",
-              "name": "Iago Domínguez",
-              "number": 14,
-              "position": "RM",
+              "id": "ply_962_10",
+              "name": "Martín Jiménez",
+              "number": 10,
+              "position": "CM",
               "attributes": {
-                "strength": 13,
-                "dexterity": 16,
-                "constitution": 9,
+                "strength": 15,
+                "dexterity": 14,
+                "constitution": 15,
                 "intelligence": 16,
-                "wisdom": 15,
+                "wisdom": 13,
+                "charisma": 10
+              },
+              "traits": [
+                "SET_PIECE_SPECIALIST",
+                "POACHER"
+              ],
+              "stamina": 100,
+              "morale": 0,
+              "cards": {
+                "yellow": 0,
+                "red": false
+              }
+            },
+            {
+              "id": "ply_962_11",
+              "name": "Xoel Castro",
+              "number": 11,
+              "position": "CM",
+              "attributes": {
+                "strength": 12,
+                "dexterity": 10,
+                "constitution": 16,
+                "intelligence": 16,
+                "wisdom": 10,
                 "charisma": 14
+              },
+              "traits": [
+                "SET_PIECE_SPECIALIST"
+              ],
+              "stamina": 100,
+              "morale": 0,
+              "cards": {
+                "yellow": 0,
+                "red": false
+              }
+            },
+            {
+              "id": "ply_962_12",
+              "name": "Adrián Serrano",
+              "number": 12,
+              "position": "CAM",
+              "attributes": {
+                "strength": 15,
+                "dexterity": 15,
+                "constitution": 12,
+                "intelligence": 15,
+                "wisdom": 13,
+                "charisma": 15
               },
               "traits": [
                 "DRIBBLE_WIZARD"
@@ -3536,21 +3487,64 @@
               }
             },
             {
+              "id": "ply_962_13",
+              "name": "Gael Molina",
+              "number": 13,
+              "position": "LM",
+              "attributes": {
+                "strength": 13,
+                "dexterity": 12,
+                "constitution": 10,
+                "intelligence": 15,
+                "wisdom": 9,
+                "charisma": 9
+              },
+              "traits": [
+                "DRIBBLE_WIZARD",
+                "POACHER"
+              ],
+              "stamina": 100,
+              "morale": 0,
+              "cards": {
+                "yellow": 0,
+                "red": false
+              }
+            },
+            {
+              "id": "ply_962_14",
+              "name": "Rodrigo Ramírez",
+              "number": 14,
+              "position": "RM",
+              "attributes": {
+                "strength": 9,
+                "dexterity": 17,
+                "constitution": 15,
+                "intelligence": 16,
+                "wisdom": 10,
+                "charisma": 10
+              },
+              "traits": [],
+              "stamina": 100,
+              "morale": 0,
+              "cards": {
+                "yellow": 0,
+                "red": false
+              }
+            },
+            {
               "id": "ply_962_15",
-              "name": "Iker Romero",
+              "name": "Iker Díaz",
               "number": 15,
               "position": "ST",
               "attributes": {
-                "strength": 15,
-                "dexterity": 16,
-                "constitution": 12,
-                "intelligence": 13,
-                "wisdom": 14,
-                "charisma": 10
+                "strength": 17,
+                "dexterity": 13,
+                "constitution": 13,
+                "intelligence": 14,
+                "wisdom": 10,
+                "charisma": 13
               },
-              "traits": [
-                "POACHER"
-              ],
+              "traits": [],
               "stamina": 100,
               "morale": 0,
               "cards": {
@@ -4430,19 +4424,19 @@
             },
             {
               "id": "ply_1068_18",
-              "name": "Alejandro Sánchez",
+              "name": "Hugo Sánchez",
               "number": 18,
               "position": "RW",
               "attributes": {
-                "strength": 10,
-                "dexterity": 13,
-                "constitution": 13,
-                "intelligence": 14,
-                "wisdom": 10,
-                "charisma": 9
+                "strength": 15,
+                "dexterity": 16,
+                "constitution": 10,
+                "intelligence": 9,
+                "wisdom": 12,
+                "charisma": 11
               },
               "traits": [
-                "EXPLOSIVE_WINGER"
+                "DRIBBLE_WIZARD"
               ],
               "stamina": 100,
               "morale": 0,
@@ -6393,38 +6387,15 @@
             },
             {
               "id": "ply_963_4",
-              "name": "Roi López",
+              "name": "Roi Navarro",
               "number": 4,
               "position": "CB",
               "attributes": {
                 "strength": 16,
-                "dexterity": 13,
+                "dexterity": 14,
                 "constitution": 13,
-                "intelligence": 14,
-                "wisdom": 15,
-                "charisma": 9
-              },
-              "traits": [
-                "ANCHOR_TACKLER"
-              ],
-              "stamina": 100,
-              "morale": 0,
-              "cards": {
-                "yellow": 0,
-                "red": false
-              }
-            },
-            {
-              "id": "ply_963_5",
-              "name": "Lucas Ramos",
-              "number": 5,
-              "position": "CB",
-              "attributes": {
-                "strength": 12,
-                "dexterity": 10,
-                "constitution": 12,
-                "intelligence": 15,
-                "wisdom": 14,
+                "intelligence": 9,
+                "wisdom": 12,
                 "charisma": 14
               },
               "traits": [
@@ -6438,17 +6409,40 @@
               }
             },
             {
+              "id": "ply_963_5",
+              "name": "Daniel Díaz",
+              "number": 5,
+              "position": "CB",
+              "attributes": {
+                "strength": 18,
+                "dexterity": 12,
+                "constitution": 14,
+                "intelligence": 10,
+                "wisdom": 15,
+                "charisma": 10
+              },
+              "traits": [
+                "ANCHOR_TACKLER"
+              ],
+              "stamina": 100,
+              "morale": 0,
+              "cards": {
+                "yellow": 0,
+                "red": false
+              }
+            },
+            {
               "id": "ply_963_6",
-              "name": "Brais Ramos",
+              "name": "Javier Moreno",
               "number": 6,
               "position": "LB",
               "attributes": {
-                "strength": 9,
+                "strength": 10,
                 "dexterity": 15,
                 "constitution": 13,
-                "intelligence": 10,
-                "wisdom": 13,
-                "charisma": 11
+                "intelligence": 14,
+                "wisdom": 11,
+                "charisma": 15
               },
               "traits": [
                 "EXPLOSIVE_WINGER"
@@ -6462,20 +6456,20 @@
             },
             {
               "id": "ply_963_7",
-              "name": "Bruno Gómez",
+              "name": "Gonzalo Navarro",
               "number": 7,
               "position": "RB",
               "attributes": {
-                "strength": 11,
-                "dexterity": 15,
-                "constitution": 14,
+                "strength": 10,
+                "dexterity": 17,
+                "constitution": 15,
                 "intelligence": 10,
-                "wisdom": 14,
+                "wisdom": 9,
                 "charisma": 13
               },
               "traits": [
-                "ANCHOR_TACKLER",
-                "EXPLOSIVE_WINGER"
+                "EXPLOSIVE_WINGER",
+                "DEFENSIVE_GENERAL"
               ],
               "stamina": 100,
               "morale": 0,
@@ -6486,61 +6480,19 @@
             },
             {
               "id": "ply_963_8",
-              "name": "Martín Domínguez",
+              "name": "Álvaro Fernández",
               "number": 8,
               "position": "CDM",
               "attributes": {
-                "strength": 13,
-                "dexterity": 11,
-                "constitution": 9,
-                "intelligence": 9,
-                "wisdom": 17,
-                "charisma": 11
-              },
-              "traits": [],
-              "stamina": 100,
-              "morale": 0,
-              "cards": {
-                "yellow": 0,
-                "red": false
-              }
-            },
-            {
-              "id": "ply_963_9",
-              "name": "Jorge Romero",
-              "number": 9,
-              "position": "CDM",
-              "attributes": {
-                "strength": 13,
-                "dexterity": 10,
-                "constitution": 15,
-                "intelligence": 13,
-                "wisdom": 18,
-                "charisma": 13
-              },
-              "traits": [],
-              "stamina": 100,
-              "morale": 0,
-              "cards": {
-                "yellow": 0,
-                "red": false
-              }
-            },
-            {
-              "id": "ply_963_10",
-              "name": "Javier Gil",
-              "number": 10,
-              "position": "CM",
-              "attributes": {
-                "strength": 13,
-                "dexterity": 15,
-                "constitution": 17,
-                "intelligence": 17,
+                "strength": 11,
+                "dexterity": 14,
+                "constitution": 11,
+                "intelligence": 14,
                 "wisdom": 11,
-                "charisma": 15
+                "charisma": 10
               },
               "traits": [
-                "COLD_BLOODED"
+                "DEFENSIVE_GENERAL"
               ],
               "stamina": 100,
               "morale": 0,
@@ -6550,17 +6502,41 @@
               }
             },
             {
-              "id": "ply_963_11",
-              "name": "Rodrigo Pérez",
-              "number": 11,
+              "id": "ply_963_9",
+              "name": "Bruno Gutiérrez",
+              "number": 9,
+              "position": "CDM",
+              "attributes": {
+                "strength": 17,
+                "dexterity": 13,
+                "constitution": 12,
+                "intelligence": 11,
+                "wisdom": 11,
+                "charisma": 11
+              },
+              "traits": [
+                "DEFENSIVE_GENERAL",
+                "DRIBBLE_WIZARD"
+              ],
+              "stamina": 100,
+              "morale": 0,
+              "cards": {
+                "yellow": 0,
+                "red": false
+              }
+            },
+            {
+              "id": "ply_963_10",
+              "name": "Mario Serrano",
+              "number": 10,
               "position": "CM",
               "attributes": {
-                "strength": 15,
-                "dexterity": 14,
-                "constitution": 13,
-                "intelligence": 12,
-                "wisdom": 9,
-                "charisma": 12
+                "strength": 9,
+                "dexterity": 12,
+                "constitution": 15,
+                "intelligence": 16,
+                "wisdom": 10,
+                "charisma": 13
               },
               "traits": [
                 "SET_PIECE_SPECIALIST"
@@ -6573,59 +6549,17 @@
               }
             },
             {
-              "id": "ply_963_12",
-              "name": "Iker López",
-              "number": 12,
-              "position": "CAM",
+              "id": "ply_963_11",
+              "name": "Mateo Moreno",
+              "number": 11,
+              "position": "CM",
               "attributes": {
-                "strength": 9,
-                "dexterity": 12,
-                "constitution": 12,
-                "intelligence": 13,
-                "wisdom": 13,
-                "charisma": 11
-              },
-              "traits": [],
-              "stamina": 100,
-              "morale": 0,
-              "cards": {
-                "yellow": 0,
-                "red": false
-              }
-            },
-            {
-              "id": "ply_963_13",
-              "name": "Antón García",
-              "number": 13,
-              "position": "LM",
-              "attributes": {
-                "strength": 12,
-                "dexterity": 11,
-                "constitution": 11,
-                "intelligence": 13,
-                "wisdom": 10,
-                "charisma": 10
-              },
-              "traits": [],
-              "stamina": 100,
-              "morale": 0,
-              "cards": {
-                "yellow": 0,
-                "red": false
-              }
-            },
-            {
-              "id": "ply_963_14",
-              "name": "Iago Ruiz",
-              "number": 14,
-              "position": "RM",
-              "attributes": {
-                "strength": 9,
+                "strength": 14,
                 "dexterity": 13,
-                "constitution": 13,
-                "intelligence": 15,
-                "wisdom": 9,
-                "charisma": 14
+                "constitution": 10,
+                "intelligence": 17,
+                "wisdom": 10,
+                "charisma": 12
               },
               "traits": [
                 "COLD_BLOODED"
@@ -6638,20 +6572,92 @@
               }
             },
             {
+              "id": "ply_963_12",
+              "name": "Rodrigo Martín",
+              "number": 12,
+              "position": "CAM",
+              "attributes": {
+                "strength": 9,
+                "dexterity": 10,
+                "constitution": 9,
+                "intelligence": 14,
+                "wisdom": 14,
+                "charisma": 9
+              },
+              "traits": [
+                "SET_PIECE_SPECIALIST"
+              ],
+              "stamina": 100,
+              "morale": 0,
+              "cards": {
+                "yellow": 0,
+                "red": false
+              }
+            },
+            {
+              "id": "ply_963_13",
+              "name": "Leo Pérez",
+              "number": 13,
+              "position": "LM",
+              "attributes": {
+                "strength": 9,
+                "dexterity": 12,
+                "constitution": 10,
+                "intelligence": 17,
+                "wisdom": 11,
+                "charisma": 9
+              },
+              "traits": [
+                "EXPLOSIVE_WINGER",
+                "COLD_BLOODED"
+              ],
+              "stamina": 100,
+              "morale": 0,
+              "cards": {
+                "yellow": 0,
+                "red": false
+              }
+            },
+            {
+              "id": "ply_963_14",
+              "name": "Iker Martínez",
+              "number": 14,
+              "position": "RM",
+              "attributes": {
+                "strength": 15,
+                "dexterity": 12,
+                "constitution": 14,
+                "intelligence": 16,
+                "wisdom": 12,
+                "charisma": 12
+              },
+              "traits": [
+                "DRIBBLE_WIZARD",
+                "POACHER"
+              ],
+              "stamina": 100,
+              "morale": 0,
+              "cards": {
+                "yellow": 0,
+                "red": false
+              }
+            },
+            {
               "id": "ply_963_15",
-              "name": "Brais Gil",
+              "name": "Samuel Jiménez",
               "number": 15,
               "position": "ST",
               "attributes": {
-                "strength": 15,
-                "dexterity": 14,
-                "constitution": 12,
-                "intelligence": 15,
-                "wisdom": 12,
-                "charisma": 13
+                "strength": 13,
+                "dexterity": 11,
+                "constitution": 11,
+                "intelligence": 10,
+                "wisdom": 11,
+                "charisma": 15
               },
               "traits": [
-                "AERIAL_TOWER"
+                "AERIAL_TOWER",
+                "POACHER"
               ],
               "stamina": 100,
               "morale": 0,
@@ -6662,20 +6668,19 @@
             },
             {
               "id": "ply_963_16",
-              "name": "Pablo Martín",
+              "name": "Rodrigo Torres",
               "number": 16,
               "position": "ST",
               "attributes": {
-                "strength": 13,
-                "dexterity": 13,
-                "constitution": 15,
-                "intelligence": 13,
-                "wisdom": 9,
-                "charisma": 14
+                "strength": 16,
+                "dexterity": 16,
+                "constitution": 13,
+                "intelligence": 9,
+                "wisdom": 14,
+                "charisma": 12
               },
               "traits": [
-                "COLD_BLOODED",
-                "ANCHOR_TACKLER"
+                "COLD_BLOODED"
               ],
               "stamina": 100,
               "morale": 0,
@@ -6686,19 +6691,20 @@
             },
             {
               "id": "ply_963_17",
-              "name": "Brais Navarro",
+              "name": "Nicolás Gil",
               "number": 17,
               "position": "LW",
               "attributes": {
-                "strength": 10,
-                "dexterity": 17,
-                "constitution": 12,
-                "intelligence": 10,
+                "strength": 12,
+                "dexterity": 16,
+                "constitution": 10,
+                "intelligence": 13,
                 "wisdom": 15,
-                "charisma": 14
+                "charisma": 11
               },
               "traits": [
-                "EXPLOSIVE_WINGER"
+                "DRIBBLE_WIZARD",
+                "ANCHOR_TACKLER"
               ],
               "stamina": 100,
               "morale": 0,
@@ -6709,19 +6715,19 @@
             },
             {
               "id": "ply_963_18",
-              "name": "Sergio Sánchez",
+              "name": "Iker Ruiz",
               "number": 18,
               "position": "RW",
               "attributes": {
-                "strength": 15,
+                "strength": 16,
                 "dexterity": 17,
-                "constitution": 11,
+                "constitution": 9,
                 "intelligence": 13,
-                "wisdom": 10,
-                "charisma": 12
+                "wisdom": 14,
+                "charisma": 13
               },
               "traits": [
-                "EXPLOSIVE_WINGER"
+                "DRIBBLE_WIZARD"
               ],
               "stamina": 100,
               "morale": 0,
@@ -13682,18 +13688,20 @@
             },
             {
               "id": "ply_67_12",
-              "name": "Iker Hernández",
+              "name": "Marcos Moreno",
               "number": 12,
               "position": "CAM",
               "attributes": {
-                "strength": 12,
-                "dexterity": 14,
-                "constitution": 9,
-                "intelligence": 18,
-                "wisdom": 10,
-                "charisma": 11
+                "strength": 9,
+                "dexterity": 16,
+                "constitution": 10,
+                "intelligence": 13,
+                "wisdom": 15,
+                "charisma": 13
               },
-              "traits": [],
+              "traits": [
+                "SET_PIECE_SPECIALIST"
+              ],
               "stamina": 100,
               "morale": 0,
               "cards": {
@@ -13703,15 +13711,62 @@
             },
             {
               "id": "ply_67_13",
-              "name": "Brais Molina",
+              "name": "David Domínguez",
               "number": 13,
               "position": "LM",
               "attributes": {
-                "strength": 11,
-                "dexterity": 14,
-                "constitution": 14,
-                "intelligence": 16,
-                "wisdom": 13,
+                "strength": 14,
+                "dexterity": 15,
+                "constitution": 11,
+                "intelligence": 14,
+                "wisdom": 15,
+                "charisma": 10
+              },
+              "traits": [
+                "EXPLOSIVE_WINGER"
+              ],
+              "stamina": 100,
+              "morale": 0,
+              "cards": {
+                "yellow": 0,
+                "red": false
+              }
+            },
+            {
+              "id": "ply_67_14",
+              "name": "Martín Castro",
+              "number": 14,
+              "position": "RM",
+              "attributes": {
+                "strength": 15,
+                "dexterity": 11,
+                "constitution": 11,
+                "intelligence": 11,
+                "wisdom": 9,
+                "charisma": 15
+              },
+              "traits": [
+                "EXPLOSIVE_WINGER",
+                "ANCHOR_TACKLER"
+              ],
+              "stamina": 100,
+              "morale": 0,
+              "cards": {
+                "yellow": 0,
+                "red": false
+              }
+            },
+            {
+              "id": "ply_67_15",
+              "name": "Javier Romero",
+              "number": 15,
+              "position": "ST",
+              "attributes": {
+                "strength": 14,
+                "dexterity": 16,
+                "constitution": 10,
+                "intelligence": 11,
+                "wisdom": 11,
                 "charisma": 11
               },
               "traits": [],
@@ -13723,17 +13778,17 @@
               }
             },
             {
-              "id": "ply_67_14",
-              "name": "Sergio Blanco",
-              "number": 14,
-              "position": "RM",
+              "id": "ply_67_16",
+              "name": "Brais Díaz",
+              "number": 16,
+              "position": "ST",
               "attributes": {
-                "strength": 10,
+                "strength": 12,
                 "dexterity": 11,
-                "constitution": 9,
-                "intelligence": 16,
-                "wisdom": 15,
-                "charisma": 9
+                "constitution": 11,
+                "intelligence": 11,
+                "wisdom": 12,
+                "charisma": 11
               },
               "traits": [
                 "AERIAL_TOWER"
@@ -13746,65 +13801,21 @@
               }
             },
             {
-              "id": "ply_67_15",
-              "name": "Álvaro Gutiérrez",
-              "number": 15,
-              "position": "ST",
-              "attributes": {
-                "strength": 13,
-                "dexterity": 14,
-                "constitution": 14,
-                "intelligence": 12,
-                "wisdom": 12,
-                "charisma": 11
-              },
-              "traits": [
-                "POACHER"
-              ],
-              "stamina": 100,
-              "morale": 0,
-              "cards": {
-                "yellow": 0,
-                "red": false
-              }
-            },
-            {
-              "id": "ply_67_16",
-              "name": "Antón Gil",
-              "number": 16,
-              "position": "ST",
-              "attributes": {
-                "strength": 11,
-                "dexterity": 13,
-                "constitution": 14,
-                "intelligence": 12,
-                "wisdom": 9,
-                "charisma": 9
-              },
-              "traits": [
-                "POACHER"
-              ],
-              "stamina": 100,
-              "morale": 0,
-              "cards": {
-                "yellow": 0,
-                "red": false
-              }
-            },
-            {
               "id": "ply_67_17",
-              "name": "Sergio Ramírez",
+              "name": "Leo Alonso",
               "number": 17,
               "position": "LW",
               "attributes": {
-                "strength": 14,
-                "dexterity": 12,
-                "constitution": 10,
-                "intelligence": 13,
+                "strength": 11,
+                "dexterity": 17,
+                "constitution": 14,
+                "intelligence": 12,
                 "wisdom": 9,
-                "charisma": 14
+                "charisma": 12
               },
-              "traits": [],
+              "traits": [
+                "EXPLOSIVE_WINGER"
+              ],
               "stamina": 100,
               "morale": 0,
               "cards": {
@@ -13814,16 +13825,16 @@
             },
             {
               "id": "ply_67_18",
-              "name": "Sergio Domínguez",
+              "name": "Iker Alonso",
               "number": 18,
               "position": "RW",
               "attributes": {
-                "strength": 16,
-                "dexterity": 17,
-                "constitution": 9,
-                "intelligence": 12,
-                "wisdom": 13,
-                "charisma": 11
+                "strength": 12,
+                "dexterity": 16,
+                "constitution": 10,
+                "intelligence": 9,
+                "wisdom": 12,
+                "charisma": 12
               },
               "traits": [],
               "stamina": 100,
@@ -18301,20 +18312,20 @@
             },
             {
               "id": "ply_434_18",
-              "name": "Iker Domínguez",
+              "name": "Roi García",
               "number": 18,
               "position": "RW",
               "attributes": {
-                "strength": 15,
-                "dexterity": 11,
-                "constitution": 11,
-                "intelligence": 10,
-                "wisdom": 15,
-                "charisma": 9
+                "strength": 12,
+                "dexterity": 13,
+                "constitution": 15,
+                "intelligence": 9,
+                "wisdom": 10,
+                "charisma": 10
               },
               "traits": [
                 "DRIBBLE_WIZARD",
-                "COLD_BLOODED"
+                "EXPLOSIVE_WINGER"
               ],
               "stamina": 100,
               "morale": 0,
@@ -18599,20 +18610,19 @@
             },
             {
               "id": "ply_98_11",
-              "name": "Samuel Ramírez",
+              "name": "Diego Gómez",
               "number": 11,
               "position": "CM",
               "attributes": {
-                "strength": 11,
-                "dexterity": 10,
-                "constitution": 11,
+                "strength": 10,
+                "dexterity": 12,
+                "constitution": 16,
                 "intelligence": 15,
                 "wisdom": 15,
-                "charisma": 13
+                "charisma": 11
               },
               "traits": [
-                "SET_PIECE_SPECIALIST",
-                "AERIAL_TOWER"
+                "SET_PIECE_SPECIALIST"
               ],
               "stamina": 100,
               "morale": 0,
@@ -18623,20 +18633,18 @@
             },
             {
               "id": "ply_98_12",
-              "name": "Lucas Ruiz",
+              "name": "Mario González",
               "number": 12,
               "position": "CAM",
               "attributes": {
                 "strength": 9,
-                "dexterity": 11,
-                "constitution": 12,
-                "intelligence": 13,
-                "wisdom": 9,
-                "charisma": 15
+                "dexterity": 14,
+                "constitution": 11,
+                "intelligence": 12,
+                "wisdom": 15,
+                "charisma": 9
               },
-              "traits": [
-                "DRIBBLE_WIZARD"
-              ],
+              "traits": [],
               "stamina": 100,
               "morale": 0,
               "cards": {
@@ -20864,19 +20872,19 @@
             },
             {
               "id": "ply_338_14",
-              "name": "Iago López",
+              "name": "Bruno Molina",
               "number": 14,
               "position": "RM",
               "attributes": {
-                "strength": 15,
-                "dexterity": 18,
-                "constitution": 10,
-                "intelligence": 16,
-                "wisdom": 12,
-                "charisma": 9
+                "strength": 10,
+                "dexterity": 16,
+                "constitution": 12,
+                "intelligence": 11,
+                "wisdom": 14,
+                "charisma": 14
               },
               "traits": [
-                "AERIAL_TOWER"
+                "EXPLOSIVE_WINGER"
               ],
               "stamina": 100,
               "morale": 0,
@@ -20887,20 +20895,18 @@
             },
             {
               "id": "ply_338_15",
-              "name": "Lucas Moreno",
+              "name": "Hugo Gómez",
               "number": 15,
               "position": "ST",
               "attributes": {
-                "strength": 12,
-                "dexterity": 12,
+                "strength": 13,
+                "dexterity": 15,
                 "constitution": 10,
-                "intelligence": 14,
-                "wisdom": 10,
-                "charisma": 15
+                "intelligence": 15,
+                "wisdom": 12,
+                "charisma": 10
               },
-              "traits": [
-                "POACHER"
-              ],
+              "traits": [],
               "stamina": 100,
               "morale": 0,
               "cards": {
@@ -20910,19 +20916,18 @@
             },
             {
               "id": "ply_338_16",
-              "name": "Daniel Martín",
+              "name": "Álvaro Serrano",
               "number": 16,
               "position": "ST",
               "attributes": {
-                "strength": 18,
-                "dexterity": 11,
+                "strength": 12,
+                "dexterity": 17,
                 "constitution": 15,
-                "intelligence": 15,
-                "wisdom": 10,
-                "charisma": 9
+                "intelligence": 10,
+                "wisdom": 9,
+                "charisma": 13
               },
               "traits": [
-                "AERIAL_TOWER",
                 "COLD_BLOODED"
               ],
               "stamina": 100,
@@ -23227,15 +23232,15 @@
             },
             {
               "id": "ply_724_18",
-              "name": "Leo Martín",
+              "name": "Bruno Moreno",
               "number": 18,
               "position": "RW",
               "attributes": {
-                "strength": 17,
+                "strength": 15,
                 "dexterity": 14,
                 "constitution": 14,
-                "intelligence": 12,
-                "wisdom": 14,
+                "intelligence": 13,
+                "wisdom": 10,
                 "charisma": 13
               },
               "traits": [],
@@ -24466,20 +24471,19 @@
             },
             {
               "id": "ply_191_16",
-              "name": "Rodrigo Pérez",
+              "name": "Adrián Jiménez",
               "number": 16,
               "position": "ST",
               "attributes": {
-                "strength": 14,
-                "dexterity": 13,
-                "constitution": 10,
+                "strength": 13,
+                "dexterity": 11,
+                "constitution": 12,
                 "intelligence": 10,
-                "wisdom": 12,
-                "charisma": 10
+                "wisdom": 14,
+                "charisma": 15
               },
               "traits": [
-                "POACHER",
-                "AERIAL_TOWER"
+                "POACHER"
               ],
               "stamina": 100,
               "morale": 0,
@@ -24490,18 +24494,20 @@
             },
             {
               "id": "ply_191_17",
-              "name": "Javier Serrano",
+              "name": "Xoel Gutiérrez",
               "number": 17,
               "position": "LW",
               "attributes": {
-                "strength": 14,
-                "dexterity": 18,
-                "constitution": 13,
-                "intelligence": 14,
-                "wisdom": 9,
-                "charisma": 14
+                "strength": 16,
+                "dexterity": 15,
+                "constitution": 14,
+                "intelligence": 9,
+                "wisdom": 14,
+                "charisma": 13
               },
-              "traits": [],
+              "traits": [
+                "EXPLOSIVE_WINGER"
+              ],
               "stamina": 100,
               "morale": 0,
               "cards": {
@@ -24511,19 +24517,19 @@
             },
             {
               "id": "ply_191_18",
-              "name": "Gael García",
+              "name": "Adrián Gómez",
               "number": 18,
               "position": "RW",
               "attributes": {
-                "strength": 13,
-                "dexterity": 13,
-                "constitution": 13,
-                "intelligence": 11,
-                "wisdom": 9,
-                "charisma": 15
+                "strength": 15,
+                "dexterity": 14,
+                "constitution": 9,
+                "intelligence": 15,
+                "wisdom": 12,
+                "charisma": 12
               },
               "traits": [
-                "EXPLOSIVE_WINGER"
+                "DRIBBLE_WIZARD"
               ],
               "stamina": 100,
               "morale": 0,
@@ -24959,16 +24965,16 @@
             },
             {
               "id": "ply_1108_18",
-              "name": "David García",
+              "name": "Bruno Fernández",
               "number": 18,
               "position": "RW",
               "attributes": {
-                "strength": 16,
-                "dexterity": 11,
-                "constitution": 12,
-                "intelligence": 12,
-                "wisdom": 15,
-                "charisma": 14
+                "strength": 13,
+                "dexterity": 15,
+                "constitution": 15,
+                "intelligence": 14,
+                "wisdom": 12,
+                "charisma": 9
               },
               "traits": [
                 "DRIBBLE_WIZARD"
@@ -25367,20 +25373,20 @@
             },
             {
               "id": "ply_938_16",
-              "name": "Hugo Vázquez",
+              "name": "Gael Castro",
               "number": 16,
               "position": "ST",
               "attributes": {
-                "strength": 16,
-                "dexterity": 17,
-                "constitution": 13,
-                "intelligence": 11,
+                "strength": 15,
+                "dexterity": 13,
+                "constitution": 10,
+                "intelligence": 13,
                 "wisdom": 10,
-                "charisma": 13
+                "charisma": 12
               },
               "traits": [
-                "COLD_BLOODED",
-                "DEFENSIVE_GENERAL"
+                "AERIAL_TOWER",
+                "ANCHOR_TACKLER"
               ],
               "stamina": 100,
               "morale": 0,
@@ -25391,20 +25397,18 @@
             },
             {
               "id": "ply_938_17",
-              "name": "Samuel Vázquez",
+              "name": "Hugo Pérez",
               "number": 17,
               "position": "LW",
               "attributes": {
-                "strength": 10,
-                "dexterity": 12,
-                "constitution": 12,
-                "intelligence": 13,
+                "strength": 13,
+                "dexterity": 16,
+                "constitution": 11,
+                "intelligence": 14,
                 "wisdom": 11,
-                "charisma": 14
+                "charisma": 10
               },
-              "traits": [
-                "DRIBBLE_WIZARD"
-              ],
+              "traits": [],
               "stamina": 100,
               "morale": 0,
               "cards": {
@@ -25414,18 +25418,20 @@
             },
             {
               "id": "ply_938_18",
-              "name": "Sergio Rodríguez",
+              "name": "Mateo Ruiz",
               "number": 18,
               "position": "RW",
               "attributes": {
-                "strength": 13,
-                "dexterity": 16,
-                "constitution": 12,
-                "intelligence": 9,
-                "wisdom": 14,
-                "charisma": 13
+                "strength": 14,
+                "dexterity": 15,
+                "constitution": 9,
+                "intelligence": 14,
+                "wisdom": 13,
+                "charisma": 12
               },
-              "traits": [],
+              "traits": [
+                "DRIBBLE_WIZARD"
+              ],
               "stamina": 100,
               "morale": 0,
               "cards": {
@@ -31987,19 +31993,19 @@
             },
             {
               "id": "ply_19230216_15",
-              "name": "Leo Castro",
+              "name": "Antón Gutiérrez",
               "number": 15,
               "position": "ST",
               "attributes": {
                 "strength": 17,
                 "dexterity": 15,
-                "constitution": 14,
-                "intelligence": 14,
-                "wisdom": 11,
-                "charisma": 13
+                "constitution": 11,
+                "intelligence": 13,
+                "wisdom": 13,
+                "charisma": 15
               },
               "traits": [
-                "POACHER",
+                "COLD_BLOODED",
                 "ANCHOR_TACKLER"
               ],
               "stamina": 100,
@@ -32011,19 +32017,19 @@
             },
             {
               "id": "ply_19230216_16",
-              "name": "Antón Vázquez",
+              "name": "Alejandro Domínguez",
               "number": 16,
               "position": "ST",
               "attributes": {
-                "strength": 13,
-                "dexterity": 15,
-                "constitution": 13,
-                "intelligence": 10,
-                "wisdom": 15,
-                "charisma": 15
+                "strength": 16,
+                "dexterity": 11,
+                "constitution": 15,
+                "intelligence": 15,
+                "wisdom": 13,
+                "charisma": 10
               },
               "traits": [
-                "POACHER"
+                "EXPLOSIVE_WINGER"
               ],
               "stamina": 100,
               "morale": 0,
@@ -32034,16 +32040,16 @@
             },
             {
               "id": "ply_19230216_17",
-              "name": "Roi Hernández",
+              "name": "Hugo Gil",
               "number": 17,
               "position": "LW",
               "attributes": {
-                "strength": 11,
-                "dexterity": 17,
-                "constitution": 11,
+                "strength": 13,
+                "dexterity": 16,
+                "constitution": 10,
                 "intelligence": 13,
-                "wisdom": 10,
-                "charisma": 13
+                "wisdom": 14,
+                "charisma": 14
               },
               "traits": [
                 "EXPLOSIVE_WINGER"
@@ -32057,18 +32063,20 @@
             },
             {
               "id": "ply_19230216_18",
-              "name": "Rodrigo Díaz",
+              "name": "Javier López",
               "number": 18,
               "position": "RW",
               "attributes": {
-                "strength": 13,
-                "dexterity": 12,
-                "constitution": 11,
-                "intelligence": 11,
+                "strength": 12,
+                "dexterity": 13,
+                "constitution": 9,
+                "intelligence": 9,
                 "wisdom": 9,
-                "charisma": 9
+                "charisma": 12
               },
-              "traits": [],
+              "traits": [
+                "DRIBBLE_WIZARD"
+              ],
               "stamina": 100,
               "morale": 0,
               "cards": {
@@ -32818,112 +32826,19 @@
             },
             {
               "id": "ply_2064_12",
-              "name": "Rodrigo Romero",
+              "name": "Antón Ruiz",
               "number": 12,
               "position": "CAM",
               "attributes": {
-                "strength": 14,
-                "dexterity": 13,
-                "constitution": 10,
-                "intelligence": 12,
-                "wisdom": 15,
-                "charisma": 11
-              },
-              "traits": [
-                "DRIBBLE_WIZARD",
-                "COLD_BLOODED"
-              ],
-              "stamina": 100,
-              "morale": 0,
-              "cards": {
-                "yellow": 0,
-                "red": false
-              }
-            },
-            {
-              "id": "ply_2064_13",
-              "name": "Roi Domínguez",
-              "number": 13,
-              "position": "LM",
-              "attributes": {
-                "strength": 13,
-                "dexterity": 17,
-                "constitution": 9,
-                "intelligence": 13,
-                "wisdom": 10,
-                "charisma": 9
-              },
-              "traits": [
-                "DRIBBLE_WIZARD"
-              ],
-              "stamina": 100,
-              "morale": 0,
-              "cards": {
-                "yellow": 0,
-                "red": false
-              }
-            },
-            {
-              "id": "ply_2064_14",
-              "name": "Lucas Vázquez",
-              "number": 14,
-              "position": "RM",
-              "attributes": {
-                "strength": 14,
-                "dexterity": 15,
-                "constitution": 13,
-                "intelligence": 13,
-                "wisdom": 14,
-                "charisma": 10
-              },
-              "traits": [
-                "EXPLOSIVE_WINGER",
-                "DRIBBLE_WIZARD"
-              ],
-              "stamina": 100,
-              "morale": 0,
-              "cards": {
-                "yellow": 0,
-                "red": false
-              }
-            },
-            {
-              "id": "ply_2064_15",
-              "name": "Diego Ruiz",
-              "number": 15,
-              "position": "ST",
-              "attributes": {
-                "strength": 14,
-                "dexterity": 15,
-                "constitution": 13,
-                "intelligence": 9,
-                "wisdom": 9,
+                "strength": 10,
+                "dexterity": 10,
+                "constitution": 15,
+                "intelligence": 14,
+                "wisdom": 12,
                 "charisma": 12
               },
               "traits": [
-                "AERIAL_TOWER"
-              ],
-              "stamina": 100,
-              "morale": 0,
-              "cards": {
-                "yellow": 0,
-                "red": false
-              }
-            },
-            {
-              "id": "ply_2064_16",
-              "name": "Roi Rodríguez",
-              "number": 16,
-              "position": "ST",
-              "attributes": {
-                "strength": 14,
-                "dexterity": 13,
-                "constitution": 12,
-                "intelligence": 12,
-                "wisdom": 12,
-                "charisma": 13
-              },
-              "traits": [
+                "DRIBBLE_WIZARD",
                 "POACHER"
               ],
               "stamina": 100,
@@ -32934,16 +32849,40 @@
               }
             },
             {
-              "id": "ply_2064_17",
-              "name": "Martín Martínez",
-              "number": 17,
-              "position": "LW",
+              "id": "ply_2064_13",
+              "name": "Nicolás Molina",
+              "number": 13,
+              "position": "LM",
               "attributes": {
-                "strength": 10,
+                "strength": 9,
                 "dexterity": 14,
-                "constitution": 11,
+                "constitution": 10,
                 "intelligence": 11,
-                "wisdom": 14,
+                "wisdom": 12,
+                "charisma": 11
+              },
+              "traits": [
+                "EXPLOSIVE_WINGER",
+                "POACHER"
+              ],
+              "stamina": 100,
+              "morale": 0,
+              "cards": {
+                "yellow": 0,
+                "red": false
+              }
+            },
+            {
+              "id": "ply_2064_14",
+              "name": "Rodrigo Navarro",
+              "number": 14,
+              "position": "RM",
+              "attributes": {
+                "strength": 11,
+                "dexterity": 16,
+                "constitution": 10,
+                "intelligence": 13,
+                "wisdom": 13,
                 "charisma": 15
               },
               "traits": [
@@ -32957,21 +32896,89 @@
               }
             },
             {
+              "id": "ply_2064_15",
+              "name": "Sergio Gil",
+              "number": 15,
+              "position": "ST",
+              "attributes": {
+                "strength": 15,
+                "dexterity": 11,
+                "constitution": 9,
+                "intelligence": 12,
+                "wisdom": 9,
+                "charisma": 10
+              },
+              "traits": [
+                "COLD_BLOODED"
+              ],
+              "stamina": 100,
+              "morale": 0,
+              "cards": {
+                "yellow": 0,
+                "red": false
+              }
+            },
+            {
+              "id": "ply_2064_16",
+              "name": "Marcos Romero",
+              "number": 16,
+              "position": "ST",
+              "attributes": {
+                "strength": 15,
+                "dexterity": 13,
+                "constitution": 12,
+                "intelligence": 13,
+                "wisdom": 12,
+                "charisma": 11
+              },
+              "traits": [
+                "POACHER"
+              ],
+              "stamina": 100,
+              "morale": 0,
+              "cards": {
+                "yellow": 0,
+                "red": false
+              }
+            },
+            {
+              "id": "ply_2064_17",
+              "name": "Martín Álvarez",
+              "number": 17,
+              "position": "LW",
+              "attributes": {
+                "strength": 13,
+                "dexterity": 14,
+                "constitution": 14,
+                "intelligence": 15,
+                "wisdom": 11,
+                "charisma": 10
+              },
+              "traits": [
+                "EXPLOSIVE_WINGER"
+              ],
+              "stamina": 100,
+              "morale": 0,
+              "cards": {
+                "yellow": 0,
+                "red": false
+              }
+            },
+            {
               "id": "ply_2064_18",
-              "name": "Jorge Martín",
+              "name": "Hugo Gutiérrez",
               "number": 18,
               "position": "RW",
               "attributes": {
-                "strength": 10,
-                "dexterity": 15,
+                "strength": 16,
+                "dexterity": 17,
                 "constitution": 14,
-                "intelligence": 14,
-                "wisdom": 14,
-                "charisma": 9
+                "intelligence": 9,
+                "wisdom": 12,
+                "charisma": 11
               },
               "traits": [
-                "EXPLOSIVE_WINGER",
-                "SET_PIECE_SPECIALIST"
+                "DRIBBLE_WIZARD"
               ],
               "stamina": 100,
               "morale": 0,
@@ -36968,82 +36975,16 @@
             },
             {
               "id": "ply_426_14",
-              "name": "Iker Serrano",
+              "name": "Iker Blanco",
               "number": 14,
               "position": "RM",
               "attributes": {
-                "strength": 12,
-                "dexterity": 17,
-                "constitution": 10,
-                "intelligence": 16,
-                "wisdom": 14,
-                "charisma": 11
-              },
-              "traits": [],
-              "stamina": 100,
-              "morale": 0,
-              "cards": {
-                "yellow": 0,
-                "red": false
-              }
-            },
-            {
-              "id": "ply_426_15",
-              "name": "Iago Ruiz",
-              "number": 15,
-              "position": "ST",
-              "attributes": {
-                "strength": 11,
+                "strength": 10,
                 "dexterity": 16,
-                "constitution": 10,
+                "constitution": 14,
                 "intelligence": 13,
                 "wisdom": 12,
-                "charisma": 9
-              },
-              "traits": [
-                "POACHER",
-                "DEFENSIVE_GENERAL"
-              ],
-              "stamina": 100,
-              "morale": 0,
-              "cards": {
-                "yellow": 0,
-                "red": false
-              }
-            },
-            {
-              "id": "ply_426_16",
-              "name": "Diego Pérez",
-              "number": 16,
-              "position": "ST",
-              "attributes": {
-                "strength": 14,
-                "dexterity": 16,
-                "constitution": 11,
-                "intelligence": 11,
-                "wisdom": 9,
-                "charisma": 15
-              },
-              "traits": [],
-              "stamina": 100,
-              "morale": 0,
-              "cards": {
-                "yellow": 0,
-                "red": false
-              }
-            },
-            {
-              "id": "ply_426_17",
-              "name": "Diego Gómez",
-              "number": 17,
-              "position": "LW",
-              "attributes": {
-                "strength": 14,
-                "dexterity": 14,
-                "constitution": 13,
-                "intelligence": 9,
-                "wisdom": 14,
-                "charisma": 12
+                "charisma": 14
               },
               "traits": [
                 "EXPLOSIVE_WINGER"
@@ -37056,17 +36997,86 @@
               }
             },
             {
+              "id": "ply_426_15",
+              "name": "Bruno Pérez",
+              "number": 15,
+              "position": "ST",
+              "attributes": {
+                "strength": 15,
+                "dexterity": 14,
+                "constitution": 9,
+                "intelligence": 11,
+                "wisdom": 12,
+                "charisma": 11
+              },
+              "traits": [
+                "AERIAL_TOWER"
+              ],
+              "stamina": 100,
+              "morale": 0,
+              "cards": {
+                "yellow": 0,
+                "red": false
+              }
+            },
+            {
+              "id": "ply_426_16",
+              "name": "Adrián Ramos",
+              "number": 16,
+              "position": "ST",
+              "attributes": {
+                "strength": 13,
+                "dexterity": 12,
+                "constitution": 9,
+                "intelligence": 15,
+                "wisdom": 14,
+                "charisma": 13
+              },
+              "traits": [
+                "POACHER"
+              ],
+              "stamina": 100,
+              "morale": 0,
+              "cards": {
+                "yellow": 0,
+                "red": false
+              }
+            },
+            {
+              "id": "ply_426_17",
+              "name": "Álvaro Torres",
+              "number": 17,
+              "position": "LW",
+              "attributes": {
+                "strength": 10,
+                "dexterity": 17,
+                "constitution": 12,
+                "intelligence": 13,
+                "wisdom": 13,
+                "charisma": 12
+              },
+              "traits": [
+                "ANCHOR_TACKLER"
+              ],
+              "stamina": 100,
+              "morale": 0,
+              "cards": {
+                "yellow": 0,
+                "red": false
+              }
+            },
+            {
               "id": "ply_426_18",
-              "name": "Martín Gutiérrez",
+              "name": "Iago Moreno",
               "number": 18,
               "position": "RW",
               "attributes": {
                 "strength": 16,
-                "dexterity": 17,
-                "constitution": 12,
-                "intelligence": 15,
-                "wisdom": 9,
-                "charisma": 9
+                "dexterity": 12,
+                "constitution": 9,
+                "intelligence": 9,
+                "wisdom": 13,
+                "charisma": 13
               },
               "traits": [
                 "EXPLOSIVE_WINGER"
@@ -41123,18 +41133,20 @@
         },
         {
           "id": "ply_67_12",
-          "name": "Iker Hernández",
+          "name": "Marcos Moreno",
           "number": 12,
           "position": "CAM",
           "attributes": {
-            "strength": 12,
-            "dexterity": 14,
-            "constitution": 9,
-            "intelligence": 18,
-            "wisdom": 10,
-            "charisma": 11
+            "strength": 9,
+            "dexterity": 16,
+            "constitution": 10,
+            "intelligence": 13,
+            "wisdom": 15,
+            "charisma": 13
           },
-          "traits": [],
+          "traits": [
+            "SET_PIECE_SPECIALIST"
+          ],
           "stamina": 100,
           "morale": 0,
           "cards": {
@@ -41144,15 +41156,62 @@
         },
         {
           "id": "ply_67_13",
-          "name": "Brais Molina",
+          "name": "David Domínguez",
           "number": 13,
           "position": "LM",
           "attributes": {
-            "strength": 11,
-            "dexterity": 14,
-            "constitution": 14,
-            "intelligence": 16,
-            "wisdom": 13,
+            "strength": 14,
+            "dexterity": 15,
+            "constitution": 11,
+            "intelligence": 14,
+            "wisdom": 15,
+            "charisma": 10
+          },
+          "traits": [
+            "EXPLOSIVE_WINGER"
+          ],
+          "stamina": 100,
+          "morale": 0,
+          "cards": {
+            "yellow": 0,
+            "red": false
+          }
+        },
+        {
+          "id": "ply_67_14",
+          "name": "Martín Castro",
+          "number": 14,
+          "position": "RM",
+          "attributes": {
+            "strength": 15,
+            "dexterity": 11,
+            "constitution": 11,
+            "intelligence": 11,
+            "wisdom": 9,
+            "charisma": 15
+          },
+          "traits": [
+            "EXPLOSIVE_WINGER",
+            "ANCHOR_TACKLER"
+          ],
+          "stamina": 100,
+          "morale": 0,
+          "cards": {
+            "yellow": 0,
+            "red": false
+          }
+        },
+        {
+          "id": "ply_67_15",
+          "name": "Javier Romero",
+          "number": 15,
+          "position": "ST",
+          "attributes": {
+            "strength": 14,
+            "dexterity": 16,
+            "constitution": 10,
+            "intelligence": 11,
+            "wisdom": 11,
             "charisma": 11
           },
           "traits": [],
@@ -41164,17 +41223,17 @@
           }
         },
         {
-          "id": "ply_67_14",
-          "name": "Sergio Blanco",
-          "number": 14,
-          "position": "RM",
+          "id": "ply_67_16",
+          "name": "Brais Díaz",
+          "number": 16,
+          "position": "ST",
           "attributes": {
-            "strength": 10,
+            "strength": 12,
             "dexterity": 11,
-            "constitution": 9,
-            "intelligence": 16,
-            "wisdom": 15,
-            "charisma": 9
+            "constitution": 11,
+            "intelligence": 11,
+            "wisdom": 12,
+            "charisma": 11
           },
           "traits": [
             "AERIAL_TOWER"
@@ -41187,65 +41246,21 @@
           }
         },
         {
-          "id": "ply_67_15",
-          "name": "Álvaro Gutiérrez",
-          "number": 15,
-          "position": "ST",
-          "attributes": {
-            "strength": 13,
-            "dexterity": 14,
-            "constitution": 14,
-            "intelligence": 12,
-            "wisdom": 12,
-            "charisma": 11
-          },
-          "traits": [
-            "POACHER"
-          ],
-          "stamina": 100,
-          "morale": 0,
-          "cards": {
-            "yellow": 0,
-            "red": false
-          }
-        },
-        {
-          "id": "ply_67_16",
-          "name": "Antón Gil",
-          "number": 16,
-          "position": "ST",
-          "attributes": {
-            "strength": 11,
-            "dexterity": 13,
-            "constitution": 14,
-            "intelligence": 12,
-            "wisdom": 9,
-            "charisma": 9
-          },
-          "traits": [
-            "POACHER"
-          ],
-          "stamina": 100,
-          "morale": 0,
-          "cards": {
-            "yellow": 0,
-            "red": false
-          }
-        },
-        {
           "id": "ply_67_17",
-          "name": "Sergio Ramírez",
+          "name": "Leo Alonso",
           "number": 17,
           "position": "LW",
           "attributes": {
-            "strength": 14,
-            "dexterity": 12,
-            "constitution": 10,
-            "intelligence": 13,
+            "strength": 11,
+            "dexterity": 17,
+            "constitution": 14,
+            "intelligence": 12,
             "wisdom": 9,
-            "charisma": 14
+            "charisma": 12
           },
-          "traits": [],
+          "traits": [
+            "EXPLOSIVE_WINGER"
+          ],
           "stamina": 100,
           "morale": 0,
           "cards": {
@@ -41255,16 +41270,16 @@
         },
         {
           "id": "ply_67_18",
-          "name": "Sergio Domínguez",
+          "name": "Iker Alonso",
           "number": 18,
           "position": "RW",
           "attributes": {
-            "strength": 16,
-            "dexterity": 17,
-            "constitution": 9,
-            "intelligence": 12,
-            "wisdom": 13,
-            "charisma": 11
+            "strength": 12,
+            "dexterity": 16,
+            "constitution": 10,
+            "intelligence": 9,
+            "wisdom": 12,
+            "charisma": 12
           },
           "traits": [],
           "stamina": 100,
@@ -42006,20 +42021,19 @@
         },
         {
           "id": "ply_98_11",
-          "name": "Samuel Ramírez",
+          "name": "Diego Gómez",
           "number": 11,
           "position": "CM",
           "attributes": {
-            "strength": 11,
-            "dexterity": 10,
-            "constitution": 11,
+            "strength": 10,
+            "dexterity": 12,
+            "constitution": 16,
             "intelligence": 15,
             "wisdom": 15,
-            "charisma": 13
+            "charisma": 11
           },
           "traits": [
-            "SET_PIECE_SPECIALIST",
-            "AERIAL_TOWER"
+            "SET_PIECE_SPECIALIST"
           ],
           "stamina": 100,
           "morale": 0,
@@ -42030,20 +42044,18 @@
         },
         {
           "id": "ply_98_12",
-          "name": "Lucas Ruiz",
+          "name": "Mario González",
           "number": 12,
           "position": "CAM",
           "attributes": {
             "strength": 9,
-            "dexterity": 11,
-            "constitution": 12,
-            "intelligence": 13,
-            "wisdom": 9,
-            "charisma": 15
+            "dexterity": 14,
+            "constitution": 11,
+            "intelligence": 12,
+            "wisdom": 15,
+            "charisma": 9
           },
-          "traits": [
-            "DRIBBLE_WIZARD"
-          ],
+          "traits": [],
           "stamina": 100,
           "morale": 0,
           "cards": {
@@ -43490,20 +43502,19 @@
         },
         {
           "id": "ply_191_16",
-          "name": "Rodrigo Pérez",
+          "name": "Adrián Jiménez",
           "number": 16,
           "position": "ST",
           "attributes": {
-            "strength": 14,
-            "dexterity": 13,
-            "constitution": 10,
+            "strength": 13,
+            "dexterity": 11,
+            "constitution": 12,
             "intelligence": 10,
-            "wisdom": 12,
-            "charisma": 10
+            "wisdom": 14,
+            "charisma": 15
           },
           "traits": [
-            "POACHER",
-            "AERIAL_TOWER"
+            "POACHER"
           ],
           "stamina": 100,
           "morale": 0,
@@ -43514,18 +43525,20 @@
         },
         {
           "id": "ply_191_17",
-          "name": "Javier Serrano",
+          "name": "Xoel Gutiérrez",
           "number": 17,
           "position": "LW",
           "attributes": {
-            "strength": 14,
-            "dexterity": 18,
-            "constitution": 13,
-            "intelligence": 14,
-            "wisdom": 9,
-            "charisma": 14
+            "strength": 16,
+            "dexterity": 15,
+            "constitution": 14,
+            "intelligence": 9,
+            "wisdom": 14,
+            "charisma": 13
           },
-          "traits": [],
+          "traits": [
+            "EXPLOSIVE_WINGER"
+          ],
           "stamina": 100,
           "morale": 0,
           "cards": {
@@ -43535,19 +43548,19 @@
         },
         {
           "id": "ply_191_18",
-          "name": "Gael García",
+          "name": "Adrián Gómez",
           "number": 18,
           "position": "RW",
           "attributes": {
-            "strength": 13,
-            "dexterity": 13,
-            "constitution": 13,
-            "intelligence": 11,
-            "wisdom": 9,
-            "charisma": 15
+            "strength": 15,
+            "dexterity": 14,
+            "constitution": 9,
+            "intelligence": 15,
+            "wisdom": 12,
+            "charisma": 12
           },
           "traits": [
-            "EXPLOSIVE_WINGER"
+            "DRIBBLE_WIZARD"
           ],
           "stamina": 100,
           "morale": 0,
@@ -46163,19 +46176,19 @@
         },
         {
           "id": "ply_338_14",
-          "name": "Iago López",
+          "name": "Bruno Molina",
           "number": 14,
           "position": "RM",
           "attributes": {
-            "strength": 15,
-            "dexterity": 18,
-            "constitution": 10,
-            "intelligence": 16,
-            "wisdom": 12,
-            "charisma": 9
+            "strength": 10,
+            "dexterity": 16,
+            "constitution": 12,
+            "intelligence": 11,
+            "wisdom": 14,
+            "charisma": 14
           },
           "traits": [
-            "AERIAL_TOWER"
+            "EXPLOSIVE_WINGER"
           ],
           "stamina": 100,
           "morale": 0,
@@ -46186,20 +46199,18 @@
         },
         {
           "id": "ply_338_15",
-          "name": "Lucas Moreno",
+          "name": "Hugo Gómez",
           "number": 15,
           "position": "ST",
           "attributes": {
-            "strength": 12,
-            "dexterity": 12,
+            "strength": 13,
+            "dexterity": 15,
             "constitution": 10,
-            "intelligence": 14,
-            "wisdom": 10,
-            "charisma": 15
+            "intelligence": 15,
+            "wisdom": 12,
+            "charisma": 10
           },
-          "traits": [
-            "POACHER"
-          ],
+          "traits": [],
           "stamina": 100,
           "morale": 0,
           "cards": {
@@ -46209,19 +46220,18 @@
         },
         {
           "id": "ply_338_16",
-          "name": "Daniel Martín",
+          "name": "Álvaro Serrano",
           "number": 16,
           "position": "ST",
           "attributes": {
-            "strength": 18,
-            "dexterity": 11,
+            "strength": 12,
+            "dexterity": 17,
             "constitution": 15,
-            "intelligence": 15,
-            "wisdom": 10,
-            "charisma": 9
+            "intelligence": 10,
+            "wisdom": 9,
+            "charisma": 13
           },
           "traits": [
-            "AERIAL_TOWER",
             "COLD_BLOODED"
           ],
           "stamina": 100,
@@ -47530,82 +47540,16 @@
         },
         {
           "id": "ply_426_14",
-          "name": "Iker Serrano",
+          "name": "Iker Blanco",
           "number": 14,
           "position": "RM",
           "attributes": {
-            "strength": 12,
-            "dexterity": 17,
-            "constitution": 10,
-            "intelligence": 16,
-            "wisdom": 14,
-            "charisma": 11
-          },
-          "traits": [],
-          "stamina": 100,
-          "morale": 0,
-          "cards": {
-            "yellow": 0,
-            "red": false
-          }
-        },
-        {
-          "id": "ply_426_15",
-          "name": "Iago Ruiz",
-          "number": 15,
-          "position": "ST",
-          "attributes": {
-            "strength": 11,
+            "strength": 10,
             "dexterity": 16,
-            "constitution": 10,
+            "constitution": 14,
             "intelligence": 13,
             "wisdom": 12,
-            "charisma": 9
-          },
-          "traits": [
-            "POACHER",
-            "DEFENSIVE_GENERAL"
-          ],
-          "stamina": 100,
-          "morale": 0,
-          "cards": {
-            "yellow": 0,
-            "red": false
-          }
-        },
-        {
-          "id": "ply_426_16",
-          "name": "Diego Pérez",
-          "number": 16,
-          "position": "ST",
-          "attributes": {
-            "strength": 14,
-            "dexterity": 16,
-            "constitution": 11,
-            "intelligence": 11,
-            "wisdom": 9,
-            "charisma": 15
-          },
-          "traits": [],
-          "stamina": 100,
-          "morale": 0,
-          "cards": {
-            "yellow": 0,
-            "red": false
-          }
-        },
-        {
-          "id": "ply_426_17",
-          "name": "Diego Gómez",
-          "number": 17,
-          "position": "LW",
-          "attributes": {
-            "strength": 14,
-            "dexterity": 14,
-            "constitution": 13,
-            "intelligence": 9,
-            "wisdom": 14,
-            "charisma": 12
+            "charisma": 14
           },
           "traits": [
             "EXPLOSIVE_WINGER"
@@ -47618,17 +47562,86 @@
           }
         },
         {
+          "id": "ply_426_15",
+          "name": "Bruno Pérez",
+          "number": 15,
+          "position": "ST",
+          "attributes": {
+            "strength": 15,
+            "dexterity": 14,
+            "constitution": 9,
+            "intelligence": 11,
+            "wisdom": 12,
+            "charisma": 11
+          },
+          "traits": [
+            "AERIAL_TOWER"
+          ],
+          "stamina": 100,
+          "morale": 0,
+          "cards": {
+            "yellow": 0,
+            "red": false
+          }
+        },
+        {
+          "id": "ply_426_16",
+          "name": "Adrián Ramos",
+          "number": 16,
+          "position": "ST",
+          "attributes": {
+            "strength": 13,
+            "dexterity": 12,
+            "constitution": 9,
+            "intelligence": 15,
+            "wisdom": 14,
+            "charisma": 13
+          },
+          "traits": [
+            "POACHER"
+          ],
+          "stamina": 100,
+          "morale": 0,
+          "cards": {
+            "yellow": 0,
+            "red": false
+          }
+        },
+        {
+          "id": "ply_426_17",
+          "name": "Álvaro Torres",
+          "number": 17,
+          "position": "LW",
+          "attributes": {
+            "strength": 10,
+            "dexterity": 17,
+            "constitution": 12,
+            "intelligence": 13,
+            "wisdom": 13,
+            "charisma": 12
+          },
+          "traits": [
+            "ANCHOR_TACKLER"
+          ],
+          "stamina": 100,
+          "morale": 0,
+          "cards": {
+            "yellow": 0,
+            "red": false
+          }
+        },
+        {
           "id": "ply_426_18",
-          "name": "Martín Gutiérrez",
+          "name": "Iago Moreno",
           "number": 18,
           "position": "RW",
           "attributes": {
             "strength": 16,
-            "dexterity": 17,
-            "constitution": 12,
-            "intelligence": 15,
-            "wisdom": 9,
-            "charisma": 9
+            "dexterity": 12,
+            "constitution": 9,
+            "intelligence": 9,
+            "wisdom": 13,
+            "charisma": 13
           },
           "traits": [
             "EXPLOSIVE_WINGER"
@@ -48080,20 +48093,20 @@
         },
         {
           "id": "ply_434_18",
-          "name": "Iker Domínguez",
+          "name": "Roi García",
           "number": 18,
           "position": "RW",
           "attributes": {
-            "strength": 15,
-            "dexterity": 11,
-            "constitution": 11,
-            "intelligence": 10,
-            "wisdom": 15,
-            "charisma": 9
+            "strength": 12,
+            "dexterity": 13,
+            "constitution": 15,
+            "intelligence": 9,
+            "wisdom": 10,
+            "charisma": 10
           },
           "traits": [
             "DRIBBLE_WIZARD",
-            "COLD_BLOODED"
+            "EXPLOSIVE_WINGER"
           ],
           "stamina": 100,
           "morale": 0,
@@ -54453,15 +54466,15 @@
         },
         {
           "id": "ply_724_18",
-          "name": "Leo Martín",
+          "name": "Bruno Moreno",
           "number": 18,
           "position": "RW",
           "attributes": {
-            "strength": 17,
+            "strength": 15,
             "dexterity": 14,
             "constitution": 14,
-            "intelligence": 12,
-            "wisdom": 14,
+            "intelligence": 13,
+            "wisdom": 10,
             "charisma": 13
           },
           "traits": [],
@@ -59848,20 +59861,20 @@
         },
         {
           "id": "ply_938_16",
-          "name": "Hugo Vázquez",
+          "name": "Gael Castro",
           "number": 16,
           "position": "ST",
           "attributes": {
-            "strength": 16,
-            "dexterity": 17,
-            "constitution": 13,
-            "intelligence": 11,
+            "strength": 15,
+            "dexterity": 13,
+            "constitution": 10,
+            "intelligence": 13,
             "wisdom": 10,
-            "charisma": 13
+            "charisma": 12
           },
           "traits": [
-            "COLD_BLOODED",
-            "DEFENSIVE_GENERAL"
+            "AERIAL_TOWER",
+            "ANCHOR_TACKLER"
           ],
           "stamina": 100,
           "morale": 0,
@@ -59872,20 +59885,18 @@
         },
         {
           "id": "ply_938_17",
-          "name": "Samuel Vázquez",
+          "name": "Hugo Pérez",
           "number": 17,
           "position": "LW",
           "attributes": {
-            "strength": 10,
-            "dexterity": 12,
-            "constitution": 12,
-            "intelligence": 13,
+            "strength": 13,
+            "dexterity": 16,
+            "constitution": 11,
+            "intelligence": 14,
             "wisdom": 11,
-            "charisma": 14
+            "charisma": 10
           },
-          "traits": [
-            "DRIBBLE_WIZARD"
-          ],
+          "traits": [],
           "stamina": 100,
           "morale": 0,
           "cards": {
@@ -59895,18 +59906,20 @@
         },
         {
           "id": "ply_938_18",
-          "name": "Sergio Rodríguez",
+          "name": "Mateo Ruiz",
           "number": 18,
           "position": "RW",
           "attributes": {
-            "strength": 13,
-            "dexterity": 16,
-            "constitution": 12,
-            "intelligence": 9,
-            "wisdom": 14,
-            "charisma": 13
+            "strength": 14,
+            "dexterity": 15,
+            "constitution": 9,
+            "intelligence": 14,
+            "wisdom": 13,
+            "charisma": 12
           },
-          "traits": [],
+          "traits": [
+            "DRIBBLE_WIZARD"
+          ],
           "stamina": 100,
           "morale": 0,
           "cards": {
@@ -61439,20 +61452,19 @@
         },
         {
           "id": "ply_962_6",
-          "name": "Martín Ruiz",
+          "name": "Sergio García",
           "number": 6,
           "position": "LB",
           "attributes": {
-            "strength": 12,
-            "dexterity": 11,
-            "constitution": 12,
-            "intelligence": 13,
-            "wisdom": 14,
-            "charisma": 10
+            "strength": 11,
+            "dexterity": 16,
+            "constitution": 16,
+            "intelligence": 10,
+            "wisdom": 9,
+            "charisma": 11
           },
           "traits": [
-            "SET_PIECE_SPECIALIST",
-            "COLD_BLOODED"
+            "EXPLOSIVE_WINGER"
           ],
           "stamina": 100,
           "morale": 0,
@@ -61463,15 +61475,15 @@
         },
         {
           "id": "ply_962_7",
-          "name": "Alejandro Martínez",
+          "name": "Daniel Rodríguez",
           "number": 7,
           "position": "RB",
           "attributes": {
-            "strength": 9,
-            "dexterity": 18,
-            "constitution": 12,
-            "intelligence": 13,
-            "wisdom": 14,
+            "strength": 15,
+            "dexterity": 13,
+            "constitution": 15,
+            "intelligence": 14,
+            "wisdom": 13,
             "charisma": 13
           },
           "traits": [
@@ -61486,18 +61498,19 @@
         },
         {
           "id": "ply_962_8",
-          "name": "Leo Torres",
+          "name": "Gonzalo Ruiz",
           "number": 8,
           "position": "CDM",
           "attributes": {
-            "strength": 12,
-            "dexterity": 9,
-            "constitution": 12,
-            "intelligence": 9,
-            "wisdom": 18,
-            "charisma": 11
+            "strength": 10,
+            "dexterity": 12,
+            "constitution": 9,
+            "intelligence": 15,
+            "wisdom": 13,
+            "charisma": 14
           },
           "traits": [
+            "ANCHOR_TACKLER",
             "AERIAL_TOWER"
           ],
           "stamina": 100,
@@ -61509,111 +61522,18 @@
         },
         {
           "id": "ply_962_9",
-          "name": "Nicolás Pérez",
+          "name": "Gael García",
           "number": 9,
           "position": "CDM",
           "attributes": {
-            "strength": 15,
-            "dexterity": 9,
-            "constitution": 15,
-            "intelligence": 11,
-            "wisdom": 12,
-            "charisma": 14
-          },
-          "traits": [
-            "DEFENSIVE_GENERAL",
-            "ANCHOR_TACKLER"
-          ],
-          "stamina": 100,
-          "morale": 0,
-          "cards": {
-            "yellow": 0,
-            "red": false
-          }
-        },
-        {
-          "id": "ply_962_10",
-          "name": "Mateo González",
-          "number": 10,
-          "position": "CM",
-          "attributes": {
-            "strength": 11,
-            "dexterity": 15,
-            "constitution": 15,
-            "intelligence": 16,
+            "strength": 17,
+            "dexterity": 11,
+            "constitution": 10,
+            "intelligence": 14,
             "wisdom": 14,
-            "charisma": 13
+            "charisma": 10
           },
           "traits": [
-            "COLD_BLOODED"
-          ],
-          "stamina": 100,
-          "morale": 0,
-          "cards": {
-            "yellow": 0,
-            "red": false
-          }
-        },
-        {
-          "id": "ply_962_11",
-          "name": "Nicolás Torres",
-          "number": 11,
-          "position": "CM",
-          "attributes": {
-            "strength": 14,
-            "dexterity": 15,
-            "constitution": 14,
-            "intelligence": 12,
-            "wisdom": 14,
-            "charisma": 14
-          },
-          "traits": [],
-          "stamina": 100,
-          "morale": 0,
-          "cards": {
-            "yellow": 0,
-            "red": false
-          }
-        },
-        {
-          "id": "ply_962_12",
-          "name": "Marcos Moreno",
-          "number": 12,
-          "position": "CAM",
-          "attributes": {
-            "strength": 13,
-            "dexterity": 13,
-            "constitution": 15,
-            "intelligence": 18,
-            "wisdom": 13,
-            "charisma": 12
-          },
-          "traits": [
-            "DRIBBLE_WIZARD",
-            "EXPLOSIVE_WINGER"
-          ],
-          "stamina": 100,
-          "morale": 0,
-          "cards": {
-            "yellow": 0,
-            "red": false
-          }
-        },
-        {
-          "id": "ply_962_13",
-          "name": "Daniel Alonso",
-          "number": 13,
-          "position": "LM",
-          "attributes": {
-            "strength": 14,
-            "dexterity": 17,
-            "constitution": 13,
-            "intelligence": 10,
-            "wisdom": 10,
-            "charisma": 13
-          },
-          "traits": [
-            "DRIBBLE_WIZARD",
             "DEFENSIVE_GENERAL"
           ],
           "stamina": 100,
@@ -61624,17 +61544,64 @@
           }
         },
         {
-          "id": "ply_962_14",
-          "name": "Iago Domínguez",
-          "number": 14,
-          "position": "RM",
+          "id": "ply_962_10",
+          "name": "Martín Jiménez",
+          "number": 10,
+          "position": "CM",
           "attributes": {
-            "strength": 13,
-            "dexterity": 16,
-            "constitution": 9,
+            "strength": 15,
+            "dexterity": 14,
+            "constitution": 15,
             "intelligence": 16,
-            "wisdom": 15,
+            "wisdom": 13,
+            "charisma": 10
+          },
+          "traits": [
+            "SET_PIECE_SPECIALIST",
+            "POACHER"
+          ],
+          "stamina": 100,
+          "morale": 0,
+          "cards": {
+            "yellow": 0,
+            "red": false
+          }
+        },
+        {
+          "id": "ply_962_11",
+          "name": "Xoel Castro",
+          "number": 11,
+          "position": "CM",
+          "attributes": {
+            "strength": 12,
+            "dexterity": 10,
+            "constitution": 16,
+            "intelligence": 16,
+            "wisdom": 10,
             "charisma": 14
+          },
+          "traits": [
+            "SET_PIECE_SPECIALIST"
+          ],
+          "stamina": 100,
+          "morale": 0,
+          "cards": {
+            "yellow": 0,
+            "red": false
+          }
+        },
+        {
+          "id": "ply_962_12",
+          "name": "Adrián Serrano",
+          "number": 12,
+          "position": "CAM",
+          "attributes": {
+            "strength": 15,
+            "dexterity": 15,
+            "constitution": 12,
+            "intelligence": 15,
+            "wisdom": 13,
+            "charisma": 15
           },
           "traits": [
             "DRIBBLE_WIZARD"
@@ -61647,21 +61614,64 @@
           }
         },
         {
+          "id": "ply_962_13",
+          "name": "Gael Molina",
+          "number": 13,
+          "position": "LM",
+          "attributes": {
+            "strength": 13,
+            "dexterity": 12,
+            "constitution": 10,
+            "intelligence": 15,
+            "wisdom": 9,
+            "charisma": 9
+          },
+          "traits": [
+            "DRIBBLE_WIZARD",
+            "POACHER"
+          ],
+          "stamina": 100,
+          "morale": 0,
+          "cards": {
+            "yellow": 0,
+            "red": false
+          }
+        },
+        {
+          "id": "ply_962_14",
+          "name": "Rodrigo Ramírez",
+          "number": 14,
+          "position": "RM",
+          "attributes": {
+            "strength": 9,
+            "dexterity": 17,
+            "constitution": 15,
+            "intelligence": 16,
+            "wisdom": 10,
+            "charisma": 10
+          },
+          "traits": [],
+          "stamina": 100,
+          "morale": 0,
+          "cards": {
+            "yellow": 0,
+            "red": false
+          }
+        },
+        {
           "id": "ply_962_15",
-          "name": "Iker Romero",
+          "name": "Iker Díaz",
           "number": 15,
           "position": "ST",
           "attributes": {
-            "strength": 15,
-            "dexterity": 16,
-            "constitution": 12,
-            "intelligence": 13,
-            "wisdom": 14,
-            "charisma": 10
+            "strength": 17,
+            "dexterity": 13,
+            "constitution": 13,
+            "intelligence": 14,
+            "wisdom": 10,
+            "charisma": 13
           },
-          "traits": [
-            "POACHER"
-          ],
+          "traits": [],
           "stamina": 100,
           "morale": 0,
           "cards": {
@@ -61852,38 +61862,15 @@
         },
         {
           "id": "ply_963_4",
-          "name": "Roi López",
+          "name": "Roi Navarro",
           "number": 4,
           "position": "CB",
           "attributes": {
             "strength": 16,
-            "dexterity": 13,
+            "dexterity": 14,
             "constitution": 13,
-            "intelligence": 14,
-            "wisdom": 15,
-            "charisma": 9
-          },
-          "traits": [
-            "ANCHOR_TACKLER"
-          ],
-          "stamina": 100,
-          "morale": 0,
-          "cards": {
-            "yellow": 0,
-            "red": false
-          }
-        },
-        {
-          "id": "ply_963_5",
-          "name": "Lucas Ramos",
-          "number": 5,
-          "position": "CB",
-          "attributes": {
-            "strength": 12,
-            "dexterity": 10,
-            "constitution": 12,
-            "intelligence": 15,
-            "wisdom": 14,
+            "intelligence": 9,
+            "wisdom": 12,
             "charisma": 14
           },
           "traits": [
@@ -61897,17 +61884,40 @@
           }
         },
         {
+          "id": "ply_963_5",
+          "name": "Daniel Díaz",
+          "number": 5,
+          "position": "CB",
+          "attributes": {
+            "strength": 18,
+            "dexterity": 12,
+            "constitution": 14,
+            "intelligence": 10,
+            "wisdom": 15,
+            "charisma": 10
+          },
+          "traits": [
+            "ANCHOR_TACKLER"
+          ],
+          "stamina": 100,
+          "morale": 0,
+          "cards": {
+            "yellow": 0,
+            "red": false
+          }
+        },
+        {
           "id": "ply_963_6",
-          "name": "Brais Ramos",
+          "name": "Javier Moreno",
           "number": 6,
           "position": "LB",
           "attributes": {
-            "strength": 9,
+            "strength": 10,
             "dexterity": 15,
             "constitution": 13,
-            "intelligence": 10,
-            "wisdom": 13,
-            "charisma": 11
+            "intelligence": 14,
+            "wisdom": 11,
+            "charisma": 15
           },
           "traits": [
             "EXPLOSIVE_WINGER"
@@ -61921,20 +61931,20 @@
         },
         {
           "id": "ply_963_7",
-          "name": "Bruno Gómez",
+          "name": "Gonzalo Navarro",
           "number": 7,
           "position": "RB",
           "attributes": {
-            "strength": 11,
-            "dexterity": 15,
-            "constitution": 14,
+            "strength": 10,
+            "dexterity": 17,
+            "constitution": 15,
             "intelligence": 10,
-            "wisdom": 14,
+            "wisdom": 9,
             "charisma": 13
           },
           "traits": [
-            "ANCHOR_TACKLER",
-            "EXPLOSIVE_WINGER"
+            "EXPLOSIVE_WINGER",
+            "DEFENSIVE_GENERAL"
           ],
           "stamina": 100,
           "morale": 0,
@@ -61945,61 +61955,19 @@
         },
         {
           "id": "ply_963_8",
-          "name": "Martín Domínguez",
+          "name": "Álvaro Fernández",
           "number": 8,
           "position": "CDM",
           "attributes": {
-            "strength": 13,
-            "dexterity": 11,
-            "constitution": 9,
-            "intelligence": 9,
-            "wisdom": 17,
-            "charisma": 11
-          },
-          "traits": [],
-          "stamina": 100,
-          "morale": 0,
-          "cards": {
-            "yellow": 0,
-            "red": false
-          }
-        },
-        {
-          "id": "ply_963_9",
-          "name": "Jorge Romero",
-          "number": 9,
-          "position": "CDM",
-          "attributes": {
-            "strength": 13,
-            "dexterity": 10,
-            "constitution": 15,
-            "intelligence": 13,
-            "wisdom": 18,
-            "charisma": 13
-          },
-          "traits": [],
-          "stamina": 100,
-          "morale": 0,
-          "cards": {
-            "yellow": 0,
-            "red": false
-          }
-        },
-        {
-          "id": "ply_963_10",
-          "name": "Javier Gil",
-          "number": 10,
-          "position": "CM",
-          "attributes": {
-            "strength": 13,
-            "dexterity": 15,
-            "constitution": 17,
-            "intelligence": 17,
+            "strength": 11,
+            "dexterity": 14,
+            "constitution": 11,
+            "intelligence": 14,
             "wisdom": 11,
-            "charisma": 15
+            "charisma": 10
           },
           "traits": [
-            "COLD_BLOODED"
+            "DEFENSIVE_GENERAL"
           ],
           "stamina": 100,
           "morale": 0,
@@ -62009,17 +61977,41 @@
           }
         },
         {
-          "id": "ply_963_11",
-          "name": "Rodrigo Pérez",
-          "number": 11,
+          "id": "ply_963_9",
+          "name": "Bruno Gutiérrez",
+          "number": 9,
+          "position": "CDM",
+          "attributes": {
+            "strength": 17,
+            "dexterity": 13,
+            "constitution": 12,
+            "intelligence": 11,
+            "wisdom": 11,
+            "charisma": 11
+          },
+          "traits": [
+            "DEFENSIVE_GENERAL",
+            "DRIBBLE_WIZARD"
+          ],
+          "stamina": 100,
+          "morale": 0,
+          "cards": {
+            "yellow": 0,
+            "red": false
+          }
+        },
+        {
+          "id": "ply_963_10",
+          "name": "Mario Serrano",
+          "number": 10,
           "position": "CM",
           "attributes": {
-            "strength": 15,
-            "dexterity": 14,
-            "constitution": 13,
-            "intelligence": 12,
-            "wisdom": 9,
-            "charisma": 12
+            "strength": 9,
+            "dexterity": 12,
+            "constitution": 15,
+            "intelligence": 16,
+            "wisdom": 10,
+            "charisma": 13
           },
           "traits": [
             "SET_PIECE_SPECIALIST"
@@ -62032,59 +62024,17 @@
           }
         },
         {
-          "id": "ply_963_12",
-          "name": "Iker López",
-          "number": 12,
-          "position": "CAM",
+          "id": "ply_963_11",
+          "name": "Mateo Moreno",
+          "number": 11,
+          "position": "CM",
           "attributes": {
-            "strength": 9,
-            "dexterity": 12,
-            "constitution": 12,
-            "intelligence": 13,
-            "wisdom": 13,
-            "charisma": 11
-          },
-          "traits": [],
-          "stamina": 100,
-          "morale": 0,
-          "cards": {
-            "yellow": 0,
-            "red": false
-          }
-        },
-        {
-          "id": "ply_963_13",
-          "name": "Antón García",
-          "number": 13,
-          "position": "LM",
-          "attributes": {
-            "strength": 12,
-            "dexterity": 11,
-            "constitution": 11,
-            "intelligence": 13,
-            "wisdom": 10,
-            "charisma": 10
-          },
-          "traits": [],
-          "stamina": 100,
-          "morale": 0,
-          "cards": {
-            "yellow": 0,
-            "red": false
-          }
-        },
-        {
-          "id": "ply_963_14",
-          "name": "Iago Ruiz",
-          "number": 14,
-          "position": "RM",
-          "attributes": {
-            "strength": 9,
+            "strength": 14,
             "dexterity": 13,
-            "constitution": 13,
-            "intelligence": 15,
-            "wisdom": 9,
-            "charisma": 14
+            "constitution": 10,
+            "intelligence": 17,
+            "wisdom": 10,
+            "charisma": 12
           },
           "traits": [
             "COLD_BLOODED"
@@ -62097,20 +62047,92 @@
           }
         },
         {
+          "id": "ply_963_12",
+          "name": "Rodrigo Martín",
+          "number": 12,
+          "position": "CAM",
+          "attributes": {
+            "strength": 9,
+            "dexterity": 10,
+            "constitution": 9,
+            "intelligence": 14,
+            "wisdom": 14,
+            "charisma": 9
+          },
+          "traits": [
+            "SET_PIECE_SPECIALIST"
+          ],
+          "stamina": 100,
+          "morale": 0,
+          "cards": {
+            "yellow": 0,
+            "red": false
+          }
+        },
+        {
+          "id": "ply_963_13",
+          "name": "Leo Pérez",
+          "number": 13,
+          "position": "LM",
+          "attributes": {
+            "strength": 9,
+            "dexterity": 12,
+            "constitution": 10,
+            "intelligence": 17,
+            "wisdom": 11,
+            "charisma": 9
+          },
+          "traits": [
+            "EXPLOSIVE_WINGER",
+            "COLD_BLOODED"
+          ],
+          "stamina": 100,
+          "morale": 0,
+          "cards": {
+            "yellow": 0,
+            "red": false
+          }
+        },
+        {
+          "id": "ply_963_14",
+          "name": "Iker Martínez",
+          "number": 14,
+          "position": "RM",
+          "attributes": {
+            "strength": 15,
+            "dexterity": 12,
+            "constitution": 14,
+            "intelligence": 16,
+            "wisdom": 12,
+            "charisma": 12
+          },
+          "traits": [
+            "DRIBBLE_WIZARD",
+            "POACHER"
+          ],
+          "stamina": 100,
+          "morale": 0,
+          "cards": {
+            "yellow": 0,
+            "red": false
+          }
+        },
+        {
           "id": "ply_963_15",
-          "name": "Brais Gil",
+          "name": "Samuel Jiménez",
           "number": 15,
           "position": "ST",
           "attributes": {
-            "strength": 15,
-            "dexterity": 14,
-            "constitution": 12,
-            "intelligence": 15,
-            "wisdom": 12,
-            "charisma": 13
+            "strength": 13,
+            "dexterity": 11,
+            "constitution": 11,
+            "intelligence": 10,
+            "wisdom": 11,
+            "charisma": 15
           },
           "traits": [
-            "AERIAL_TOWER"
+            "AERIAL_TOWER",
+            "POACHER"
           ],
           "stamina": 100,
           "morale": 0,
@@ -62121,20 +62143,19 @@
         },
         {
           "id": "ply_963_16",
-          "name": "Pablo Martín",
+          "name": "Rodrigo Torres",
           "number": 16,
           "position": "ST",
           "attributes": {
-            "strength": 13,
-            "dexterity": 13,
-            "constitution": 15,
-            "intelligence": 13,
-            "wisdom": 9,
-            "charisma": 14
+            "strength": 16,
+            "dexterity": 16,
+            "constitution": 13,
+            "intelligence": 9,
+            "wisdom": 14,
+            "charisma": 12
           },
           "traits": [
-            "COLD_BLOODED",
-            "ANCHOR_TACKLER"
+            "COLD_BLOODED"
           ],
           "stamina": 100,
           "morale": 0,
@@ -62145,19 +62166,20 @@
         },
         {
           "id": "ply_963_17",
-          "name": "Brais Navarro",
+          "name": "Nicolás Gil",
           "number": 17,
           "position": "LW",
           "attributes": {
-            "strength": 10,
-            "dexterity": 17,
-            "constitution": 12,
-            "intelligence": 10,
+            "strength": 12,
+            "dexterity": 16,
+            "constitution": 10,
+            "intelligence": 13,
             "wisdom": 15,
-            "charisma": 14
+            "charisma": 11
           },
           "traits": [
-            "EXPLOSIVE_WINGER"
+            "DRIBBLE_WIZARD",
+            "ANCHOR_TACKLER"
           ],
           "stamina": 100,
           "morale": 0,
@@ -62168,19 +62190,19 @@
         },
         {
           "id": "ply_963_18",
-          "name": "Sergio Sánchez",
+          "name": "Iker Ruiz",
           "number": 18,
           "position": "RW",
           "attributes": {
-            "strength": 15,
+            "strength": 16,
             "dexterity": 17,
-            "constitution": 11,
+            "constitution": 9,
             "intelligence": 13,
-            "wisdom": 10,
-            "charisma": 12
+            "wisdom": 14,
+            "charisma": 13
           },
           "traits": [
-            "EXPLOSIVE_WINGER"
+            "DRIBBLE_WIZARD"
           ],
           "stamina": 100,
           "morale": 0,
@@ -64181,39 +64203,16 @@
         },
         {
           "id": "ply_996_6",
-          "name": "Álvaro Rodríguez",
+          "name": "Diego García",
           "number": 6,
           "position": "LB",
           "attributes": {
-            "strength": 12,
-            "dexterity": 11,
-            "constitution": 10,
-            "intelligence": 10,
+            "strength": 9,
+            "dexterity": 12,
+            "constitution": 12,
+            "intelligence": 11,
             "wisdom": 10,
             "charisma": 11
-          },
-          "traits": [
-            "DEFENSIVE_GENERAL"
-          ],
-          "stamina": 100,
-          "morale": 0,
-          "cards": {
-            "yellow": 0,
-            "red": false
-          }
-        },
-        {
-          "id": "ply_996_7",
-          "name": "Diego Martínez",
-          "number": 7,
-          "position": "RB",
-          "attributes": {
-            "strength": 13,
-            "dexterity": 17,
-            "constitution": 15,
-            "intelligence": 13,
-            "wisdom": 10,
-            "charisma": 15
           },
           "traits": [
             "EXPLOSIVE_WINGER"
@@ -64226,17 +64225,38 @@
           }
         },
         {
+          "id": "ply_996_7",
+          "name": "Sergio Gil",
+          "number": 7,
+          "position": "RB",
+          "attributes": {
+            "strength": 14,
+            "dexterity": 16,
+            "constitution": 11,
+            "intelligence": 15,
+            "wisdom": 12,
+            "charisma": 10
+          },
+          "traits": [],
+          "stamina": 100,
+          "morale": 0,
+          "cards": {
+            "yellow": 0,
+            "red": false
+          }
+        },
+        {
           "id": "ply_996_8",
-          "name": "Carlos Martínez",
+          "name": "Samuel Gil",
           "number": 8,
           "position": "CDM",
           "attributes": {
-            "strength": 11,
-            "dexterity": 15,
-            "constitution": 14,
-            "intelligence": 13,
-            "wisdom": 12,
-            "charisma": 9
+            "strength": 14,
+            "dexterity": 9,
+            "constitution": 9,
+            "intelligence": 14,
+            "wisdom": 17,
+            "charisma": 15
           },
           "traits": [
             "DEFENSIVE_GENERAL"
@@ -64250,20 +64270,19 @@
         },
         {
           "id": "ply_996_9",
-          "name": "Bruno Domínguez",
+          "name": "Martín Gil",
           "number": 9,
           "position": "CDM",
           "attributes": {
-            "strength": 11,
-            "dexterity": 9,
-            "constitution": 14,
-            "intelligence": 11,
-            "wisdom": 18,
-            "charisma": 13
+            "strength": 13,
+            "dexterity": 15,
+            "constitution": 13,
+            "intelligence": 12,
+            "wisdom": 15,
+            "charisma": 11
           },
           "traits": [
-            "DEFENSIVE_GENERAL",
-            "DRIBBLE_WIZARD"
+            "DEFENSIVE_GENERAL"
           ],
           "stamina": 100,
           "morale": 0,
@@ -64274,19 +64293,19 @@
         },
         {
           "id": "ply_996_10",
-          "name": "Xoel Álvarez",
+          "name": "Adrián Navarro",
           "number": 10,
           "position": "CM",
           "attributes": {
-            "strength": 11,
-            "dexterity": 13,
-            "constitution": 15,
-            "intelligence": 13,
+            "strength": 14,
+            "dexterity": 11,
+            "constitution": 14,
+            "intelligence": 17,
             "wisdom": 12,
-            "charisma": 14
+            "charisma": 11
           },
           "traits": [
-            "COLD_BLOODED"
+            "SET_PIECE_SPECIALIST"
           ],
           "stamina": 100,
           "morale": 0,
@@ -64297,19 +64316,20 @@
         },
         {
           "id": "ply_996_11",
-          "name": "Iker Hernández",
+          "name": "Diego Alonso",
           "number": 11,
           "position": "CM",
           "attributes": {
-            "strength": 13,
-            "dexterity": 10,
-            "constitution": 16,
-            "intelligence": 15,
-            "wisdom": 10,
-            "charisma": 12
+            "strength": 10,
+            "dexterity": 15,
+            "constitution": 15,
+            "intelligence": 12,
+            "wisdom": 12,
+            "charisma": 10
           },
           "traits": [
-            "COLD_BLOODED"
+            "SET_PIECE_SPECIALIST",
+            "DEFENSIVE_GENERAL"
           ],
           "stamina": 100,
           "morale": 0,
@@ -64320,87 +64340,18 @@
         },
         {
           "id": "ply_996_12",
-          "name": "Gael Gutiérrez",
+          "name": "Carlos Navarro",
           "number": 12,
           "position": "CAM",
           "attributes": {
-            "strength": 12,
-            "dexterity": 14,
-            "constitution": 15,
-            "intelligence": 18,
-            "wisdom": 14,
-            "charisma": 13
-          },
-          "traits": [
-            "ANCHOR_TACKLER"
-          ],
-          "stamina": 100,
-          "morale": 0,
-          "cards": {
-            "yellow": 0,
-            "red": false
-          }
-        },
-        {
-          "id": "ply_996_13",
-          "name": "Pablo Hernández",
-          "number": 13,
-          "position": "LM",
-          "attributes": {
-            "strength": 9,
-            "dexterity": 13,
-            "constitution": 11,
-            "intelligence": 11,
-            "wisdom": 14,
-            "charisma": 10
-          },
-          "traits": [
-            "EXPLOSIVE_WINGER",
-            "ANCHOR_TACKLER"
-          ],
-          "stamina": 100,
-          "morale": 0,
-          "cards": {
-            "yellow": 0,
-            "red": false
-          }
-        },
-        {
-          "id": "ply_996_14",
-          "name": "Nicolás Serrano",
-          "number": 14,
-          "position": "RM",
-          "attributes": {
-            "strength": 10,
-            "dexterity": 13,
+            "strength": 15,
+            "dexterity": 17,
             "constitution": 14,
-            "intelligence": 17,
+            "intelligence": 15,
             "wisdom": 13,
-            "charisma": 15
-          },
-          "traits": [],
-          "stamina": 100,
-          "morale": 0,
-          "cards": {
-            "yellow": 0,
-            "red": false
-          }
-        },
-        {
-          "id": "ply_996_15",
-          "name": "Marcos Gutiérrez",
-          "number": 15,
-          "position": "ST",
-          "attributes": {
-            "strength": 17,
-            "dexterity": 11,
-            "constitution": 11,
-            "intelligence": 11,
-            "wisdom": 9,
-            "charisma": 13
+            "charisma": 11
           },
           "traits": [
-            "COLD_BLOODED",
             "DRIBBLE_WIZARD"
           ],
           "stamina": 100,
@@ -64411,19 +64362,92 @@
           }
         },
         {
+          "id": "ply_996_13",
+          "name": "Hugo Ruiz",
+          "number": 13,
+          "position": "LM",
+          "attributes": {
+            "strength": 11,
+            "dexterity": 12,
+            "constitution": 14,
+            "intelligence": 11,
+            "wisdom": 12,
+            "charisma": 13
+          },
+          "traits": [
+            "DRIBBLE_WIZARD"
+          ],
+          "stamina": 100,
+          "morale": 0,
+          "cards": {
+            "yellow": 0,
+            "red": false
+          }
+        },
+        {
+          "id": "ply_996_14",
+          "name": "Manuel Ruiz",
+          "number": 14,
+          "position": "RM",
+          "attributes": {
+            "strength": 14,
+            "dexterity": 17,
+            "constitution": 13,
+            "intelligence": 16,
+            "wisdom": 11,
+            "charisma": 13
+          },
+          "traits": [
+            "DRIBBLE_WIZARD",
+            "COLD_BLOODED"
+          ],
+          "stamina": 100,
+          "morale": 0,
+          "cards": {
+            "yellow": 0,
+            "red": false
+          }
+        },
+        {
+          "id": "ply_996_15",
+          "name": "Adrián Martín",
+          "number": 15,
+          "position": "ST",
+          "attributes": {
+            "strength": 12,
+            "dexterity": 15,
+            "constitution": 9,
+            "intelligence": 14,
+            "wisdom": 12,
+            "charisma": 14
+          },
+          "traits": [
+            "COLD_BLOODED",
+            "DEFENSIVE_GENERAL"
+          ],
+          "stamina": 100,
+          "morale": 0,
+          "cards": {
+            "yellow": 0,
+            "red": false
+          }
+        },
+        {
           "id": "ply_996_16",
-          "name": "Adrián Molina",
+          "name": "Mateo Pérez",
           "number": 16,
           "position": "ST",
           "attributes": {
-            "strength": 15,
+            "strength": 12,
             "dexterity": 13,
-            "constitution": 9,
-            "intelligence": 10,
-            "wisdom": 10,
-            "charisma": 11
+            "constitution": 10,
+            "intelligence": 11,
+            "wisdom": 9,
+            "charisma": 10
           },
-          "traits": [],
+          "traits": [
+            "POACHER"
+          ],
           "stamina": 100,
           "morale": 0,
           "cards": {
@@ -64433,16 +64457,16 @@
         },
         {
           "id": "ply_996_17",
-          "name": "Daniel Álvarez",
+          "name": "Rodrigo Alonso",
           "number": 17,
           "position": "LW",
           "attributes": {
-            "strength": 15,
-            "dexterity": 13,
+            "strength": 14,
+            "dexterity": 15,
             "constitution": 12,
-            "intelligence": 13,
-            "wisdom": 13,
-            "charisma": 12
+            "intelligence": 10,
+            "wisdom": 10,
+            "charisma": 13
           },
           "traits": [],
           "stamina": 100,
@@ -64454,20 +64478,18 @@
         },
         {
           "id": "ply_996_18",
-          "name": "Alex Hernández",
+          "name": "Hugo Gómez",
           "number": 18,
           "position": "RW",
           "attributes": {
-            "strength": 17,
-            "dexterity": 11,
-            "constitution": 9,
-            "intelligence": 9,
-            "wisdom": 11,
-            "charisma": 13
+            "strength": 15,
+            "dexterity": 12,
+            "constitution": 15,
+            "intelligence": 12,
+            "wisdom": 14,
+            "charisma": 9
           },
-          "traits": [
-            "EXPLOSIVE_WINGER"
-          ],
+          "traits": [],
           "stamina": 100,
           "morale": 0,
           "cards": {
@@ -65819,19 +65841,19 @@
         },
         {
           "id": "ply_1068_18",
-          "name": "Alejandro Sánchez",
+          "name": "Hugo Sánchez",
           "number": 18,
           "position": "RW",
           "attributes": {
-            "strength": 10,
-            "dexterity": 13,
-            "constitution": 13,
-            "intelligence": 14,
-            "wisdom": 10,
-            "charisma": 9
+            "strength": 15,
+            "dexterity": 16,
+            "constitution": 10,
+            "intelligence": 9,
+            "wisdom": 12,
+            "charisma": 11
           },
           "traits": [
-            "EXPLOSIVE_WINGER"
+            "DRIBBLE_WIZARD"
           ],
           "stamina": 100,
           "morale": 0,
@@ -68097,16 +68119,16 @@
         },
         {
           "id": "ply_1108_18",
-          "name": "David García",
+          "name": "Bruno Fernández",
           "number": 18,
           "position": "RW",
           "attributes": {
-            "strength": 16,
-            "dexterity": 11,
-            "constitution": 12,
-            "intelligence": 12,
-            "wisdom": 15,
-            "charisma": 14
+            "strength": 13,
+            "dexterity": 15,
+            "constitution": 15,
+            "intelligence": 14,
+            "wisdom": 12,
+            "charisma": 9
           },
           "traits": [
             "DRIBBLE_WIZARD"
@@ -68279,20 +68301,18 @@
         },
         {
           "id": "ply_1186_6",
-          "name": "Hugo Molina",
+          "name": "Samuel Ramírez",
           "number": 6,
           "position": "LB",
           "attributes": {
-            "strength": 15,
-            "dexterity": 17,
+            "strength": 14,
+            "dexterity": 13,
             "constitution": 16,
-            "intelligence": 10,
-            "wisdom": 14,
-            "charisma": 12
+            "intelligence": 12,
+            "wisdom": 15,
+            "charisma": 14
           },
-          "traits": [
-            "SET_PIECE_SPECIALIST"
-          ],
+          "traits": [],
           "stamina": 100,
           "morale": 0,
           "cards": {
@@ -68302,18 +68322,21 @@
         },
         {
           "id": "ply_1186_7",
-          "name": "Martín Martínez",
+          "name": "Alejandro Álvarez",
           "number": 7,
           "position": "RB",
           "attributes": {
-            "strength": 12,
+            "strength": 14,
             "dexterity": 16,
-            "constitution": 15,
-            "intelligence": 12,
-            "wisdom": 15,
-            "charisma": 12
+            "constitution": 13,
+            "intelligence": 15,
+            "wisdom": 12,
+            "charisma": 9
           },
-          "traits": [],
+          "traits": [
+            "EXPLOSIVE_WINGER",
+            "AERIAL_TOWER"
+          ],
           "stamina": 100,
           "morale": 0,
           "cards": {
@@ -68323,37 +68346,16 @@
         },
         {
           "id": "ply_1186_8",
-          "name": "Diego Ramírez",
+          "name": "Pablo Molina",
           "number": 8,
           "position": "CDM",
           "attributes": {
-            "strength": 12,
-            "dexterity": 10,
+            "strength": 15,
+            "dexterity": 12,
             "constitution": 15,
-            "intelligence": 14,
-            "wisdom": 15,
-            "charisma": 15
-          },
-          "traits": [],
-          "stamina": 100,
-          "morale": 0,
-          "cards": {
-            "yellow": 0,
-            "red": false
-          }
-        },
-        {
-          "id": "ply_1186_9",
-          "name": "Álvaro Molina",
-          "number": 9,
-          "position": "CDM",
-          "attributes": {
-            "strength": 14,
-            "dexterity": 10,
-            "constitution": 10,
             "intelligence": 13,
-            "wisdom": 17,
-            "charisma": 14
+            "wisdom": 14,
+            "charisma": 9
           },
           "traits": [
             "DEFENSIVE_GENERAL"
@@ -68366,17 +68368,38 @@
           }
         },
         {
+          "id": "ply_1186_9",
+          "name": "Alejandro Torres",
+          "number": 9,
+          "position": "CDM",
+          "attributes": {
+            "strength": 16,
+            "dexterity": 14,
+            "constitution": 13,
+            "intelligence": 11,
+            "wisdom": 15,
+            "charisma": 14
+          },
+          "traits": [],
+          "stamina": 100,
+          "morale": 0,
+          "cards": {
+            "yellow": 0,
+            "red": false
+          }
+        },
+        {
           "id": "ply_1186_10",
-          "name": "Mateo Jiménez",
+          "name": "Lucas Martínez",
           "number": 10,
           "position": "CM",
           "attributes": {
-            "strength": 9,
+            "strength": 11,
             "dexterity": 10,
-            "constitution": 13,
-            "intelligence": 13,
+            "constitution": 16,
+            "intelligence": 16,
             "wisdom": 14,
-            "charisma": 13
+            "charisma": 15
           },
           "traits": [
             "COLD_BLOODED",
@@ -68391,20 +68414,18 @@
         },
         {
           "id": "ply_1186_11",
-          "name": "Gael Vázquez",
+          "name": "Hugo Martín",
           "number": 11,
           "position": "CM",
           "attributes": {
             "strength": 9,
-            "dexterity": 11,
-            "constitution": 11,
-            "intelligence": 18,
+            "dexterity": 15,
+            "constitution": 15,
+            "intelligence": 13,
             "wisdom": 13,
-            "charisma": 10
+            "charisma": 14
           },
-          "traits": [
-            "COLD_BLOODED"
-          ],
+          "traits": [],
           "stamina": 100,
           "morale": 0,
           "cards": {
@@ -68414,20 +68435,18 @@
         },
         {
           "id": "ply_1186_12",
-          "name": "Alejandro Vázquez",
+          "name": "Brais Ramos",
           "number": 12,
           "position": "CAM",
           "attributes": {
-            "strength": 14,
-            "dexterity": 15,
-            "constitution": 10,
-            "intelligence": 17,
-            "wisdom": 10,
-            "charisma": 13
+            "strength": 13,
+            "dexterity": 11,
+            "constitution": 15,
+            "intelligence": 13,
+            "wisdom": 13,
+            "charisma": 10
           },
-          "traits": [
-            "DRIBBLE_WIZARD"
-          ],
+          "traits": [],
           "stamina": 100,
           "morale": 0,
           "cards": {
@@ -69773,112 +69792,19 @@
         },
         {
           "id": "ply_2064_12",
-          "name": "Rodrigo Romero",
+          "name": "Antón Ruiz",
           "number": 12,
           "position": "CAM",
           "attributes": {
-            "strength": 14,
-            "dexterity": 13,
-            "constitution": 10,
-            "intelligence": 12,
-            "wisdom": 15,
-            "charisma": 11
-          },
-          "traits": [
-            "DRIBBLE_WIZARD",
-            "COLD_BLOODED"
-          ],
-          "stamina": 100,
-          "morale": 0,
-          "cards": {
-            "yellow": 0,
-            "red": false
-          }
-        },
-        {
-          "id": "ply_2064_13",
-          "name": "Roi Domínguez",
-          "number": 13,
-          "position": "LM",
-          "attributes": {
-            "strength": 13,
-            "dexterity": 17,
-            "constitution": 9,
-            "intelligence": 13,
-            "wisdom": 10,
-            "charisma": 9
-          },
-          "traits": [
-            "DRIBBLE_WIZARD"
-          ],
-          "stamina": 100,
-          "morale": 0,
-          "cards": {
-            "yellow": 0,
-            "red": false
-          }
-        },
-        {
-          "id": "ply_2064_14",
-          "name": "Lucas Vázquez",
-          "number": 14,
-          "position": "RM",
-          "attributes": {
-            "strength": 14,
-            "dexterity": 15,
-            "constitution": 13,
-            "intelligence": 13,
-            "wisdom": 14,
-            "charisma": 10
-          },
-          "traits": [
-            "EXPLOSIVE_WINGER",
-            "DRIBBLE_WIZARD"
-          ],
-          "stamina": 100,
-          "morale": 0,
-          "cards": {
-            "yellow": 0,
-            "red": false
-          }
-        },
-        {
-          "id": "ply_2064_15",
-          "name": "Diego Ruiz",
-          "number": 15,
-          "position": "ST",
-          "attributes": {
-            "strength": 14,
-            "dexterity": 15,
-            "constitution": 13,
-            "intelligence": 9,
-            "wisdom": 9,
+            "strength": 10,
+            "dexterity": 10,
+            "constitution": 15,
+            "intelligence": 14,
+            "wisdom": 12,
             "charisma": 12
           },
           "traits": [
-            "AERIAL_TOWER"
-          ],
-          "stamina": 100,
-          "morale": 0,
-          "cards": {
-            "yellow": 0,
-            "red": false
-          }
-        },
-        {
-          "id": "ply_2064_16",
-          "name": "Roi Rodríguez",
-          "number": 16,
-          "position": "ST",
-          "attributes": {
-            "strength": 14,
-            "dexterity": 13,
-            "constitution": 12,
-            "intelligence": 12,
-            "wisdom": 12,
-            "charisma": 13
-          },
-          "traits": [
+            "DRIBBLE_WIZARD",
             "POACHER"
           ],
           "stamina": 100,
@@ -69889,16 +69815,40 @@
           }
         },
         {
-          "id": "ply_2064_17",
-          "name": "Martín Martínez",
-          "number": 17,
-          "position": "LW",
+          "id": "ply_2064_13",
+          "name": "Nicolás Molina",
+          "number": 13,
+          "position": "LM",
           "attributes": {
-            "strength": 10,
+            "strength": 9,
             "dexterity": 14,
-            "constitution": 11,
+            "constitution": 10,
             "intelligence": 11,
-            "wisdom": 14,
+            "wisdom": 12,
+            "charisma": 11
+          },
+          "traits": [
+            "EXPLOSIVE_WINGER",
+            "POACHER"
+          ],
+          "stamina": 100,
+          "morale": 0,
+          "cards": {
+            "yellow": 0,
+            "red": false
+          }
+        },
+        {
+          "id": "ply_2064_14",
+          "name": "Rodrigo Navarro",
+          "number": 14,
+          "position": "RM",
+          "attributes": {
+            "strength": 11,
+            "dexterity": 16,
+            "constitution": 10,
+            "intelligence": 13,
+            "wisdom": 13,
             "charisma": 15
           },
           "traits": [
@@ -69912,21 +69862,89 @@
           }
         },
         {
+          "id": "ply_2064_15",
+          "name": "Sergio Gil",
+          "number": 15,
+          "position": "ST",
+          "attributes": {
+            "strength": 15,
+            "dexterity": 11,
+            "constitution": 9,
+            "intelligence": 12,
+            "wisdom": 9,
+            "charisma": 10
+          },
+          "traits": [
+            "COLD_BLOODED"
+          ],
+          "stamina": 100,
+          "morale": 0,
+          "cards": {
+            "yellow": 0,
+            "red": false
+          }
+        },
+        {
+          "id": "ply_2064_16",
+          "name": "Marcos Romero",
+          "number": 16,
+          "position": "ST",
+          "attributes": {
+            "strength": 15,
+            "dexterity": 13,
+            "constitution": 12,
+            "intelligence": 13,
+            "wisdom": 12,
+            "charisma": 11
+          },
+          "traits": [
+            "POACHER"
+          ],
+          "stamina": 100,
+          "morale": 0,
+          "cards": {
+            "yellow": 0,
+            "red": false
+          }
+        },
+        {
+          "id": "ply_2064_17",
+          "name": "Martín Álvarez",
+          "number": 17,
+          "position": "LW",
+          "attributes": {
+            "strength": 13,
+            "dexterity": 14,
+            "constitution": 14,
+            "intelligence": 15,
+            "wisdom": 11,
+            "charisma": 10
+          },
+          "traits": [
+            "EXPLOSIVE_WINGER"
+          ],
+          "stamina": 100,
+          "morale": 0,
+          "cards": {
+            "yellow": 0,
+            "red": false
+          }
+        },
+        {
           "id": "ply_2064_18",
-          "name": "Jorge Martín",
+          "name": "Hugo Gutiérrez",
           "number": 18,
           "position": "RW",
           "attributes": {
-            "strength": 10,
-            "dexterity": 15,
+            "strength": 16,
+            "dexterity": 17,
             "constitution": 14,
-            "intelligence": 14,
-            "wisdom": 14,
-            "charisma": 9
+            "intelligence": 9,
+            "wisdom": 12,
+            "charisma": 11
           },
           "traits": [
-            "EXPLOSIVE_WINGER",
-            "SET_PIECE_SPECIALIST"
+            "DRIBBLE_WIZARD"
           ],
           "stamina": 100,
           "morale": 0,
@@ -73480,19 +73498,19 @@
         },
         {
           "id": "ply_19230216_15",
-          "name": "Leo Castro",
+          "name": "Antón Gutiérrez",
           "number": 15,
           "position": "ST",
           "attributes": {
             "strength": 17,
             "dexterity": 15,
-            "constitution": 14,
-            "intelligence": 14,
-            "wisdom": 11,
-            "charisma": 13
+            "constitution": 11,
+            "intelligence": 13,
+            "wisdom": 13,
+            "charisma": 15
           },
           "traits": [
-            "POACHER",
+            "COLD_BLOODED",
             "ANCHOR_TACKLER"
           ],
           "stamina": 100,
@@ -73504,19 +73522,19 @@
         },
         {
           "id": "ply_19230216_16",
-          "name": "Antón Vázquez",
+          "name": "Alejandro Domínguez",
           "number": 16,
           "position": "ST",
           "attributes": {
-            "strength": 13,
-            "dexterity": 15,
-            "constitution": 13,
-            "intelligence": 10,
-            "wisdom": 15,
-            "charisma": 15
+            "strength": 16,
+            "dexterity": 11,
+            "constitution": 15,
+            "intelligence": 15,
+            "wisdom": 13,
+            "charisma": 10
           },
           "traits": [
-            "POACHER"
+            "EXPLOSIVE_WINGER"
           ],
           "stamina": 100,
           "morale": 0,
@@ -73527,16 +73545,16 @@
         },
         {
           "id": "ply_19230216_17",
-          "name": "Roi Hernández",
+          "name": "Hugo Gil",
           "number": 17,
           "position": "LW",
           "attributes": {
-            "strength": 11,
-            "dexterity": 17,
-            "constitution": 11,
+            "strength": 13,
+            "dexterity": 16,
+            "constitution": 10,
             "intelligence": 13,
-            "wisdom": 10,
-            "charisma": 13
+            "wisdom": 14,
+            "charisma": 14
           },
           "traits": [
             "EXPLOSIVE_WINGER"
@@ -73550,18 +73568,20 @@
         },
         {
           "id": "ply_19230216_18",
-          "name": "Rodrigo Díaz",
+          "name": "Javier López",
           "number": 18,
           "position": "RW",
           "attributes": {
-            "strength": 13,
-            "dexterity": 12,
-            "constitution": 11,
-            "intelligence": 11,
+            "strength": 12,
+            "dexterity": 13,
+            "constitution": 9,
+            "intelligence": 9,
             "wisdom": 9,
-            "charisma": 9
+            "charisma": 12
           },
-          "traits": [],
+          "traits": [
+            "DRIBBLE_WIZARD"
+          ],
           "stamina": 100,
           "morale": 0,
           "cards": {
