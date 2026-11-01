@@ -12,6 +12,7 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:balance": "tsx scripts/verify-balance.ts",
+    "audit:ui": "tsx scripts/audit-ui.ts",
     "import:data": "tsx scripts/import-sources-data.ts"
   },
   "dependencies": {

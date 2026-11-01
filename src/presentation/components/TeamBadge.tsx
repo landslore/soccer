@@ -84,3 +84,4 @@ export const TeamBadge: React.FC<TeamBadgeProps> = ({
     </div>
   );
 };
+

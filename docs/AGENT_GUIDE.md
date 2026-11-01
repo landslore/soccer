@@ -30,6 +30,23 @@ Cualquier cambio que realices **DEBE** respetar estrictamente los siguientes pri
 - Los porteros nunca deben participar en la construcción de campo abierto (`excludeGK = true`).
 - Sus coordenadas en el canvas están clampadas a su respectiva área de meta.
 
+### 🚨 Invariante 6: Barrido Visual y Funcional Obligatorio en Local (Cero Regresiones)
+- **NUNCA des por terminada una tarea limitándote a que compile o pase el type-check.**
+- El usuario **NO debe ser el tester** que detecte imágenes caídas, inconsistencias lógicas en el partido o controles desincronizados.
+- **Antes de considerar finalizada cualquier modificación**, el agente DEBE ejecutar obligatoriamente:
+  1. `npm run audit:ui`: Script automatizado de auditoría que verifica la presencia física del 100% de escudos en `public/badges/`, la unicidad estricta de nombres por plantilla y simula 25 partidos completos (4.500 micro-ticks) verificando que no existan autogoles absurdos, autopases ni pérdidas del panel de decisiones IA.
+  2. **Barrido de la Web Real en Local**:
+     - **Assets & Escudos**: Verificar que en la Clasificación y Jornadas no aparezca ningún icono de imagen rota (`<img>` fallido), asegurando que se utilice siempre el componente `<TeamBadge>`.
+     - **Limpieza de Controles UI**: Comprobar que no existan selectores redundantes o duplicados (ej: el selector de grupo solo reside en la cabecera `Navbar.tsx`).
+     - **Flujo en Vivo del Partido**: Iniciar un partido en el *Modo Chapas F11*, ejecutar varias tiradas D20 y verificar:
+       * Los 22 jugadores respetan sus mitades reglamentarias (Regla 8 IFAB).
+       * Las velocidades y zancadas reflejan la destreza (`DES`) y la fatiga (`stamina`) de cada chapa.
+       * El balón viaja al jugador al que se asiste, sin saltos mágicos ni teletransportes.
+       * El panel de debug de decisiones muestra la personalidad del jugador (`SOLO_DRIBBLER`, `PASS_MAESTRO`, etc.) y el desglose de utilidad.
+       * En los goles y paradas, el panel de decisiones permanece accesible y auditable.
+       * La barra de navegación histórica (*time-travel scrubber*) permite saltar a fotogramas previos y reanudar el partido sin errores.
+     - **Consola del Navegador**: 0 errores o excepciones no controladas en DevTools.
+
 ---
 
 ## 2. Batería de Comandos de Verificación Obligatoria
@@ -46,7 +63,10 @@ npm run test:run
 # 3. Verificación de balance estadístico Monte Carlo (1000 partidos)
 npm run test:balance
 
-# 4. Build de producción completo
+# 4. Auditoría Integral Agéntica de UI, Assets e Invariantes del Motor
+npm run audit:ui
+
+# 5. Build de producción completo con Vite
 npm run build
 ```
 
