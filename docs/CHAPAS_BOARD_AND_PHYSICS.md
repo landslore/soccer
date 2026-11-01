@@ -114,3 +114,22 @@ Los porteros no abandonan su área:
 Para eliminar cualquier confusión cuando dos jugadores generados proceduralmente comparten nombre de pila (p. ej. *Leo* o *Alex*):
 - **Cápsula de Nombre Local**: Fondo azul profundo `rgba(0, 60, 150, 0.92)` con reborde dorado y etiqueta `[L] Leo (ST)`.
 - **Cápsula de Nombre Visitante**: Fondo carmesí `rgba(180, 25, 25, 0.92)` con reborde blanco y etiqueta `[V] Leo (ST)`.
+
+---
+
+## 6. Coherencia Espacial en Ataque y Time-Travel Audit Trail
+
+### 6.1. Separación de Roles: Banda vs Carril Central
+- **Jugadas de Banda (`CROSS_COMPLETED`)**:
+  - El pasador (`LW`, `RW`, `LB`, `RB`) se posiciona bien pegado a la línea de cal ($x \approx 60$ o $x \approx \text{width} - 60$, $y \approx 165$ / $\text{height} - 165$).
+  - El delantero rematador (`targetChapa`, `ST`) penetra al punto de penalti ($y \approx 135$ / $\text{height} - 135$, $x \approx \text{width}/2$).
+- **Jugadas Centrales (`THROUGH_BALL`)**:
+  - El mediapunta o interior (`CAM`, `CM`) filtra desde la frontal del área ($y \approx 245$ / $\text{height} - 245$).
+  - El delantero rompe el fuera de juego y se planta en el área para definir mano a mano ($y \approx 140$ / $\text{height} - 140$).
+- **Finalización de Gol (`GOAL`) y Parada (`SHOT_SAVED`)**:
+  - El rematador está estrictamente dentro del área ($y \approx 130$ / $\text{height} - 130$).
+  - El portero defiende bajo palos.
+
+### 6.2. Motor de Auditoría Histórica (Time-Travel)
+- Cada jugada congela un `BoardSnapshot` con las coordenadas $(\mathbf{x}, \mathbf{y})$ y `hasBall` de cada una de las 22 chapas y el balón.
+- Al navegar con `MatchAuditNavigator`, se restauran las posiciones exactas del fotograma histórico sin recalcular ni degradar la posición de los delanteros a mitad de camino.

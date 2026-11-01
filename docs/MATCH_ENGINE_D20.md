@@ -81,7 +81,7 @@ En cada jugada, el jugador en posesión evalúa varias alternativas tácticas po
 
 ```typescript
 export interface TacticalOption {
-  actionType: 'SHORT_PASS' | 'THROUGH_BALL' | 'COUNTER_ATTACK' | 'CROSS' | 'DRIBBLE' | 'LONG_SHOT';
+  actionType: 'SHORT_PASS' | 'THROUGH_BALL' | 'COUNTER_ATTACK' | 'CROSS' | 'DRIBBLE' | 'LONG_SHOT' | 'BOX_FINISH';
   label: string;
   targetPlayer?: Player;
   targetZone: PitchZone;
@@ -92,10 +92,15 @@ export interface TacticalOption {
 }
 ```
 
-### Reglas Tácticas Clave:
+### Reglas Tácticas y de Integridad Clave:
 1. **Evitar bucles al centro del campo**: Las recuperaciones defensivas en campo propio transicionan a `DEFENSIVE_HALF`, permitiendo armar juego progresivo en lugar de saltar forzadamente a `MIDFIELD`.
-2. **Contragolpe de Transición Rápida**: Si la táctica del equipo es `FAST_TRANSITION` y el delantero tiene `DES >= 13`, el pase largo salta directamente de `OWN_BOX` a `ATTACKING_THIRD` con ventaja d20.
-3. **Confinamiento de Porteros**: Las acciones de campo abierto excluyen explícitamente al portero (`excludeGK = true`). El guardameta únicamente interviene en disparos dentro del área (`OPPONENT_BOX` / `SHOT_SAVED`) y saques desde su área (`OWN_BOX`).
+2. **Coherencia Táctica Posicional**:
+   - Jugadores de banda (`LW`, `RW`, `LB`, `RB`): centran al área o desbordan por la línea de fondo.
+   - Jugadores centrales (`CAM`, `CM`, `ST`): filtran pases al hueco entre centrales (`THROUGH_BALL`), abren a las bandas o disparan desde la frontal.
+3. **Auditoría Completa de Decisiones en Goles y Paradas**: En `resolveBoxShot`, el delantero evalúa alternativas tácticas (`BOX_FINISH` a la escuadra vs `LONG_SHOT` de potencia vs `DRIBBLE` al portero) y la `decision: PlayerDecision` se asocia tanto a eventos `GOAL` como `SHOT_SAVED`.
+4. **Prohibición de Auto-Pases**: La función `getActivePlayer` admite `excludePlayerIds`, garantizando que el receptor o rematador nunca sea el propio jugador que asiste.
+5. **Nombres 100% Únicos por Plantilla**: El generador procedural `src/domain/procedural-roster.ts` mantiene un `Set<string>` para garantizar que ningún equipo tenga nombres o apellidos duplicados.
+6. **Confinamiento de Porteros**: Las acciones de campo abierto excluyen explícitamente al portero (`excludeGK = true`). El guardameta únicamente interviene en disparos dentro del área (`OPPONENT_BOX` / `SHOT_SAVED`) y saques desde su área (`OWN_BOX`).
 
 ---
 
