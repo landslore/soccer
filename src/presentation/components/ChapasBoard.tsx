@@ -161,79 +161,12 @@ export const ChapasBoard: React.FC = () => {
 
     const isHomeAttacking = ev.attackingTeamId === currentMatch?.homeTeam.id;
 
-    // Altura relativa del balón según la zona de juego real (0 a 1)
-    let ballZoneYPercent = 0.5;
-    if (ev.zone === 'OPPONENT_BOX') ballZoneYPercent = isHomeAttacking ? 0.15 : 0.85;
-    else if (ev.zone === 'ATTACKING_THIRD') ballZoneYPercent = isHomeAttacking ? 0.30 : 0.70;
-    else if (ev.zone === 'MIDFIELD') ballZoneYPercent = 0.50;
-    else if (ev.zone === 'DEFENSIVE_HALF') ballZoneYPercent = isHomeAttacking ? 0.70 : 0.30;
-    else if (ev.zone === 'OWN_BOX') ballZoneYPercent = isHomeAttacking ? 0.85 : 0.15;
+    // Movimiento lateral natural según la jugada
+    const lateralShift = Math.random() > 0.5 ? 20 : -20;
 
-    const lateralShift = Math.random() > 0.5 ? 25 : -25;
-
-    // Actualizar dinámicamente las posiciones sin reseteos al centro
-    Object.values(chapas).forEach((c) => {
-      c.hasBall = false;
-      c.isHighlight = false;
-      c.isMakingRun = false;
-
-      // REGLA ESTRICTA DE PORTERO: Guardar su arco
-      if (c.position === 'GK') {
-        c.targetX = width / 2 + lateralShift * 0.3;
-        c.targetY = c.baseY;
-        return;
-      }
-
-      const isAttacker = c.isHome === isHomeAttacking;
-
-      if (isAttacker) {
-        // El bloque atacante adelanta proporcionalmente hacia la zona del balón
-        let depthY = c.baseY;
-        if (c.isHome) {
-          // Ataca hacia arriba (y menor)
-          const targetForwardY = ballZoneYPercent * height;
-          if (c.position === 'ST' || c.position === 'LW' || c.position === 'RW') {
-            depthY = Math.max(110, targetForwardY - 30);
-          } else if (c.position === 'CAM' || c.position === 'CM') {
-            depthY = Math.max(220, targetForwardY + 40);
-          } else {
-            // Defensas adelantan hasta el centro o campo rival
-            depthY = Math.max(360, targetForwardY + 140);
-          }
-        } else {
-          // Ataca hacia abajo (y mayor)
-          const targetForwardY = ballZoneYPercent * height;
-          if (c.position === 'ST' || c.position === 'LW' || c.position === 'RW') {
-            depthY = Math.min(height - 110, targetForwardY + 30);
-          } else if (c.position === 'CAM' || c.position === 'CM') {
-            depthY = Math.min(height - 220, targetForwardY - 40);
-          } else {
-            depthY = Math.min(height - 360, targetForwardY - 140);
-          }
-        }
-
-        let spreadX = c.baseX;
-        if (c.position === 'LW' || c.position === 'LB') spreadX = Math.max(40, c.baseX - 20);
-        if (c.position === 'RW' || c.position === 'RB') spreadX = Math.min(width - 40, c.baseX + 20);
-
-        c.targetX = spreadX;
-        c.targetY = depthY;
-      } else {
-        // El bloque defensor se repliega protegiendo su portería y bascula al balón
-        let depthY = c.baseY;
-        if (c.isHome) {
-          // Defiende su arco inferior (y mayor)
-          depthY = Math.min(height - 90, c.baseY + 40);
-        } else {
-          // Defiende su arco superior (y menor)
-          depthY = Math.max(90, c.baseY - 40);
-        }
-
-        c.targetX = Math.max(45, Math.min(width - 45, c.baseX + lateralShift * 0.6));
-        c.targetY = depthY;
-      }
-    });
-
+    // Determinar la línea de altura de la jugada de forma continua
+    // Local ataca hacia arriba (y: 100), defiende abajo (y: 700)
+    // Visitante ataca hacia abajo (y: 700), defiende arriba (y: 100)
     const primaryChapa = ev.primaryPlayer ? chapas[ev.primaryPlayer.id] : null;
     const secondaryChapa = ev.secondaryPlayer ? chapas[ev.secondaryPlayer.id] : null;
     const targetChapa = ev.targetPlayer ? chapas[ev.targetPlayer.id] : null;
@@ -241,15 +174,85 @@ export const ChapasBoard: React.FC = () => {
     if (primaryChapa) primaryChapa.isHighlight = true;
     if (secondaryChapa) secondaryChapa.isHighlight = true;
 
+    // Actualizar dinámicamente las posiciones sin reseteos al centro
+    Object.values(chapas).forEach((c) => {
+      c.hasBall = false;
+      c.isHighlight = false;
+      c.isMakingRun = false;
+
+      // REGLA ESTRICTA DE PORTERO: Guardar su arco exclusivamente
+      if (c.position === 'GK') {
+        c.targetX = width / 2 + lateralShift * 0.25;
+        c.targetY = c.baseY;
+        return;
+      }
+
+      const isAttacker = c.isHome === isHomeAttacking;
+
+      if (isAttacker) {
+        // El equipo atacante mantiene la presión alta según dónde esté el balón
+        let targetForwardY = c.y; // Mantener posición previa como referencia
+
+        if (ev.zone === 'OPPONENT_BOX' || ev.zone === 'ATTACKING_THIRD') {
+          // El equipo atacante está en campo rival: los delanteros pisan área y los medios están en la frontal
+          if (c.isHome) {
+            if (c.position === 'ST' || c.position === 'LW' || c.position === 'RW') {
+              targetForwardY = Math.min(c.y, Math.max(120, height * 0.22));
+            } else if (c.position === 'CAM' || c.position === 'CM') {
+              targetForwardY = Math.min(c.y, Math.max(240, height * 0.40));
+            } else {
+              targetForwardY = Math.min(c.y, Math.max(380, height * 0.54)); // Defensa en medio campo
+            }
+          } else {
+            if (c.position === 'ST' || c.position === 'LW' || c.position === 'RW') {
+              targetForwardY = Math.max(c.y, Math.min(height - 120, height * 0.78));
+            } else if (c.position === 'CAM' || c.position === 'CM') {
+              targetForwardY = Math.max(c.y, Math.min(height - 240, height * 0.60));
+            } else {
+              targetForwardY = Math.max(c.y, Math.min(height - 380, height * 0.46));
+            }
+          }
+        } else if (ev.zone === 'MIDFIELD') {
+          // En mediocampo: avanzar suavemente unos metros, NUNCA retroceder bruscamente si ya estaban arriba
+          const nudge = c.isHome ? -15 : 15;
+          targetForwardY = c.y + nudge;
+        }
+
+        c.targetY = Math.max(80, Math.min(height - 80, targetForwardY));
+        c.targetX = Math.max(40, Math.min(width - 40, c.x + lateralShift * 0.3));
+      } else {
+        // El equipo defensor mantiene bloque compacto cerca de su portería
+        let targetDefendY = c.y;
+        if (ev.zone === 'OPPONENT_BOX' || ev.zone === 'ATTACKING_THIRD') {
+          // Repliegue defensivo en su área
+          if (c.isHome) {
+            targetDefendY = Math.max(c.y, Math.min(height - 100, height * 0.78));
+          } else {
+            targetDefendY = Math.min(c.y, Math.max(100, height * 0.22));
+          }
+        }
+
+        c.targetY = Math.max(80, Math.min(height - 80, targetDefendY));
+        c.targetX = Math.max(45, Math.min(width - 45, c.x + lateralShift * 0.4));
+      }
+    });
+
     // Desmarque activo del receptor
     if (targetChapa && targetChapa.position !== 'GK') {
       targetChapa.isMakingRun = true;
-      const runY = targetChapa.isHome ? -40 : 40;
-      targetChapa.targetY += runY;
-      targetChapa.targetX += lateralShift * 0.4;
+      const runY = targetChapa.isHome ? -45 : 45;
+      targetChapa.targetY = Math.max(100, Math.min(height - 100, targetChapa.y + runY));
+      targetChapa.targetX = Math.max(40, Math.min(width - 40, targetChapa.x + lateralShift * 0.5));
     }
 
     switch (ev.type) {
+      case 'KICK_OFF':
+      case 'HALF_TIME': {
+        ball.targetX = width / 2;
+        ball.targetY = height / 2;
+        break;
+      }
+
       case 'PASS_COMPLETED': {
         if (primaryChapa && targetChapa) {
           primaryChapa.hasBall = true;

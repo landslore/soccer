@@ -297,7 +297,9 @@ export class MatchEngine {
       const check = resolveContestedCheck(rollAtk, rollDef);
 
       if (check.attackerWon) {
-        this.state.ballZone = 'MIDFIELD';
+        // Si sale desde su propia área pasa a su mitad defensiva; si ya estaba en su mitad avanza a la medular
+        const nextZone = this.state.ballZone === 'OWN_BOX' ? 'DEFENSIVE_HALF' : 'MIDFIELD';
+        this.state.ballZone = nextZone;
         return this.recordEvent({
           minute: min,
           type: 'PASS_COMPLETED',
@@ -306,15 +308,16 @@ export class MatchEngine {
           primaryPlayer: passer,
           secondaryPlayer: presser,
           targetPlayer: midfielder,
-          zone: 'MIDFIELD',
+          zone: nextZone,
           contestedCheck: check,
           decision,
-          commentary: `${passer.name} juega con criterio en corto con ${midfielder.name} para iniciar jugada.`,
+          commentary: `${passer.name} juega con criterio en corto con ${midfielder.name} para dar salida al balón.`,
           score: { ...this.state.score },
         });
       } else {
         this.switchPossession();
-        this.state.ballZone = 'ATTACKING_THIRD';
+        const turnoverZone = this.state.ballZone === 'OWN_BOX' ? 'OPPONENT_BOX' : 'ATTACKING_THIRD';
+        this.state.ballZone = turnoverZone;
         return this.recordEvent({
           minute: min,
           type: 'PASS_INTERCEPTED',
@@ -323,10 +326,10 @@ export class MatchEngine {
           primaryPlayer: presser,
           secondaryPlayer: passer,
           targetPlayer: midfielder,
-          zone: 'ATTACKING_THIRD',
+          zone: turnoverZone,
           contestedCheck: check,
           decision,
-          commentary: `¡Error en salida! ${presser.name} corta el pase de ${passer.name} muy cerca del área.`,
+          commentary: `¡Peligro! ${presser.name} corta el pase de ${passer.name} en zona comprometida.`,
           score: { ...this.state.score },
         });
       }
@@ -488,7 +491,8 @@ export class MatchEngine {
       advantage: winger.traits.includes('EXPLOSIVE_WINGER'),
       rng: this.rng,
     });
-    const rollDef = rollD20(getAttributeModifier(fullBack.attributes.dexterity) + 1, { rng: this.rng });
+    // Cobertura colectiva de la zaga en el último tercio
+    const rollDef = rollD20(getAttributeModifier(fullBack.attributes.dexterity) + 2, { rng: this.rng });
     const check = resolveContestedCheck(rollAtk, rollDef);
 
     if (check.attackerWon) {
@@ -541,8 +545,8 @@ export class MatchEngine {
       rng: this.rng,
     });
 
-    // En F11, el portero tiene cobertura del central
-    const defBonus = 2 + getAttributeModifier(defender.attributes.wisdom);
+    // En F11, el portero tiene achique posicional y cobertura del central (+3 bono defensivo del arco)
+    const defBonus = 3 + getAttributeModifier(defender.attributes.wisdom);
     const rollSave = rollD20(getAttributeModifier(keeper.attributes.dexterity) + defBonus, { rng: this.rng });
     const check = resolveContestedCheck(rollShot, rollSave);
 
@@ -553,6 +557,7 @@ export class MatchEngine {
         this.state.score.away++;
       }
 
+      // TRAS GOL: Saque de centro del campo por el equipo que encajó
       this.state.ballZone = 'MIDFIELD';
       this.switchPossession();
 
@@ -570,8 +575,9 @@ export class MatchEngine {
         score: { ...this.state.score },
       });
     } else {
+      // TRAS PARADA: El portero se queda el balón en su propia área (OWN_BOX)
       this.switchPossession();
-      this.state.ballZone = 'DEFENSIVE_HALF';
+      this.state.ballZone = 'OWN_BOX';
       return this.recordEvent({
         minute: min,
         type: 'SHOT_SAVED',
@@ -579,9 +585,9 @@ export class MatchEngine {
         defendingTeamId: def.id,
         primaryPlayer: keeper,
         secondaryPlayer: striker,
-        zone: 'DEFENSIVE_HALF',
+        zone: 'OWN_BOX',
         contestedCheck: check,
-        commentary: `¡PARADÓN! El guardameta ${keeper.name} salva el gol bajo palos ante el remate de ${striker.name}.`,
+        commentary: `¡PARADÓN! El guardameta ${keeper.name} salva el gol bajo palos y asegura el esférico en su área.`,
         score: { ...this.state.score },
       });
     }
