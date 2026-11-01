@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useGameStore } from '../../state/game-store';
-import { Play, Pause, FastForward, RotateCcw, Dices, Award, Sparkles } from 'lucide-react';
+import { Play, Pause, FastForward, RotateCcw, Dices, Award, Sparkles, Brain } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { DecisionDebugger } from './DecisionDebugger';
 
 interface ChapaEntity {
   id: string;
@@ -20,7 +21,7 @@ interface ChapaEntity {
   radius: number;
   hasBall: boolean;
   isHighlight: boolean;
-  isMakingRun: boolean; // Desmarque activo
+  isMakingRun: boolean;
 }
 
 interface BallEntity {
@@ -51,6 +52,7 @@ export const ChapasBoard: React.FC = () => {
   });
 
   const [activeActionText, setActiveActionText] = useState<string>('');
+  const [showDebugger, setShowDebugger] = useState<boolean>(true);
 
   // 1. Inicializar las 22 chapas según formación 4-3-3 reglamentaria
   useEffect(() => {
@@ -145,7 +147,7 @@ export const ChapasBoard: React.FC = () => {
     chapasRef.current = map;
   }, [currentMatch?.homeTeam.id, currentMatch?.awayTeam.id]);
 
-  // 2. Animar físicamente la jugada y coordinar el movimiento colectivo de los 22 jugadores
+  // 2. Animar físicamente la jugada con avance orgánico continuo (sin reseteos al centro)
   useEffect(() => {
     const ev = currentMatch?.lastEvent;
     if (!ev) return;
@@ -159,47 +161,76 @@ export const ChapasBoard: React.FC = () => {
 
     const isHomeAttacking = ev.attackingTeamId === currentMatch?.homeTeam.id;
 
-    // Calcular la basculación colectiva según la zona del balón
-    let teamAdvanceOffset = 0;
-    if (ev.zone === 'ATTACKING_THIRD' || ev.zone === 'OPPONENT_BOX') {
-      teamAdvanceOffset = 45; // El equipo atacante adelanta líneas
-    } else if (ev.zone === 'OWN_BOX' || ev.zone === 'DEFENSIVE_HALF') {
-      teamAdvanceOffset = -25;
-    }
+    // Altura relativa del balón según la zona de juego real (0 a 1)
+    let ballZoneYPercent = 0.5;
+    if (ev.zone === 'OPPONENT_BOX') ballZoneYPercent = isHomeAttacking ? 0.15 : 0.85;
+    else if (ev.zone === 'ATTACKING_THIRD') ballZoneYPercent = isHomeAttacking ? 0.30 : 0.70;
+    else if (ev.zone === 'MIDFIELD') ballZoneYPercent = 0.50;
+    else if (ev.zone === 'DEFENSIVE_HALF') ballZoneYPercent = isHomeAttacking ? 0.70 : 0.30;
+    else if (ev.zone === 'OWN_BOX') ballZoneYPercent = isHomeAttacking ? 0.85 : 0.15;
 
-    // Basculación lateral (carril izquierdo, centro o derecho)
-    const lateralShift = Math.random() > 0.5 ? 20 : -20;
+    const lateralShift = Math.random() > 0.5 ? 25 : -25;
 
-    // Actualizar las posiciones tácticas de TODAS las 22 chapas
+    // Actualizar dinámicamente las posiciones sin reseteos al centro
     Object.values(chapas).forEach((c) => {
       c.hasBall = false;
       c.isHighlight = false;
       c.isMakingRun = false;
 
-      // REGLA ESTRICTA DE PORTERO: El portero NUNCA sale de su área
+      // REGLA ESTRICTA DE PORTERO: Guardar su arco
       if (c.position === 'GK') {
-        c.targetX = width / 2 + lateralShift * 0.4;
-        c.targetY = c.baseY; // Se mantiene en su línea de gol
+        c.targetX = width / 2 + lateralShift * 0.3;
+        c.targetY = c.baseY;
         return;
       }
 
       const isAttacker = c.isHome === isHomeAttacking;
 
       if (isAttacker) {
-        // Equipo en ataque: adelanta líneas, abre bandas para ofrecer pase
-        const advanceY = c.isHome ? -teamAdvanceOffset : teamAdvanceOffset;
-        let spreadX = 0;
-        if (c.position === 'LB' || c.position === 'LW') spreadX = -15; // Amplitud en banda
-        if (c.position === 'RB' || c.position === 'RW') spreadX = 15;
-        if (c.position === 'CM' || c.position === 'CAM') spreadX = lateralShift * 0.6; // Apoyo
+        // El bloque atacante adelanta proporcionalmente hacia la zona del balón
+        let depthY = c.baseY;
+        if (c.isHome) {
+          // Ataca hacia arriba (y menor)
+          const targetForwardY = ballZoneYPercent * height;
+          if (c.position === 'ST' || c.position === 'LW' || c.position === 'RW') {
+            depthY = Math.max(110, targetForwardY - 30);
+          } else if (c.position === 'CAM' || c.position === 'CM') {
+            depthY = Math.max(220, targetForwardY + 40);
+          } else {
+            // Defensas adelantan hasta el centro o campo rival
+            depthY = Math.max(360, targetForwardY + 140);
+          }
+        } else {
+          // Ataca hacia abajo (y mayor)
+          const targetForwardY = ballZoneYPercent * height;
+          if (c.position === 'ST' || c.position === 'LW' || c.position === 'RW') {
+            depthY = Math.min(height - 110, targetForwardY + 30);
+          } else if (c.position === 'CAM' || c.position === 'CM') {
+            depthY = Math.min(height - 220, targetForwardY - 40);
+          } else {
+            depthY = Math.min(height - 360, targetForwardY - 140);
+          }
+        }
 
-        c.targetX = Math.max(35, Math.min(width - 35, c.baseX + spreadX));
-        c.targetY = Math.max(70, Math.min(height - 70, c.baseY + advanceY));
+        let spreadX = c.baseX;
+        if (c.position === 'LW' || c.position === 'LB') spreadX = Math.max(40, c.baseX - 20);
+        if (c.position === 'RW' || c.position === 'RB') spreadX = Math.min(width - 40, c.baseX + 20);
+
+        c.targetX = spreadX;
+        c.targetY = depthY;
       } else {
-        // Equipo en defensa: basculación defensiva hacia el balón y repliegue
-        const retreatY = c.isHome ? teamAdvanceOffset * 0.8 : -teamAdvanceOffset * 0.8;
-        c.targetX = Math.max(45, Math.min(width - 45, c.baseX + lateralShift * 0.7)); // Basculan juntos
-        c.targetY = Math.max(85, Math.min(height - 85, c.baseY + retreatY));
+        // El bloque defensor se repliega protegiendo su portería y bascula al balón
+        let depthY = c.baseY;
+        if (c.isHome) {
+          // Defiende su arco inferior (y mayor)
+          depthY = Math.min(height - 90, c.baseY + 40);
+        } else {
+          // Defiende su arco superior (y menor)
+          depthY = Math.max(90, c.baseY - 40);
+        }
+
+        c.targetX = Math.max(45, Math.min(width - 45, c.baseX + lateralShift * 0.6));
+        c.targetY = depthY;
       }
     });
 
@@ -207,36 +238,29 @@ export const ChapasBoard: React.FC = () => {
     const secondaryChapa = ev.secondaryPlayer ? chapas[ev.secondaryPlayer.id] : null;
     const targetChapa = ev.targetPlayer ? chapas[ev.targetPlayer.id] : null;
 
-    if (primaryChapa) {
-      primaryChapa.isHighlight = true;
-    }
-    if (secondaryChapa) {
-      secondaryChapa.isHighlight = true;
-    }
+    if (primaryChapa) primaryChapa.isHighlight = true;
+    if (secondaryChapa) secondaryChapa.isHighlight = true;
 
-    // El jugador receptor inicia un desmarque activo para recibir el pase
+    // Desmarque activo del receptor
     if (targetChapa && targetChapa.position !== 'GK') {
       targetChapa.isMakingRun = true;
-      const runDirectionY = targetChapa.isHome ? -35 : 35;
-      targetChapa.targetY += runDirectionY;
-      targetChapa.targetX += lateralShift * 0.5;
+      const runY = targetChapa.isHome ? -40 : 40;
+      targetChapa.targetY += runY;
+      targetChapa.targetX += lateralShift * 0.4;
     }
 
     switch (ev.type) {
       case 'PASS_COMPLETED': {
         if (primaryChapa && targetChapa) {
           primaryChapa.hasBall = true;
-          // Pasador da dos pasos adelante
-          primaryChapa.targetX = primaryChapa.baseX + (targetChapa.targetX - primaryChapa.baseX) * 0.15;
-          primaryChapa.targetY = primaryChapa.baseY + (targetChapa.targetY - primaryChapa.baseY) * 0.15;
+          primaryChapa.targetX = primaryChapa.x + (targetChapa.targetX - primaryChapa.x) * 0.15;
+          primaryChapa.targetY = primaryChapa.y + (targetChapa.targetY - primaryChapa.y) * 0.15;
 
-          // Defensor intenta encimar pero el desmarque del receptor lo supera
           if (secondaryChapa && secondaryChapa.position !== 'GK') {
-            secondaryChapa.targetX = (primaryChapa.targetX + targetChapa.targetX) * 0.5 + 10;
+            secondaryChapa.targetX = (primaryChapa.targetX + targetChapa.targetX) * 0.5 + 15;
             secondaryChapa.targetY = (primaryChapa.targetY + targetChapa.targetY) * 0.5;
           }
 
-          // El pase va al espacio ventajoso donde llega el receptor
           ball.targetX = targetChapa.targetX;
           ball.targetY = targetChapa.targetY;
 
@@ -251,10 +275,9 @@ export const ChapasBoard: React.FC = () => {
       case 'PASS_INTERCEPTED': {
         if (primaryChapa && secondaryChapa) {
           primaryChapa.hasBall = true;
-          // Si el defensor es el corte, sale con velocidad hacia la línea de pase
           if (secondaryChapa.position !== 'GK') {
-            const cutX = (primaryChapa.targetX + (targetChapa ? targetChapa.targetX : secondaryChapa.baseX)) / 2;
-            const cutY = (primaryChapa.targetY + (targetChapa ? targetChapa.targetY : secondaryChapa.baseY)) / 2;
+            const cutX = (primaryChapa.targetX + (targetChapa ? targetChapa.targetX : secondaryChapa.x)) / 2;
+            const cutY = (primaryChapa.targetY + (targetChapa ? targetChapa.targetY : secondaryChapa.y)) / 2;
 
             secondaryChapa.targetX = cutX;
             secondaryChapa.targetY = cutY;
@@ -274,13 +297,13 @@ export const ChapasBoard: React.FC = () => {
       case 'DRIBBLE_SUCCESS': {
         if (primaryChapa && secondaryChapa) {
           primaryChapa.hasBall = true;
-          const forwardDir = primaryChapa.isHome ? -65 : 65;
-          primaryChapa.targetX = primaryChapa.baseX + 28;
-          primaryChapa.targetY = primaryChapa.baseY + forwardDir;
+          const forwardDir = primaryChapa.isHome ? -70 : 70;
+          primaryChapa.targetX = primaryChapa.x + 30;
+          primaryChapa.targetY = primaryChapa.y + forwardDir;
 
           if (secondaryChapa.position !== 'GK') {
-            secondaryChapa.targetX = primaryChapa.baseX - 12;
-            secondaryChapa.targetY = primaryChapa.baseY - forwardDir * 0.2;
+            secondaryChapa.targetX = primaryChapa.x - 15;
+            secondaryChapa.targetY = primaryChapa.y - forwardDir * 0.2;
           }
 
           ball.targetX = primaryChapa.targetX;
@@ -289,16 +312,31 @@ export const ChapasBoard: React.FC = () => {
         break;
       }
 
+      case 'CROSS_COMPLETED': {
+        if (primaryChapa && targetChapa) {
+          primaryChapa.hasBall = true;
+          // Centro hacia el corazón del área
+          ball.targetX = targetChapa.targetX;
+          ball.targetY = targetChapa.targetY;
+
+          setTimeout(() => {
+            targetChapa.hasBall = true;
+            if (primaryChapa) primaryChapa.hasBall = false;
+          }, 450);
+        }
+        break;
+      }
+
       case 'DRIBBLE_TACKLED': {
         if (primaryChapa && secondaryChapa) {
           primaryChapa.hasBall = true;
           if (secondaryChapa.position !== 'GK') {
-            const tackleX = (primaryChapa.baseX + secondaryChapa.baseX) / 2;
-            const tackleY = (primaryChapa.baseY + secondaryChapa.baseY) / 2;
+            const tackleX = (primaryChapa.x + secondaryChapa.x) / 2;
+            const tackleY = (primaryChapa.y + secondaryChapa.y) / 2;
 
-            primaryChapa.targetX = tackleX - 10;
+            primaryChapa.targetX = tackleX - 12;
             primaryChapa.targetY = tackleY;
-            secondaryChapa.targetX = tackleX + 10;
+            secondaryChapa.targetX = tackleX + 12;
             secondaryChapa.targetY = tackleY;
 
             ball.targetX = tackleX;
@@ -321,7 +359,6 @@ export const ChapasBoard: React.FC = () => {
 
           primaryChapa.targetY += primaryChapa.isHome ? -35 : 35;
 
-          // El portero se estira hacia el palo pero no llega
           if (secondaryChapa && secondaryChapa.position === 'GK') {
             secondaryChapa.targetX = width / 2 + (targetGoalX > width / 2 ? 18 : -18);
           }
@@ -365,7 +402,7 @@ export const ChapasBoard: React.FC = () => {
     }
   }, [currentMatch?.lastEvent]);
 
-  // 3. Loop de Física a 60 FPS con Basculación Dinámica
+  // 3. Loop de Renderizado a 60 FPS
   useEffect(() => {
     let animId: number;
 
@@ -382,9 +419,7 @@ export const ChapasBoard: React.FC = () => {
       const chapas = chapasRef.current;
       const ball = ballRef.current;
 
-      // Actualizar física suave de todas las chapas
       Object.values(chapas).forEach((c) => {
-        // Porteros con confinamiento rígido al área pequeña
         if (c.position === 'GK') {
           if (c.isHome) {
             c.targetY = Math.max(height * 0.86, Math.min(height * 0.94, c.targetY));
@@ -399,7 +434,6 @@ export const ChapasBoard: React.FC = () => {
         c.y += (c.targetY - c.y) * 0.11;
       });
 
-      // Actualizar balón
       ball.x += (ball.targetX - ball.x) * 0.15;
       ball.y += (ball.targetY - ball.y) * 0.15;
       ball.rotation += 0.18;
@@ -407,9 +441,7 @@ export const ChapasBoard: React.FC = () => {
       ball.trail.push({ x: ball.x, y: ball.y });
       if (ball.trail.length > 7) ball.trail.shift();
 
-      // --- DIBUJADO DE LA ESCENA ---
-
-      // 1. Césped con franjas
+      // Césped
       const numStripes = 10;
       const stripeHeight = height / numStripes;
       for (let i = 0; i < numStripes; i++) {
@@ -417,19 +449,17 @@ export const ChapasBoard: React.FC = () => {
         ctx.fillRect(0, i * stripeHeight, width, stripeHeight);
       }
 
-      // 2. Líneas Reglamentarias F11
+      // Líneas
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
       ctx.lineWidth = 2.5;
 
       ctx.strokeRect(pad, pad, width - pad * 2, height - pad * 2);
 
-      // Medio campo
       ctx.beginPath();
       ctx.moveTo(pad, height / 2);
       ctx.lineTo(width - pad * 2, height / 2);
       ctx.stroke();
 
-      // Círculo central
       ctx.beginPath();
       ctx.arc(width / 2, height / 2, 45, 0, Math.PI * 2);
       ctx.stroke();
@@ -439,19 +469,16 @@ export const ChapasBoard: React.FC = () => {
       ctx.fillStyle = '#ffffff';
       ctx.fill();
 
-      // Áreas de penalti
       const boxW = 150;
       const boxH = 70;
       ctx.strokeRect((width - boxW) / 2, pad, boxW, boxH);
       ctx.strokeRect((width - boxW) / 2, height - pad - boxH, boxW, boxH);
 
-      // Porterías
       ctx.strokeStyle = '#ffffff';
       ctx.lineWidth = 3.5;
       ctx.strokeRect(width / 2 - 38, pad - 12, 76, 12);
       ctx.strokeRect(width / 2 - 38, height - pad, 76, 12);
 
-      // Redes
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
       ctx.lineWidth = 1;
       for (let rx = width / 2 - 34; rx < width / 2 + 38; rx += 8) {
@@ -465,7 +492,7 @@ export const ChapasBoard: React.FC = () => {
         ctx.stroke();
       }
 
-      // 3. Vector de pase o tiro trazado en el césped
+      // Vector de pase
       if (Math.hypot(ball.targetX - ball.x, ball.targetY - ball.y) > 8) {
         ctx.beginPath();
         ctx.moveTo(ball.x, ball.y);
@@ -477,7 +504,7 @@ export const ChapasBoard: React.FC = () => {
         ctx.setLineDash([]);
       }
 
-      // 4. Estela del balón
+      // Estela
       ball.trail.forEach((t, idx) => {
         const alpha = (idx / ball.trail.length) * 0.35;
         ctx.beginPath();
@@ -486,26 +513,23 @@ export const ChapasBoard: React.FC = () => {
         ctx.fill();
       });
 
-      // 5. Dibujar las 22 Chapas con IA de basculación
+      // Chapas
       Object.values(chapas).forEach((c) => {
-        // Sombra
         ctx.beginPath();
         ctx.arc(c.x + 2.5, c.y + 3.5, c.radius, 0, Math.PI * 2);
         ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
         ctx.fill();
 
-        // Si está haciendo un desmarque al espacio, dibujar flecha de carrera
         if (c.isMakingRun) {
           ctx.beginPath();
           ctx.arc(c.x, c.y, c.radius + 6, 0, Math.PI * 2);
-          ctx.strokeStyle = '#22c55e'; // Verde de desmarque al hueco
+          ctx.strokeStyle = '#22c55e';
           ctx.lineWidth = 2;
           ctx.setLineDash([2, 3]);
           ctx.stroke();
           ctx.setLineDash([]);
         }
 
-        // Si es el protagonista de la jugada, aureola dorada
         if (c.isHighlight) {
           ctx.beginPath();
           ctx.arc(c.x, c.y, c.radius + 7, 0, Math.PI * 2);
@@ -514,7 +538,6 @@ export const ChapasBoard: React.FC = () => {
           ctx.stroke();
         }
 
-        // Si tiene el balón, círculo de posesión
         if (c.hasBall) {
           ctx.beginPath();
           ctx.arc(c.x, c.y, c.radius + 10, 0, Math.PI * 2);
@@ -525,31 +548,27 @@ export const ChapasBoard: React.FC = () => {
           ctx.setLineDash([]);
         }
 
-        // Chapa
         ctx.beginPath();
         ctx.arc(c.x, c.y, c.radius, 0, Math.PI * 2);
         ctx.fillStyle = c.isHome ? '#004d99' : '#dc2626';
         ctx.fill();
 
-        // Borde
         ctx.strokeStyle = c.isHome ? '#fdd835' : '#ffffff';
         ctx.lineWidth = 2.5;
         ctx.stroke();
 
-        // Dorsal
         ctx.fillStyle = '#ffffff';
         ctx.font = 'black 11px sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(String(c.number), c.x, c.y);
 
-        // Nombre y posición
         ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
         ctx.font = 'bold 9px sans-serif';
         ctx.fillText(`${c.name} (${c.position})`, c.x, c.y + c.radius + 8);
       });
 
-      // 6. Balón
+      // Balón
       ctx.save();
       ctx.translate(ball.x, ball.y);
       ctx.rotate(ball.rotation);
@@ -581,7 +600,7 @@ export const ChapasBoard: React.FC = () => {
     return () => cancelAnimationFrame(animId);
   }, []);
 
-  // 4. Timer de Auto-Play
+  // 4. Auto-Play
   useEffect(() => {
     let interval: any = null;
     if (currentMatch?.isPlaying && !currentMatch.state.isFinished) {
@@ -646,7 +665,7 @@ export const ChapasBoard: React.FC = () => {
           </div>
         </div>
 
-        {/* Panel de Controles */}
+        {/* Panel de Controles & Interruptor Debug */}
         <div className="bg-slate-800/90 px-4 py-2.5 border-t border-slate-700 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <button
@@ -681,18 +700,38 @@ export const ChapasBoard: React.FC = () => {
             </button>
           </div>
 
-          <button
-            onClick={() => startMatch(homeTeam.id, awayTeam.id)}
-            className="text-slate-400 hover:text-white flex items-center gap-1 text-xs"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            Reiniciar Partido
-          </button>
+          <div className="flex items-center gap-3">
+            {/* Toggle para mostrar/ocultar Debug de Decisiones */}
+            <button
+              onClick={() => setShowDebugger(!showDebugger)}
+              className={`text-xs px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition-all border ${
+                showDebugger
+                  ? 'bg-indigo-600 text-white border-indigo-400 shadow-md'
+                  : 'bg-slate-700 text-slate-300 border-slate-600 hover:text-white'
+              }`}
+            >
+              <Brain className="w-4 h-4 text-indigo-200" />
+              {showDebugger ? 'Ocultar Debug IA' : '🔍 Debug Decisiones IA'}
+            </button>
+
+            <button
+              onClick={() => startMatch(homeTeam.id, awayTeam.id)}
+              className="text-slate-400 hover:text-white flex items-center gap-1 text-xs"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              Reiniciar
+            </button>
+          </div>
         </div>
       </div>
 
+      {/* PANEL DE DEBUG DE DECISIONES DE LA IA (Se puede activar/desactivar con 1 clic) */}
+      {showDebugger && (
+        <DecisionDebugger decision={lastEvent?.decision} minute={state.currentMinute} />
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Columna Izquierda: Tablero Canvas 2D con Movimiento Colectivo */}
+        {/* Columna Izquierda: Tablero Canvas 2D con Movimiento Continuo */}
         <div className="lg:col-span-8 bg-white rounded-xl shadow-md p-4 border border-slate-200 flex flex-col items-center">
           {/* Banner de Jugada Activa con Ventaja Táctica */}
           <div className="w-full bg-slate-900 text-valle-yellow font-bold text-xs px-3 py-2 rounded-lg mb-3 flex items-center justify-between border border-slate-700">
@@ -719,7 +758,7 @@ export const ChapasBoard: React.FC = () => {
           </div>
 
           <p className="text-[11px] text-slate-400 mt-3 text-center">
-            ⚽ Táctica Orgánica F11: Los 20 jugadores de campo basculan y tiran desmarques al espacio (anillo verde), mientras los porteros guardan estrictamente su área.
+            ⚽ Táctica Orgánica F11: Bloque dinámico y desmarques al espacio. El equipo retiene la posición en campo contrario sin reseteos bruscos al centro.
           </p>
         </div>
 
