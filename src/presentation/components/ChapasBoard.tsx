@@ -61,32 +61,35 @@ export const ChapasBoard: React.FC = () => {
     const width = 560;
     const height = 800;
 
+    // Posiciones reglamentarias F11 4-3-3: Cada equipo estrictamente en su mitad de campo (Regla 8 IFAB)
+    // Local (Home): Mitad inferior (y >= 0.50), defiende portería sur y ataca portería norte
     const homePositions = [
-      { x: 0.5, y: 0.91, pos: 'GK' },
-      { x: 0.16, y: 0.77, pos: 'LB' },
-      { x: 0.38, y: 0.79, pos: 'CB' },
-      { x: 0.62, y: 0.79, pos: 'CB' },
-      { x: 0.84, y: 0.77, pos: 'RB' },
-      { x: 0.5, y: 0.64, pos: 'CDM' },
-      { x: 0.3, y: 0.53, pos: 'CM' },
-      { x: 0.7, y: 0.53, pos: 'CAM' },
-      { x: 0.18, y: 0.36, pos: 'LW' },
-      { x: 0.5, y: 0.32, pos: 'ST' },
-      { x: 0.82, y: 0.36, pos: 'RW' },
+      { x: 0.50, y: 0.92, pos: 'GK' },
+      { x: 0.16, y: 0.81, pos: 'LB' },
+      { x: 0.38, y: 0.82, pos: 'CB' },
+      { x: 0.62, y: 0.82, pos: 'CB' },
+      { x: 0.84, y: 0.81, pos: 'RB' },
+      { x: 0.50, y: 0.70, pos: 'CDM' },
+      { x: 0.30, y: 0.61, pos: 'CM' },
+      { x: 0.70, y: 0.61, pos: 'CAM' },
+      { x: 0.20, y: 0.53, pos: 'LW' },
+      { x: 0.50, y: 0.51, pos: 'ST' },
+      { x: 0.80, y: 0.53, pos: 'RW' },
     ];
 
+    // Visitante (Away): Mitad superior (y <= 0.50), defiende portería norte y ataca portería sur
     const awayPositions = [
-      { x: 0.5, y: 0.09, pos: 'GK' },
-      { x: 0.84, y: 0.23, pos: 'LB' },
-      { x: 0.62, y: 0.21, pos: 'CB' },
-      { x: 0.38, y: 0.21, pos: 'CB' },
-      { x: 0.16, y: 0.23, pos: 'RB' },
-      { x: 0.5, y: 0.36, pos: 'CDM' },
-      { x: 0.7, y: 0.47, pos: 'CM' },
-      { x: 0.3, y: 0.47, pos: 'CAM' },
-      { x: 0.82, y: 0.64, pos: 'LW' },
-      { x: 0.5, y: 0.68, pos: 'ST' },
-      { x: 0.18, y: 0.64, pos: 'RW' },
+      { x: 0.50, y: 0.08, pos: 'GK' },
+      { x: 0.84, y: 0.19, pos: 'LB' },
+      { x: 0.62, y: 0.18, pos: 'CB' },
+      { x: 0.38, y: 0.18, pos: 'CB' },
+      { x: 0.16, y: 0.19, pos: 'RB' },
+      { x: 0.50, y: 0.30, pos: 'CDM' },
+      { x: 0.70, y: 0.39, pos: 'CM' },
+      { x: 0.30, y: 0.39, pos: 'CAM' },
+      { x: 0.80, y: 0.47, pos: 'LW' },
+      { x: 0.50, y: 0.49, pos: 'ST' },
+      { x: 0.20, y: 0.47, pos: 'RW' },
     ];
 
     const map: Record<string, ChapaEntity> = {};
@@ -192,37 +195,88 @@ export const ChapasBoard: React.FC = () => {
 
         if (ev.zone === 'OPPONENT_BOX' || ev.zone === 'ATTACKING_THIRD') {
           if (c.isHome) {
+            // Local ataca hacia la portería norte (y decrece hacia 0)
             if (c.position === 'ST' || c.position === 'LW' || c.position === 'RW') {
-              targetForwardY = Math.min(c.y, Math.max(125, height * 0.22));
+              targetForwardY = Math.max(120, Math.min(c.y, height * 0.22));
             } else if (c.position === 'CAM' || c.position === 'CM') {
-              targetForwardY = Math.min(c.y, Math.max(245, height * 0.40));
+              targetForwardY = Math.max(220, Math.min(c.y, height * 0.38));
+            } else if (c.position === 'CDM') {
+              targetForwardY = Math.max(340, Math.min(c.y, height * 0.52));
             } else {
-              targetForwardY = Math.min(c.y, Math.max(380, height * 0.54));
+              targetForwardY = Math.max(430, Math.min(c.y, height * 0.62));
             }
           } else {
+            // Visitante ataca hacia la portería sur (y crece hacia 800)
             if (c.position === 'ST' || c.position === 'LW' || c.position === 'RW') {
-              targetForwardY = Math.max(c.y, Math.min(height - 125, height * 0.78));
+              targetForwardY = Math.min(height - 120, Math.max(c.y, height * 0.78));
             } else if (c.position === 'CAM' || c.position === 'CM') {
-              targetForwardY = Math.max(c.y, Math.min(height - 245, height * 0.60));
+              targetForwardY = Math.min(height - 220, Math.max(c.y, height * 0.62));
+            } else if (c.position === 'CDM') {
+              targetForwardY = Math.min(height - 340, Math.max(c.y, height * 0.48));
             } else {
-              targetForwardY = Math.max(c.y, Math.min(height - 380, height * 0.46));
+              targetForwardY = Math.min(height - 430, Math.max(c.y, height * 0.38));
             }
           }
         } else if (ev.zone === 'MIDFIELD') {
-          const nudge = c.isHome ? -12 : 12;
-          targetForwardY = c.y + nudge;
+          // Fase equilibrada en el círculo central
+          if (c.isHome) {
+            targetForwardY = Math.max(height * 0.44, c.baseY - 35);
+          } else {
+            targetForwardY = Math.min(height * 0.56, c.baseY + 35);
+          }
+        } else if (ev.zone === 'DEFENSIVE_HALF' || ev.zone === 'OWN_BOX') {
+          // Construcción desde atrás: mantienen bases tácticas en su propio campo
+          targetForwardY = c.baseY;
         }
 
         c.targetY = Math.max(80, Math.min(height - 80, targetForwardY));
         c.targetX = Math.max(40, Math.min(width - 40, c.baseX + lateralShift * 0.3));
       } else {
-        // Defensor mantiene la posición delante de su portería
+        // Bloque defensivo y basculación reglamentaria
         let targetDefendY = c.y;
         if (ev.zone === 'OPPONENT_BOX' || ev.zone === 'ATTACKING_THIRD') {
+          // El rival está atacando en campo propio
           if (c.isHome) {
-            targetDefendY = Math.max(c.y, Math.min(height - 100, height * 0.78));
+            // Local defiende su portería sur (y = 800)
+            if (c.position === 'CB' || c.position === 'LB' || c.position === 'RB') {
+              targetDefendY = Math.min(height - 95, Math.max(c.y, height * 0.81));
+            } else if (c.position === 'CDM' || c.position === 'CM' || c.position === 'CAM') {
+              targetDefendY = Math.min(height - 180, Math.max(c.y, height * 0.70));
+            } else {
+              // Los delanteros esperan el despeje/contra en tres cuartos de su campo
+              targetDefendY = Math.min(height * 0.62, Math.max(c.y, height * 0.54));
+            }
           } else {
-            targetDefendY = Math.min(c.y, Math.max(100, height * 0.22));
+            // Visitante defiende su portería norte (y = 0)
+            if (c.position === 'CB' || c.position === 'LB' || c.position === 'RB') {
+              targetDefendY = Math.max(95, Math.min(c.y, height * 0.19));
+            } else if (c.position === 'CDM' || c.position === 'CM' || c.position === 'CAM') {
+              targetDefendY = Math.max(180, Math.min(c.y, height * 0.30));
+            } else {
+              // Delanteros a la expectativa de contragolpe
+              targetDefendY = Math.max(height * 0.38, Math.min(c.y, height * 0.46));
+            }
+          }
+        } else if (ev.zone === 'MIDFIELD') {
+          targetDefendY = c.baseY;
+        } else if (ev.zone === 'DEFENSIVE_HALF' || ev.zone === 'OWN_BOX') {
+          // Presión alta adelantada sobre la salida rival
+          if (c.isHome) {
+            if (c.position === 'ST' || c.position === 'LW' || c.position === 'RW') {
+              targetDefendY = Math.max(height * 0.34, c.baseY - 110);
+            } else if (c.position === 'CAM' || c.position === 'CM') {
+              targetDefendY = Math.max(height * 0.46, c.baseY - 70);
+            } else {
+              targetDefendY = c.baseY - 30;
+            }
+          } else {
+            if (c.position === 'ST' || c.position === 'LW' || c.position === 'RW') {
+              targetDefendY = Math.min(height * 0.66, c.baseY + 110);
+            } else if (c.position === 'CAM' || c.position === 'CM') {
+              targetDefendY = Math.min(height * 0.54, c.baseY + 70);
+            } else {
+              targetDefendY = c.baseY + 30;
+            }
           }
         }
 
@@ -244,6 +298,19 @@ export const ChapasBoard: React.FC = () => {
       case 'HALF_TIME': {
         ball.targetX = width / 2;
         ball.targetY = height / 2;
+        Object.values(chapas).forEach((c) => {
+          c.targetX = c.baseX;
+          c.targetY = c.baseY;
+          c.hasBall = false;
+        });
+        const kickStriker = Object.values(chapas).find(
+          (c) => c.isHome === isHomeAttacking && c.position === 'ST'
+        );
+        if (kickStriker) {
+          kickStriker.targetX = width / 2;
+          kickStriker.targetY = isHomeAttacking ? height / 2 + 12 : height / 2 - 12;
+          kickStriker.hasBall = true;
+        }
         break;
       }
 
@@ -355,6 +422,7 @@ export const ChapasBoard: React.FC = () => {
       case 'GOAL': {
         if (primaryChapa) {
           primaryChapa.hasBall = true;
+          // Local ataca hacia la portería norte (y = 22), Visitante hacia la sur (y = height - 22)
           const targetGoalY = primaryChapa.isHome ? 22 : height - 22;
           const targetGoalX = width / 2 + (Math.random() * 36 - 18);
 
@@ -372,27 +440,48 @@ export const ChapasBoard: React.FC = () => {
             spread: 75,
             origin: { y: primaryChapa.isHome ? 0.3 : 0.7 },
           });
+
+          // Tras la celebración del gol (1.2s), el equipo que encaja saca de centro reglamentariamente
+          setTimeout(() => {
+            ball.targetX = width / 2;
+            ball.targetY = height / 2;
+            Object.values(chapas).forEach((c) => {
+              c.targetX = c.baseX;
+              c.targetY = c.baseY;
+              c.hasBall = false;
+            });
+            const concedingTeamIsHome = !primaryChapa.isHome;
+            const kickoffStriker = Object.values(chapas).find(
+              (c) => c.isHome === concedingTeamIsHome && c.position === 'ST'
+            );
+            if (kickoffStriker) {
+              kickoffStriker.targetX = width / 2;
+              kickoffStriker.targetY = concedingTeamIsHome ? height / 2 + 12 : height / 2 - 12;
+              kickoffStriker.hasBall = true;
+            }
+          }, 1200);
         }
         break;
       }
 
       case 'SHOT_SAVED': {
-        if (primaryChapa && secondaryChapa) {
-          primaryChapa.hasBall = true;
-          const diveGoalX = width / 2 + (Math.random() * 24 - 12);
-          const diveGoalY = secondaryChapa.baseY;
+        // En SHOT_SAVED: primaryChapa es el GK que hace la parada, secondaryChapa es el atacante que chutó
+        const gk = (primaryChapa?.position === 'GK' ? primaryChapa : (secondaryChapa?.position === 'GK' ? secondaryChapa : null)) || primaryChapa;
+        const shooter = gk === primaryChapa ? secondaryChapa : primaryChapa;
 
-          if (secondaryChapa.position === 'GK') {
-            secondaryChapa.targetX = diveGoalX;
-            secondaryChapa.targetY = diveGoalY;
-          }
+        if (gk) {
+          const diveGoalX = width / 2 + (Math.random() * 24 - 12);
+          const diveGoalY = gk.baseY;
+
+          gk.targetX = diveGoalX;
+          gk.targetY = diveGoalY;
 
           ball.targetX = diveGoalX;
           ball.targetY = diveGoalY;
 
           setTimeout(() => {
-            secondaryChapa.hasBall = true;
-            if (primaryChapa) primaryChapa.hasBall = false;
+            gk.hasBall = true;
+            if (shooter) shooter.hasBall = false;
           }, 350);
         }
         break;
@@ -633,16 +722,21 @@ export const ChapasBoard: React.FC = () => {
         ctx.textBaseline = 'middle';
         ctx.fillText(String(c.number), drawX, drawY);
 
-        // Badge de Nombre cápsula anti-solapamiento
-        const labelText = `${c.name} (${c.position})`;
+        // Badge de Nombre cápsula anti-solapamiento con distinción nítida de equipo
+        const teamTag = c.isHome ? 'L' : 'V';
+        const labelText = `[${teamTag}] ${c.name} (${c.position})`;
         ctx.font = 'bold 9px sans-serif';
         const textWidth = ctx.measureText(labelText).width;
         const badgeY = drawY + c.radius + 3;
 
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+        ctx.fillStyle = c.isHome ? 'rgba(0, 60, 150, 0.92)' : 'rgba(180, 25, 25, 0.92)';
         ctx.beginPath();
-        ctx.roundRect(drawX - textWidth / 2 - 4, badgeY, textWidth + 8, 13, 3);
+        ctx.roundRect(drawX - textWidth / 2 - 5, badgeY, textWidth + 10, 13, 3);
         ctx.fill();
+
+        ctx.strokeStyle = c.isHome ? 'rgba(253, 216, 53, 0.75)' : 'rgba(255, 255, 255, 0.75)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
 
         ctx.fillStyle = '#ffffff';
         ctx.fillText(labelText, drawX, badgeY + 7);
