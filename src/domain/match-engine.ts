@@ -344,27 +344,56 @@ export class MatchEngine {
   private resolveBuildUpOrCounter(atk: Team, def: Team, min: number, sec: number = 0): MatchEvent {
     const passer = getActivePlayer(atk, ['CB', 'LB', 'RB'], true);
     const presser = getActivePlayer(def, ['ST', 'LW', 'RW'], true);
-    const midfielder = getActivePlayer(atk, ['CM', 'CDM', 'CAM', 'LM', 'RM'], true, [passer.id]);
-    const forward = getActivePlayer(atk, ['ST', 'LW', 'RW'], true, [passer.id]);
+    const midfielder = getActivePlayer(atk, ['CDM', 'CM', 'CAM', 'LM', 'RM'], true, [passer.id]);
+    const fullback = getActivePlayer(atk, ['LB', 'RB', 'CB'], true, [passer.id]);
+    const forward = getActivePlayer(atk, ['ST', 'LW', 'RW'], true, [passer.id, midfielder.id]);
+    const opposingShadow = getActivePlayer(def, ['CAM', 'CM', 'ST'], true, [presser.id]);
 
     const passerInt = passer.attributes.intelligence;
     const passerDes = passer.attributes.dexterity;
     const modPass = getAttributeModifier(passerDes) + this.getFatigueModifier(passer);
+    const isDangerZone = this.state.ballZone === 'OWN_BOX';
+
+    // Evaluación táctica de sombra de presión (GAP-001):
+    // El mediocentro está comprometido si el rival presiona alto o si el mediapunta rival vigila la zona interior
+    const isMidfielderMarked = def.tactics.pressingLevel === 'HIGH_PRESS' || 
+      opposingShadow.attributes.wisdom >= 11 || 
+      opposingShadow.attributes.dexterity >= 11;
 
     // Evaluar opciones de salida
     const isCounterAdvantage = atk.tactics.tempo === 'FAST_TRANSITION' && forward.attributes.dexterity >= 13;
 
+    // 1. Pase interior al mediocentro: Si está marcado, NUNCA es de bajo riesgo ni tiene utilidad alta
     const optShort: TacticalOption = {
       actionType: 'SHORT_PASS',
-      label: `Pase seguro en corto a ${midfielder.name}`,
+      label: isMidfielderMarked 
+        ? `Pase interior comprometido a ${midfielder.name}` 
+        : `Pase en corto a ${midfielder.name}`,
       targetPlayer: midfielder,
-      targetZone: 'MIDFIELD',
-      utilityScore: isCounterAdvantage ? 55 : 82,
-      riskLevel: 'LOW',
-      reason: `Asegurar posesión y dar salida limpia ante la presión de ${presser.name}`,
-      d20Bonus: modPass + 1,
+      targetZone: isDangerZone ? 'DEFENSIVE_HALF' : 'MIDFIELD',
+      utilityScore: isMidfielderMarked 
+        ? Math.max(25, 42 - (12 - passerInt)) // Penalización severa por estar en sombra de pase
+        : (isCounterAdvantage ? 55 : 80),
+      riskLevel: isMidfielderMarked ? 'HIGH' : 'LOW',
+      reason: isMidfielderMarked 
+        ? `Riesgo elevado: ${midfielder.name} se encuentra en la sombra de presión y vigilancia de ${opposingShadow.name}` 
+        : `Apoyo en el pivote defensivo con línea de pase limpia ante la presión de ${presser.name}`,
+      d20Bonus: isMidfielderMarked ? modPass - 1 : modPass + 1,
     };
 
+    // 2. Apertura a la banda hacia el lateral libre (Solución táctica preferida ante congestión interior)
+    const optWide: TacticalOption = {
+      actionType: 'SHORT_PASS',
+      label: `Apertura segura a la banda hacia ${fullback.name}`,
+      targetPlayer: fullback,
+      targetZone: isDangerZone ? 'DEFENSIVE_HALF' : 'MIDFIELD',
+      utilityScore: isMidfielderMarked ? 84 : 74,
+      riskLevel: 'LOW',
+      reason: `Aprovechar el carril exterior libre de la presión central de ${presser.name} para ganar metros`,
+      d20Bonus: modPass + 2,
+    };
+
+    // 3. Contragolpe / Envío en largo al delantero
     const optCounter: TacticalOption = {
       actionType: 'COUNTER_ATTACK',
       label: `Balón largo al desmarque de ${forward.name}`,
@@ -378,17 +407,29 @@ export class MatchEngine {
       d20Bonus: getAttributeModifier(passerInt) + this.getFatigueModifier(passer),
     };
 
+    // 4. Despeje de seguridad orientado (En área propia bajo agobio)
+    const optClearance: TacticalOption = {
+      actionType: 'COUNTER_ATTACK',
+      label: `Despeje de seguridad hacia la divisoria`,
+      targetZone: 'MIDFIELD',
+      utilityScore: isDangerZone && isMidfielderMarked ? 70 : 40,
+      riskLevel: 'MEDIUM',
+      reason: `Ante el asedio rival en área propia y el centro tapado, alejar el balón hacia zona neutra`,
+      d20Bonus: getAttributeModifier(passer.attributes.strength) + this.getFatigueModifier(passer),
+    };
+
+    // 5. Conducción vertical de escape
     const optDribbleExit: TacticalOption = {
       actionType: 'DRIBBLE',
       label: `Conducción vertical para sortear la presión de ${presser.name}`,
       targetZone: 'MIDFIELD',
-      utilityScore: passerDes >= 13 ? 65 : 35,
+      utilityScore: passerDes >= 13 ? 62 : 32,
       riskLevel: 'HIGH',
       reason: `Eludir al delantero con quiebro y salir con balón dominado`,
       d20Bonus: getAttributeModifier(passerDes) + this.getFatigueModifier(passer),
     };
 
-    const rawOptions = [optShort, optCounter, optDribbleExit];
+    const rawOptions = [optWide, optShort, optCounter, optClearance, optDribbleExit];
     const evaluatedOptions = rawOptions
       .map(opt => applyPersonalityBias(passer, opt))
       .sort((a, b) => b.utilityScore - a.utilityScore);
@@ -491,12 +532,16 @@ export class MatchEngine {
         });
       }
     } else {
-      // Salida en corto
+      // Salida en corto (hacia banda o interior)
+      const target = chosen.targetPlayer || midfielder;
+      const isPassToFlank = target.id === fullback.id;
+      const interceptor = isPassToFlank ? presser : (isMidfielderMarked ? opposingShadow : presser);
+
       this.applyEffort(passer, 'LOW');
-      this.applyEffort(midfielder, 'LOW');
+      this.applyEffort(target, 'LOW');
 
       const rollAtk = rollD20(chosen.d20Bonus, { rng: this.rng });
-      const rollDef = rollD20(getAttributeModifier(presser.attributes.strength), { rng: this.rng });
+      const rollDef = rollD20(getAttributeModifier(interceptor.attributes.dexterity), { rng: this.rng });
       const check = resolveContestedCheck(rollAtk, rollDef);
 
       if (check.attackerWon) {
@@ -510,17 +555,22 @@ export class MatchEngine {
           attackingTeamId: atk.id,
           defendingTeamId: def.id,
           primaryPlayer: passer,
-          secondaryPlayer: presser,
-          targetPlayer: midfielder,
+          secondaryPlayer: interceptor,
+          targetPlayer: target,
           zone: nextZone,
           contestedCheck: check,
           decision,
-          commentary: `${passer.name} juega con criterio en corto con ${midfielder.name} para dar salida al balón.`,
+          commentary: isPassToFlank
+            ? `${passer.name} encuentra el desahogo en la banda hacia ${target.name}, eludiendo con solvencia el embudo central.`
+            : `${passer.name} juega con criterio en corto con ${target.name} para dar salida al balón.`,
           score: { ...this.state.score },
         });
       } else {
         this.switchPossession();
-        const turnoverZone = this.state.ballZone === 'OWN_BOX' ? 'OPPONENT_BOX' : 'ATTACKING_THIRD';
+        // Si el corte fue en banda, el balón queda en la divisoria lateral, no regalado en el punto de penalti
+        const turnoverZone = isPassToFlank 
+          ? 'DEFENSIVE_HALF' 
+          : (this.state.ballZone === 'OWN_BOX' ? 'OPPONENT_BOX' : 'ATTACKING_THIRD');
         this.state.ballZone = turnoverZone;
         return this.recordEvent({
           minute: min,
@@ -528,13 +578,15 @@ export class MatchEngine {
           type: 'PASS_INTERCEPTED',
           attackingTeamId: def.id,
           defendingTeamId: atk.id,
-          primaryPlayer: presser,
+          primaryPlayer: interceptor,
           secondaryPlayer: passer,
-          targetPlayer: midfielder,
+          targetPlayer: target,
           zone: turnoverZone,
           contestedCheck: check,
           decision,
-          commentary: `¡Peligro! ${presser.name} corta el pase de ${passer.name} en zona comprometida.`,
+          commentary: isPassToFlank
+            ? `${interceptor.name} encima la salida hacia la cal y corta el avance de ${target.name}.`
+            : `¡Peligro! ${interceptor.name} anticipa el pase interior de ${passer.name} y roba en zona comprometida.`,
           score: { ...this.state.score },
         });
       }
@@ -556,8 +608,8 @@ export class MatchEngine {
     const optControl: TacticalOption = {
       actionType: 'CONTROL_AND_DRIVE',
       label: `Control orientado y avance 5 metros con balón dominado`,
-      targetZone: 'MIDFIELD',
-      utilityScore: desVal >= 13 ? 88 : 78,
+      targetZone: 'ATTACKING_THIRD',
+      utilityScore: desVal >= 14 ? 74 : 66,
       riskLevel: 'LOW',
       reason: `${playmaker.name} orienta el cuerpo, templa el juego y gana metros en conducción arrastrando marcas`,
       d20Bonus: getAttributeModifier(desVal) + this.getFatigueModifier(playmaker),
@@ -644,6 +696,7 @@ export class MatchEngine {
       const check = resolveContestedCheck(rollAtk, rollDef);
 
       if (check.attackerWon) {
+        this.state.ballZone = 'ATTACKING_THIRD';
         return this.recordEvent({
           minute: min,
           second: sec,
@@ -652,10 +705,10 @@ export class MatchEngine {
           defendingTeamId: def.id,
           primaryPlayer: playmaker,
           secondaryPlayer: defender,
-          zone: 'MIDFIELD',
+          zone: 'ATTACKING_THIRD',
           contestedCheck: check,
           decision,
-          commentary: `⚡ ${playmaker.name} orienta el control con categoría y avanza 5 metros con balón dominado mientras el equipo bascula.`,
+          commentary: `⚡ ${playmaker.name} orienta el control con categoría y avanza con balón dominado pisando tres cuartos de campo.`,
           score: { ...this.state.score },
         });
       } else {
@@ -902,8 +955,8 @@ export class MatchEngine {
       advantage: carrier.traits.includes('EXPLOSIVE_WINGER') || carrier.traits.includes('DRIBBLE_WIZARD'),
       rng: this.rng,
     });
-    // Cobertura colectiva de la zaga y repliegue en el último tercio (+4 bono posicional)
-    const rollDef = rollD20(getAttributeModifier(fullBack.attributes.dexterity) + 4, { rng: this.rng });
+    // Cobertura colectiva de la zaga y repliegue en el último tercio (+3 bono posicional)
+    const rollDef = rollD20(getAttributeModifier(fullBack.attributes.dexterity) + 3, { rng: this.rng });
     const check = resolveContestedCheck(rollAtk, rollDef);
 
     if (check.attackerWon) {
@@ -1022,8 +1075,8 @@ export class MatchEngine {
       rng: this.rng,
     });
 
-    // En F11, el portero tiene achique posicional y cobertura del central (+5 bono defensivo del arco)
-    const defBonus = 5 + getAttributeModifier(defender.attributes.wisdom);
+    // En F11, el portero tiene achique posicional y cobertura del central (+4 bono defensivo del arco)
+    const defBonus = 4 + getAttributeModifier(defender.attributes.wisdom);
     const rollSave = rollD20(getAttributeModifier(keeper.attributes.dexterity) + defBonus, { rng: this.rng });
     const check = resolveContestedCheck(rollShot, rollSave);
 

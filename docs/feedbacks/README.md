@@ -10,7 +10,7 @@ Cualquier agente que trabaje en el motor de decisiones (`src/domain/match-engine
 
 | ID | Fecha | Minuto/Contexto | Descripción Corta | Estado | Archivo de Detalle |
 | :--- | :---: | :---: | :--- | :---: | :--- |
-| **GAP-001** | 2026-11-01 | Min 6' 30" (`OWN_BOX`) | Central efectúa "pase seguro" a mediocentro que está totalmente tapado en sombra de pase | 🟡 PENDIENTE | [`GAP-001_salida_balon_pase_comprometido.md`](./GAP-001_salida_balon_pase_comprometido.md) |
+| **GAP-001** | 2026-11-01 | Min 6' 30" (`OWN_BOX`) | Central efectúa "pase seguro" a mediocentro que está totalmente tapado en sombra de pase | 🟢 CORREGIDO | [`GAP-001_salida_balon_pase_comprometido.md`](./GAP-001_salida_balon_pase_comprometido.md) |
 
 ---
 
@@ -40,3 +40,4 @@ Para registrar un nuevo gap detectado, crea un archivo con el formato `GAP-XXX_n
 ## 4. Solución Técnica Propuesta
 [Cambios específicos a implementar en el motor: penalización de utilidad, cálculo de sombra de marcaje, nueva opción táctica, etc.].
 ```
+

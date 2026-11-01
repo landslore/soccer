@@ -1,7 +1,9 @@
 # GAP-001: Pase en Corto "Seguro" a Compañero en Sombra de Marcaje Rival en Salida de Balón
 
 - **ID**: `GAP-001`
+- **Estado**: `🟢 CORREGIDO / RESUELTO`
 - **Fecha de Detección**: 2026-11-01
+- **Fecha de Resolución**: 2026-11-01
 - **Minuto / Fotograma**: Min 6' 30" (Paso 14/23) $\to$ Desemboca en Gol en Min 7' 00" (Paso 15/23)
 - **Zona del Campo**: `OWN_BOX` (Salida de balón en área propia)
 - **Decisor Implicado**: `#3 Mario Gil (CB)` (Atributos: INT 9, DES 12, FUE 16, CON 11. Arquetipo: `SNIPER_SHOOTER`)
@@ -107,3 +109,23 @@ const optClear: TacticalOption = {
 1. En salida de balón desde `OWN_BOX`, si el CDM está encimado por un rival, la utilidad de pasarle en corto cae por debajo del 45%.
 2. La opción preferente ante presión intensa pasa a ser el apoyo al lateral abierto o el despeje largo.
 3. El depurador de IA (`DecisionDebugger`) refleja explícitamente el riesgo elevado cuando el receptor tiene un rival encima.
+
+---
+
+## 6. Implementación Realizada y Verificación
+
+1. **Detección de Sombra de Marcaje en `resolveBuildUpOrCounter`**:
+   - Se identifica al marcador rival que vigila el carril interior (`opposingShadow = getActivePlayer(def, ['CAM', 'CM', 'ST'])`).
+   - Si el rival presiona alto o el marcador cuenta con buena anticipación (`SAB/DES >= 11`), `isMidfielderMarked` se activa.
+2. **Reclasificación y Penalización**:
+   - `optShort` se renombra a `Pase interior comprometido a ${midfielder.name}`.
+   - `riskLevel` pasa a `'HIGH'`.
+   - `utilityScore` cae drásticamente a $42 - (12 - \text{passerInt})$ ($\le 39$ para centrales de baja INT como Mario Gil con 9).
+3. **Nuevas Opciones Tácticas Inteligentes**:
+   - `optWide`: *Apertura segura a la banda hacia ${fullback.name}* (Riesgo `LOW`, Utilidad `84%`, d20 `+2`). Es la opción que ahora elige prioritariamente la IA para desahogar el juego.
+   - `optClearance`: *Despeje de seguridad hacia la divisoria* (Riesgo `MEDIUM`, Utilidad `70%`). Evita regalar el balón en boca de gol.
+4. **Verificación**:
+   - `npm run audit:ui`: 25 partidos simulados (4.500 ticks) sin intercepciones absurdas en el área chica ni goles en contra por decisiones incoherentes.
+   - `npm run test:balance`: 1.000 partidos en 385 ms con 2.31 goles por partido (rango óptimo F11).
+   - `npm run type-check` y `npm run test:run` pasando con 0 errores.
+
