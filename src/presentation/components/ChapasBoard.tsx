@@ -208,30 +208,62 @@ export const ChapasBoard: React.FC = () => {
       const isAttacker = c.isHome === isHomeAttacking;
 
       if (isAttacker) {
-        let targetForwardY = c.y;
+        let targetForwardY = c.baseY;
 
-        if (ev.zone === 'OPPONENT_BOX' || ev.zone === 'ATTACKING_THIRD') {
+        if (ev.zone === 'OPPONENT_BOX') {
+          // Asedio en el área rival: Delantero dentro de la zona de castigo, mediapuntas en la frontal
           if (c.isHome) {
             // Local ataca hacia la portería norte (y decrece hacia 0)
-            if (c.position === 'ST' || c.position === 'LW' || c.position === 'RW') {
-              targetForwardY = Math.max(120, Math.min(c.y, height * 0.22));
+            if (c.position === 'ST') {
+              targetForwardY = 135;
+            } else if (c.position === 'LW' || c.position === 'RW') {
+              targetForwardY = 155;
             } else if (c.position === 'CAM' || c.position === 'CM') {
-              targetForwardY = Math.max(220, Math.min(c.y, height * 0.38));
+              targetForwardY = 230;
             } else if (c.position === 'CDM') {
-              targetForwardY = Math.max(340, Math.min(c.y, height * 0.52));
+              targetForwardY = 350;
             } else {
-              targetForwardY = Math.max(430, Math.min(c.y, height * 0.62));
+              targetForwardY = 440;
             }
           } else {
-            // Visitante ataca hacia la portería sur (y crece hacia 800)
-            if (c.position === 'ST' || c.position === 'LW' || c.position === 'RW') {
-              targetForwardY = Math.min(height - 120, Math.max(c.y, height * 0.78));
+            // Visitante ataca hacia la portería sur (y crece hacia height)
+            if (c.position === 'ST') {
+              targetForwardY = height - 135;
+            } else if (c.position === 'LW' || c.position === 'RW') {
+              targetForwardY = height - 155;
             } else if (c.position === 'CAM' || c.position === 'CM') {
-              targetForwardY = Math.min(height - 220, Math.max(c.y, height * 0.62));
+              targetForwardY = height - 230;
             } else if (c.position === 'CDM') {
-              targetForwardY = Math.min(height - 340, Math.max(c.y, height * 0.48));
+              targetForwardY = height - 350;
             } else {
-              targetForwardY = Math.min(height - 430, Math.max(c.y, height * 0.38));
+              targetForwardY = height - 440;
+            }
+          }
+        } else if (ev.zone === 'ATTACKING_THIRD') {
+          // Tres cuartos de campo: bloque adelantado
+          if (c.isHome) {
+            if (c.position === 'ST') {
+              targetForwardY = 180;
+            } else if (c.position === 'LW' || c.position === 'RW') {
+              targetForwardY = 200;
+            } else if (c.position === 'CAM' || c.position === 'CM') {
+              targetForwardY = 270;
+            } else if (c.position === 'CDM') {
+              targetForwardY = 380;
+            } else {
+              targetForwardY = 470;
+            }
+          } else {
+            if (c.position === 'ST') {
+              targetForwardY = height - 180;
+            } else if (c.position === 'LW' || c.position === 'RW') {
+              targetForwardY = height - 200;
+            } else if (c.position === 'CAM' || c.position === 'CM') {
+              targetForwardY = height - 270;
+            } else if (c.position === 'CDM') {
+              targetForwardY = height - 380;
+            } else {
+              targetForwardY = height - 470;
             }
           }
         } else if (ev.zone === 'MIDFIELD') {
@@ -250,28 +282,53 @@ export const ChapasBoard: React.FC = () => {
         c.targetX = Math.max(40, Math.min(width - 40, c.baseX + lateralShift * 0.3));
       } else {
         // Bloque defensivo y basculación reglamentaria
-        let targetDefendY = c.y;
-        if (ev.zone === 'OPPONENT_BOX' || ev.zone === 'ATTACKING_THIRD') {
-          // El rival está atacando en campo propio
+        let targetDefendY = c.baseY;
+        if (ev.zone === 'OPPONENT_BOX') {
+          // El rival está dentro del área propia: repliegue intensivo
           if (c.isHome) {
-            // Local defiende su portería sur (y = 800)
+            // Local defiende su portería sur (y = height)
             if (c.position === 'CB' || c.position === 'LB' || c.position === 'RB') {
-              targetDefendY = Math.min(height - 95, Math.max(c.y, height * 0.81));
-            } else if (c.position === 'CDM' || c.position === 'CM' || c.position === 'CAM') {
-              targetDefendY = Math.min(height - 180, Math.max(c.y, height * 0.70));
+              targetDefendY = height - 130;
+            } else if (c.position === 'CDM' || c.position === 'CM') {
+              targetDefendY = height - 210;
+            } else if (c.position === 'CAM') {
+              targetDefendY = height - 260;
             } else {
-              // Los delanteros esperan el despeje/contra en tres cuartos de su campo
-              targetDefendY = Math.min(height * 0.62, Math.max(c.y, height * 0.54));
+              targetDefendY = height - 360;
             }
           } else {
             // Visitante defiende su portería norte (y = 0)
             if (c.position === 'CB' || c.position === 'LB' || c.position === 'RB') {
-              targetDefendY = Math.max(95, Math.min(c.y, height * 0.19));
-            } else if (c.position === 'CDM' || c.position === 'CM' || c.position === 'CAM') {
-              targetDefendY = Math.max(180, Math.min(c.y, height * 0.30));
+              targetDefendY = 130;
+            } else if (c.position === 'CDM' || c.position === 'CM') {
+              targetDefendY = 210;
+            } else if (c.position === 'CAM') {
+              targetDefendY = 260;
             } else {
-              // Delanteros a la expectativa de contragolpe
-              targetDefendY = Math.max(height * 0.38, Math.min(c.y, height * 0.46));
+              targetDefendY = 360;
+            }
+          }
+        } else if (ev.zone === 'ATTACKING_THIRD') {
+          // El rival está en tres cuartos
+          if (c.isHome) {
+            if (c.position === 'CB' || c.position === 'LB' || c.position === 'RB') {
+              targetDefendY = height - 165;
+            } else if (c.position === 'CDM' || c.position === 'CM') {
+              targetDefendY = height - 250;
+            } else if (c.position === 'CAM') {
+              targetDefendY = height - 310;
+            } else {
+              targetDefendY = height - 400;
+            }
+          } else {
+            if (c.position === 'CB' || c.position === 'LB' || c.position === 'RB') {
+              targetDefendY = 165;
+            } else if (c.position === 'CDM' || c.position === 'CM') {
+              targetDefendY = 250;
+            } else if (c.position === 'CAM') {
+              targetDefendY = 310;
+            } else {
+              targetDefendY = 400;
             }
           }
         } else if (ev.zone === 'MIDFIELD') {
@@ -302,12 +359,20 @@ export const ChapasBoard: React.FC = () => {
       }
     });
 
-    // Desmarque activo del receptor
+    // Desmarque activo y colocación del receptor
     if (targetChapa && targetChapa.position !== 'GK') {
       targetChapa.isMakingRun = true;
-      const runY = targetChapa.isHome ? -45 : 45;
-      targetChapa.targetY = Math.max(100, Math.min(height - 100, targetChapa.y + runY));
-      targetChapa.targetX = Math.max(40, Math.min(width - 40, targetChapa.x + lateralShift * 0.5));
+      if (ev.zone === 'OPPONENT_BOX') {
+        targetChapa.targetY = targetChapa.isHome ? 135 : height - 135;
+        targetChapa.targetX = width / 2 + (Math.random() * 24 - 12);
+      } else if (ev.zone === 'ATTACKING_THIRD') {
+        targetChapa.targetY = targetChapa.isHome ? 175 : height - 175;
+        targetChapa.targetX = width / 2 + (Math.random() * 30 - 15);
+      } else {
+        const forwardStep = targetChapa.isHome ? -35 : 35;
+        targetChapa.targetY = Math.max(100, Math.min(height - 100, targetChapa.baseY + forwardStep));
+        targetChapa.targetX = Math.max(40, Math.min(width - 40, targetChapa.x + lateralShift * 0.5));
+      }
     }
 
     switch (ev.type) {
@@ -399,14 +464,41 @@ export const ChapasBoard: React.FC = () => {
 
       case 'CROSS_COMPLETED': {
         if (primaryChapa && targetChapa) {
-          primaryChapa.hasBall = true;
+          // El centrador (extremo o lateral) gana línea de fondo y se sitúa en la banda
+          const isLeftFlank = primaryChapa.position === 'LW' || primaryChapa.position === 'LB' || primaryChapa.baseX < width / 2;
+          primaryChapa.targetX = isLeftFlank ? 60 : width - 60;
+          primaryChapa.targetY = primaryChapa.isHome ? 165 : height - 165;
+          primaryChapa.hasBall = false;
+
+          // El receptor (delantero) ataca el punto de penalti dentro del área pequeña
+          targetChapa.targetX = width / 2 + (Math.random() * 24 - 12);
+          targetChapa.targetY = targetChapa.isHome ? 135 : height - 135;
+          targetChapa.isMakingRun = true;
+          targetChapa.hasBall = true;
+
+          // El centro vuela medido al corazón del área
           ball.targetX = targetChapa.targetX;
           ball.targetY = targetChapa.targetY;
+        }
+        break;
+      }
 
-          setTimeout(() => {
-            targetChapa.hasBall = true;
-            if (primaryChapa) primaryChapa.hasBall = false;
-          }, 450);
+      case 'THROUGH_BALL': {
+        if (primaryChapa && targetChapa) {
+          // El pasador (mediapunta o centrocampista) filtra desde la frontal del área
+          primaryChapa.targetX = width / 2 + (Math.random() * 30 - 15);
+          primaryChapa.targetY = primaryChapa.isHome ? 245 : height - 245;
+          primaryChapa.hasBall = false;
+
+          // El delantero gana la espalda a la zaga y se planta solo en el área
+          targetChapa.targetX = width / 2 + (Math.random() * 20 - 10);
+          targetChapa.targetY = targetChapa.isHome ? 140 : height - 140;
+          targetChapa.isMakingRun = true;
+          targetChapa.hasBall = true;
+
+          // El balón filtra entre los centrales
+          ball.targetX = targetChapa.targetX;
+          ball.targetY = targetChapa.targetY;
         }
         break;
       }
@@ -438,15 +530,18 @@ export const ChapasBoard: React.FC = () => {
 
       case 'GOAL': {
         if (primaryChapa) {
+          // El goleador culmina dentro del área
+          primaryChapa.targetX = width / 2 + (Math.random() * 24 - 12);
+          primaryChapa.targetY = primaryChapa.isHome ? 130 : height - 130;
           primaryChapa.hasBall = true;
-          // Local ataca hacia la portería norte (y = 22), Visitante hacia la sur (y = height - 22)
-          const targetGoalY = primaryChapa.isHome ? 22 : height - 22;
+
+          // Local ataca hacia la portería norte (y = 20), Visitante hacia la sur (y = height - 20)
+          const targetGoalY = primaryChapa.isHome ? 20 : height - 20;
           const targetGoalX = width / 2 + (Math.random() * 36 - 18);
 
-          primaryChapa.targetY += primaryChapa.isHome ? -30 : 30;
-
           if (secondaryChapa && secondaryChapa.position === 'GK') {
-            secondaryChapa.targetX = width / 2 + (targetGoalX > width / 2 ? 18 : -18);
+            secondaryChapa.targetX = width / 2 + (targetGoalX > width / 2 ? 22 : -22);
+            secondaryChapa.targetY = secondaryChapa.baseY;
           }
 
           ball.targetX = targetGoalX;
@@ -455,7 +550,7 @@ export const ChapasBoard: React.FC = () => {
           confetti({
             particleCount: 85,
             spread: 75,
-            origin: { y: primaryChapa.isHome ? 0.3 : 0.7 },
+            origin: { y: primaryChapa.isHome ? 0.25 : 0.75 },
           });
 
           // Tras la celebración del gol (1.2s), el equipo que encaja saca de centro reglamentariamente
@@ -486,20 +581,22 @@ export const ChapasBoard: React.FC = () => {
         const gk = (primaryChapa?.position === 'GK' ? primaryChapa : (secondaryChapa?.position === 'GK' ? secondaryChapa : null)) || primaryChapa;
         const shooter = gk === primaryChapa ? secondaryChapa : primaryChapa;
 
+        if (shooter) {
+          shooter.targetX = width / 2 + (Math.random() * 24 - 12);
+          shooter.targetY = shooter.isHome ? 135 : height - 135;
+          shooter.hasBall = false;
+        }
+
         if (gk) {
           const diveGoalX = width / 2 + (Math.random() * 24 - 12);
           const diveGoalY = gk.baseY;
 
           gk.targetX = diveGoalX;
           gk.targetY = diveGoalY;
+          gk.hasBall = true;
 
           ball.targetX = diveGoalX;
           ball.targetY = diveGoalY;
-
-          setTimeout(() => {
-            gk.hasBall = true;
-            if (shooter) shooter.hasBall = false;
-          }, 350);
         }
         break;
       }

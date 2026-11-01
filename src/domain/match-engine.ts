@@ -22,6 +22,7 @@ export type MatchEventType =
   | 'DRIBBLE_SUCCESS'
   | 'DRIBBLE_TACKLED'
   | 'CROSS_COMPLETED'
+  | 'THROUGH_BALL'
   | 'AERIAL_DUEL_WON'
   | 'SHOT_SAVED'
   | 'GOAL'
@@ -456,82 +457,140 @@ export class MatchEngine {
   }
 
   private resolveAttackingThirdDecisions(atk: Team, def: Team, min: number): MatchEvent {
-    const winger = getActivePlayer(atk, ['LW', 'RW', 'CAM', 'ST'], true);
-    const fullBack = getActivePlayer(def, ['LB', 'RB', 'CB'], true);
-    // ¡El rematador o receptor del centro NUNCA puede ser el mismo jugador que centra!
-    const striker = getActivePlayer(atk, ['ST', 'CAM', 'LW', 'RW'], true, [winger.id]);
+    // Determinar si la jugada transcurre por banda (extremo/lateral) o por el carril central (mediapunta/interior)
+    const flankPlayer = getActivePlayer(atk, ['LW', 'RW', 'LB', 'RB'], true);
+    const centralPlaymaker = getActivePlayer(atk, ['CAM', 'CM', 'ST'], true);
+    const isFlankPlay = atk.tactics.width === 'WIDE' || (this.rng ? this.rng() > 0.45 : Math.random() > 0.45);
 
-    const wingerDes = winger.attributes.dexterity;
-    const wingerFue = winger.attributes.strength;
+    const carrier = isFlankPlay ? flankPlayer : centralPlaymaker;
+    const fullBack = getActivePlayer(def, ['LB', 'RB', 'CB'], true);
+    // El rematador o receptor del pase NUNCA puede ser el portador del balón
+    const striker = getActivePlayer(atk, ['ST', 'CAM', 'LW', 'RW'], true, [carrier.id]);
+
+    const carrierDes = carrier.attributes.dexterity;
+    const carrierFue = carrier.attributes.strength;
+    const carrierInt = carrier.attributes.intelligence;
     const isPoacher = striker.traits.includes('POACHER') || striker.attributes.strength >= 13;
 
-    // Opciones en zona de ataque
-    const optCross: TacticalOption = {
-      actionType: 'CROSS',
-      label: `Centro al área buscando el remate de ${striker.name}`,
-      targetPlayer: striker,
-      targetZone: 'OPPONENT_BOX',
-      utilityScore: isPoacher ? 86 : 68,
-      riskLevel: 'MEDIUM',
-      reason: `Aprovechar el posicionamiento de ${striker.name} en el punto de penalti para remate franco`,
-      d20Bonus: getAttributeModifier(wingerDes) + (striker.traits.includes('AERIAL_TOWER') ? 2 : 0),
-    };
+    let evaluatedOptions: TacticalOption[] = [];
 
-    const optDribbleBox: TacticalOption = {
-      actionType: 'DRIBBLE',
-      label: `Desborde 1vs1 hacia línea de fondo`,
-      targetZone: 'OPPONENT_BOX',
-      utilityScore: wingerDes >= 14 ? 80 : 50,
-      riskLevel: 'HIGH',
-      reason: `Encarar a ${fullBack.name} para pisar área con balón dominado`,
-      d20Bonus: getAttributeModifier(wingerDes),
-    };
+    if (isFlankPlay) {
+      // JUGADA POR BANDA: Centros, desborde por línea de fondo o diagonal interior
+      const optCross: TacticalOption = {
+        actionType: 'CROSS',
+        label: `Centro al área buscando el remate de ${striker.name}`,
+        targetPlayer: striker,
+        targetZone: 'OPPONENT_BOX',
+        utilityScore: isPoacher ? 88 : 72,
+        riskLevel: 'MEDIUM',
+        reason: `${carrier.name} gana línea de fondo y pone un centro medido al corazón del área para ${striker.name}`,
+        d20Bonus: getAttributeModifier(carrierDes) + (striker.traits.includes('AERIAL_TOWER') ? 2 : 0),
+      };
 
-    const optLongShot: TacticalOption = {
-      actionType: 'LONG_SHOT',
-      label: `Disparo potente desde la frontal del área`,
-      targetZone: 'OPPONENT_BOX',
-      utilityScore: wingerFue >= 14 ? 72 : 45,
-      riskLevel: 'MEDIUM',
-      reason: `Probar el tiro de media distancia ante el repliegue rival`,
-      d20Bonus: getAttributeModifier(wingerFue),
-    };
+      const optDribbleBox: TacticalOption = {
+        actionType: 'DRIBBLE',
+        label: `Desborde 1vs1 por banda hacia línea de fondo`,
+        targetZone: 'OPPONENT_BOX',
+        utilityScore: carrierDes >= 14 ? 80 : 52,
+        riskLevel: 'HIGH',
+        reason: `Encarar a ${fullBack.name} con regate exterior para pisar área con balón dominado`,
+        d20Bonus: getAttributeModifier(carrierDes),
+      };
 
-    const evaluatedOptions = [optCross, optDribbleBox, optLongShot].sort((a, b) => b.utilityScore - a.utilityScore);
+      const optLongShot: TacticalOption = {
+        actionType: 'LONG_SHOT',
+        label: `Diagonal hacia el interior y disparo con rosca`,
+        targetZone: 'OPPONENT_BOX',
+        utilityScore: carrierFue >= 14 ? 70 : 46,
+        riskLevel: 'MEDIUM',
+        reason: `Trazar la diagonal hacia la frontal buscando el ángulo lejano`,
+        d20Bonus: getAttributeModifier(carrierFue),
+      };
+
+      evaluatedOptions = [optCross, optDribbleBox, optLongShot].sort((a, b) => b.utilityScore - a.utilityScore);
+    } else {
+      // JUGADA POR EL CENTRO (CAM / CM): Pase filtrado al desmarque, apertura o tiro lejano
+      const optThrough: TacticalOption = {
+        actionType: 'THROUGH_BALL',
+        label: `Pase filtrado al desmarque de ruptura de ${striker.name}`,
+        targetPlayer: striker,
+        targetZone: 'OPPONENT_BOX',
+        utilityScore: striker.attributes.dexterity >= 13 ? 90 : 75,
+        riskLevel: 'MEDIUM',
+        reason: `${carrier.name} filtra un balón milimétrico a la espalda de los centrales para la carrera de ${striker.name}`,
+        d20Bonus: getAttributeModifier(carrierInt) + 1,
+      };
+
+      const optSpread: TacticalOption = {
+        actionType: 'SHORT_PASS',
+        label: `Apertura a la banda para ${flankPlayer.name}`,
+        targetPlayer: flankPlayer,
+        targetZone: 'ATTACKING_THIRD',
+        utilityScore: 78,
+        riskLevel: 'LOW',
+        reason: `Abrir el juego a la banda para estirar la zaga y buscar el 2vs1`,
+        d20Bonus: getAttributeModifier(carrierInt),
+      };
+
+      const optEdgeShot: TacticalOption = {
+        actionType: 'LONG_SHOT',
+        label: `Disparo seco desde la frontal del área`,
+        targetZone: 'OPPONENT_BOX',
+        utilityScore: carrierFue >= 14 ? 74 : 50,
+        riskLevel: 'MEDIUM',
+        reason: `Probar el golpeo de media distancia ante el bloque bajo rival`,
+        d20Bonus: getAttributeModifier(carrierFue),
+      };
+
+      evaluatedOptions = [optThrough, optSpread, optEdgeShot].sort((a, b) => b.utilityScore - a.utilityScore);
+    }
+
     const chosen = evaluatedOptions[0];
 
     const decision: PlayerDecision = {
-      decisionMaker: winger,
+      decisionMaker: carrier,
       chosenOption: chosen,
       evaluatedOptions,
-      tacticalContext: `Ataque en tres cuartos de campo rival (${this.state.ballZone})`,
+      tacticalContext: `Ataque en tres cuartos de campo (${isFlankPlay ? 'Acción por Banda' : 'Creación Interior'})`,
     };
 
     const rollAtk = rollD20(chosen.d20Bonus, {
-      advantage: winger.traits.includes('EXPLOSIVE_WINGER'),
+      advantage: carrier.traits.includes('EXPLOSIVE_WINGER') || carrier.traits.includes('DRIBBLE_WIZARD'),
       rng: this.rng,
     });
-    // Cobertura colectiva de la zaga en el último tercio
-    const rollDef = rollD20(getAttributeModifier(fullBack.attributes.dexterity) + 2, { rng: this.rng });
+    // Cobertura colectiva de la zaga y repliegue en el último tercio (+3 bono posicional)
+    const rollDef = rollD20(getAttributeModifier(fullBack.attributes.dexterity) + 3, { rng: this.rng });
     const check = resolveContestedCheck(rollAtk, rollDef);
 
     if (check.attackerWon) {
       // ¡ÉXITO: PISA EL ÁREA RIVAL PARA DISPARAR O CENTRAR!
       this.state.ballZone = 'OPPONENT_BOX';
+      const eventType: MatchEventType = chosen.actionType === 'CROSS' 
+        ? 'CROSS_COMPLETED' 
+        : chosen.actionType === 'DRIBBLE' 
+        ? 'DRIBBLE_SUCCESS' 
+        : chosen.actionType === 'THROUGH_BALL'
+        ? 'THROUGH_BALL'
+        : 'PASS_COMPLETED';
+
+      const commentaryText = chosen.actionType === 'CROSS'
+        ? `¡Qué centro milimétrico de ${carrier.name}! Conecta con ${striker.name} dentro del área de penalti (D20: ${rollAtk.total} vs ${rollDef.total}).`
+        : chosen.actionType === 'THROUGH_BALL'
+        ? `¡Visión estelar! ${carrier.name} filtra un balón quirúrgico entre centrales para ${striker.name}, que se planta dentro del área.`
+        : `¡Desborde sensacional! ${carrier.name} supera a ${fullBack.name} y se mete hasta la cocina en el área rival.`;
+
       return this.recordEvent({
         minute: min,
-        type: chosen.actionType === 'CROSS' ? 'CROSS_COMPLETED' : 'DRIBBLE_SUCCESS',
+        type: eventType,
         attackingTeamId: atk.id,
         defendingTeamId: def.id,
-        primaryPlayer: winger,
+        primaryPlayer: carrier,
         secondaryPlayer: fullBack,
-        targetPlayer: striker,
+        targetPlayer: chosen.targetPlayer || striker,
         zone: 'OPPONENT_BOX',
         contestedCheck: check,
         decision,
-        commentary: chosen.actionType === 'CROSS'
-          ? `¡Qué centro milimétrico de ${winger.name}! Conecta con ${striker.name} dentro del área pequeña (D20: ${rollAtk.total} vs ${rollDef.total}).`
-          : `¡Desborde sensacional! ${winger.name} supera a ${fullBack.name} y se mete hasta la cocina en el área rival.`,
+        commentary: commentaryText,
         score: { ...this.state.score },
       });
     } else {
@@ -544,11 +603,11 @@ export class MatchEngine {
         attackingTeamId: def.id,
         defendingTeamId: atk.id,
         primaryPlayer: fullBack,
-        secondaryPlayer: winger,
+        secondaryPlayer: carrier,
         zone: 'DEFENSIVE_HALF',
         contestedCheck: check,
         decision,
-        commentary: `Gran acción defensiva de ${fullBack.name} taponando la incursión de ${winger.name} y despejando el peligro.`,
+        commentary: `Gran acción defensiva de ${fullBack.name} taponando la incursión de ${carrier.name} y despejando el peligro.`,
         score: { ...this.state.score },
       });
     }
@@ -557,16 +616,61 @@ export class MatchEngine {
   private resolveBoxShot(atk: Team, def: Team, min: number): MatchEvent {
     const striker = getActivePlayer(atk, ['ST', 'LW', 'RW', 'CAM'], true);
     const keeper = getActivePlayer(def, ['GK'], false); // ¡Aquí y solo aquí actúa el portero!
-    const defender = getActivePlayer(def, ['CB'], true);
+    const defender = getActivePlayer(def, ['CB', 'LB', 'RB'], true);
 
+    const strikerDes = striker.attributes.dexterity;
+    const strikerFue = striker.attributes.strength;
     const isPoacher = striker.traits.includes('POACHER');
-    const rollShot = rollD20(getAttributeModifier(striker.attributes.strength), {
+
+    // Opciones tácticas del delantero en boca de gol
+    const optPlacement: TacticalOption = {
+      actionType: 'BOX_FINISH',
+      label: `Disparo colocado a la escuadra`,
+      targetZone: 'OPPONENT_BOX',
+      utilityScore: strikerDes >= 14 ? 85 : 72,
+      riskLevel: 'LOW',
+      reason: `Buscar el ángulo imposible ajustando el balón al poste con rosca sutil fuera del alcance de ${keeper.name}`,
+      d20Bonus: getAttributeModifier(strikerDes) + (isPoacher ? 1 : 0),
+    };
+
+    const optPower: TacticalOption = {
+      actionType: 'LONG_SHOT',
+      label: `Fusilar con potencia a romper la red`,
+      targetZone: 'OPPONENT_BOX',
+      utilityScore: strikerFue >= 14 ? 82 : 70,
+      riskLevel: 'MEDIUM',
+      reason: `Zambombazo seco de empeine total buscando doblarle las manos a ${keeper.name}`,
+      d20Bonus: getAttributeModifier(strikerFue),
+    };
+
+    const optDribbleKeeper: TacticalOption = {
+      actionType: 'DRIBBLE',
+      label: `Regatear al portero en el mano a mano`,
+      targetZone: 'OPPONENT_BOX',
+      utilityScore: (strikerDes >= 15 && striker.traits.includes('DRIBBLE_WIZARD')) ? 86 : 52,
+      riskLevel: 'HIGH',
+      reason: `Amagar la salida de ${keeper.name} para empujarla a puerta vacía`,
+      d20Bonus: getAttributeModifier(strikerDes),
+    };
+
+    const evaluatedOptions = [optPlacement, optPower, optDribbleKeeper].sort((a, b) => b.utilityScore - a.utilityScore);
+    const chosen = evaluatedOptions[0];
+
+    const decision: PlayerDecision = {
+      decisionMaker: striker,
+      chosenOption: chosen,
+      evaluatedOptions,
+      tacticalContext: `Definición en el área rival ante ${keeper.name} (OPPONENT_BOX)`,
+    };
+
+    const rollShot = rollD20(chosen.d20Bonus, {
       criticalThreshold: isPoacher ? 18 : 20,
+      advantage: chosen.actionType === 'DRIBBLE' && striker.traits.includes('DRIBBLE_WIZARD'),
       rng: this.rng,
     });
 
-    // En F11, el portero tiene achique posicional y cobertura del central (+3 bono defensivo del arco)
-    const defBonus = 3 + getAttributeModifier(defender.attributes.wisdom);
+    // En F11, el portero tiene achique posicional y cobertura del central (+4 bono defensivo del arco)
+    const defBonus = 4 + getAttributeModifier(defender.attributes.wisdom);
     const rollSave = rollD20(getAttributeModifier(keeper.attributes.dexterity) + defBonus, { rng: this.rng });
     const check = resolveContestedCheck(rollShot, rollSave);
 
@@ -591,7 +695,8 @@ export class MatchEngine {
         zone: 'OPPONENT_BOX',
         diceCheck: rollShot,
         contestedCheck: check,
-        commentary: `⚽ ¡GOOOOOOL DE ${atk.name.toUpperCase()}! ${striker.name} fusila las redes (Tirada D20: ${rollShot.total} ${rollShot.isCritical ? '¡NAT 20 CRÍTICO!' : ''}).`,
+        decision,
+        commentary: `⚽ ¡GOOOOOOL DE ${atk.name.toUpperCase()}! ${striker.name} culmina la jugada con ${chosen.label.toLowerCase()} (Tirada D20: ${rollShot.total} ${rollShot.isCritical ? '¡NAT 20 CRÍTICO!' : ''}).`,
         score: { ...this.state.score },
       });
     } else {
@@ -607,7 +712,8 @@ export class MatchEngine {
         secondaryPlayer: striker,
         zone: 'OWN_BOX',
         contestedCheck: check,
-        commentary: `¡PARADÓN! El guardameta ${keeper.name} salva el gol bajo palos y asegura el esférico en su área.`,
+        decision,
+        commentary: `¡PARADÓN! El guardameta ${keeper.name} salva el gol bajo palos ante el intento de ${striker.name} (${chosen.label.toLowerCase()}).`,
         score: { ...this.state.score },
       });
     }
